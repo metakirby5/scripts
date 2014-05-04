@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# chat
+# Author: Ethan Chan
+# Date: 5/4/14
+#
+# A script to emulate a multi-person chatroom using write.
+
+echo
+
+if [[ $# == 0 ]]; then
+	echo "Sets up multi-way write with timestamp and handle."
+	echo "Usage: chat [your name] [user1] [user2] [...]"
+	echo
+	echo "Available users:"
+	finger
+	echo
+	exit 1
+fi
+
+if [[ $# < 2 ]]; then
+	echo "ERROR: Missing recipients!"
+	error=1
+fi
+
+handle=$1
+shift
+
+# Process additional args
+while [[ $# > 0 ]]; do
+	if [[ ! $(finger | grep ^$1) ]]; then
+		echo "ERROR: User $1 not found!"
+		error=1
+	fi
+	people="$people >(write $1)"
+	shift
+done
+
+if [[ $error ]]; then
+	echo
+	echo "Error(s) encountered, aborting..."
+	echo
+	exit $error
+fi
+
+echo "Now chatting!"
+
+# Eval because process substitution is stupid. Need to use fflsuh with awk
+# so the messages come through instantly, rather than at EOF.
+eval "cat | awk '{ print strftime(\"[%H:%M:%S]\"), \"$handle: \" \$0;\
+	fflush(); }' | tee$people > /dev/null"
