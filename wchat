@@ -9,9 +9,10 @@
 echo
 
 if [[ $# == 0 ]]; then
-	echo "Sets up multi-way write with timestamp and handle."
-	echo "See available users using \"$ finger\"."
-	echo "Usage: chat [your name] [user1 [pts/XXX]] [user2 [pts/XXX]] [...]"
+	echo "Usage: wchat [your name] [user1 (pts/XXX)] (user2 (pts/XXX)) (...)"
+	echo "    Sets up multi-way write with timestamp and handle."
+	echo "    See available users using:"
+	echo "        $ finger"
 	echo
 	exit 1
 fi
@@ -63,7 +64,7 @@ if [[ $error ]]; then
 	exit $error
 fi
 
-echo "Now chatting!"
+echo "====================Now chatting!===================="
 
 # Eval because process substitution is stupid. Need to use fflsuh with awk
 # so the messages come through instantly, rather than at EOF.
