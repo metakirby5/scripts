@@ -6,15 +6,20 @@
 #
 # A script to emulate a multi-person chatroom using write.
 
+usage() {
+	echo "Usage: wchat [your name] [user1 (pts/XXX)] (user2 (pts/XXX)) (...)"
+	echo
+}
+
 echo
 
 if [[ $# == 0 ]]; then
-	echo "Usage: wchat [your name] [user1 (pts/XXX)] (user2 (pts/XXX)) (...)"
+	usage
 	echo "    Sets up multi-way write with timestamp and handle."
 	echo "    See available users using:"
 	echo "        $ finger"
 	echo
-	exit 1
+	exit 0
 fi
 
 if [[ $# < 2 ]]; then
@@ -28,23 +33,34 @@ shift
 # Process additional args
 while [[ $# > 0 ]]; do
 
-	# Process pts
+	# Process tty
 	if [[ $1 =~ ^pts/ ]]; then
 		rmtail=${people%%)}
 		person=${rmtail##* }
-		if [[ $(finger | grep ^$person | grep $1) ]]; then
-			people="$rmtail $1)"
-		else
-			if [[ $person =~ ^pts/ ]]; then
-				rmhead=${people##*write }
-				realperson=${rmhead%%[ )]*}
-				echo "ERROR: multiple tty per user not supported!"
-				echo "       Context: $realperson $person $1"
+
+		# Is there even a person to give the tty?
+		if [[ $person ]]; then
+
+			# Is that person online?
+			if [[ $(finger | grep ^$person | grep $1) ]]; then
+				people="$rmtail $1)"
 			else
-				echo "ERROR: tty $1 not found for user $person!"
+				# What kind of mistake did the user make?
+				if [[ $person =~ ^pts/ ]]; then
+					rmhead=${people##*write }
+					realperson=${rmhead%%[ )]*}
+					echo "ERROR: multiple tty per user not supported!"
+					echo "       Context: $realperson $person $1"
+				else
+					echo "ERROR: tty $1 not found for user $person!"
+				fi
+				error=1
 			fi
+		else
+			echo "ERROR: No user to assign tty $1 to!"
 			error=1
 		fi
+
 	# Process user
 	else
 		if [[ $(finger | grep ^$1) ]]; then
@@ -61,6 +77,7 @@ if [[ $error ]]; then
 	echo
 	echo "Error(s) encountered, aborting..."
 	echo
+	usage
 	exit $error
 fi
 
