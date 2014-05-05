@@ -67,5 +67,5 @@ echo "Now chatting!"
 
 # Eval because process substitution is stupid. Need to use fflsuh with awk
 # so the messages come through instantly, rather than at EOF.
-eval "cat | awk '{ print strftime(\"[%H:%M:%S]\"), \"$handle: \" \$0;\
+eval "cat | awk '{ print \n, strftime(\"[%H:%M:%S]\"), \"$handle: \" \$0;\
 	fflush(); }' | tee$people > /dev/null"
