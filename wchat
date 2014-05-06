@@ -88,7 +88,7 @@ echo "Chatting with:$HRPeople"
 # Eval because process substitution is stupid. Need to use fflsuh with awk
 # so the messages come through instantly, rather than at EOF.
 eval "cat | awk '{ \
-	print ((NR == 1) ?\"\nChatting with:$HRPeople\n\n\" : \"\n\"), \
+	print ((NR == 1) ?\"\nChatting with: $USER$HRPeople\n\n\" : \"\n\"), \
 	strftime(\"[%H:%M:%S]\"), \"$handle: \" \$0;\
 	fflush();\
 }' | tee$people > /dev/null"
