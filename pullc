@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# pullc
+# Author: Ethan Chan
+# Date: 5/5/14
+#
+# A script to pull my git-maintained configs.
+
+# Pulls the directory provided as arg 1.
+pull_dir() {
+	if [[ -d $1 ]]; then
+		if [[ -d $1/.git ]]; then
+			cd $1
+		else
+			echo "ERROR: $1 is not a git repository"
+			echo
+			errors=$1 $errors
+			return
+		fi
+	else
+		echo "ERROR: $1 is not a directory"
+		echo
+		errors=$1 $errors
+		return
+	fi
+
+	echo "===Pulling $1..."
+	git pull
+	echo
+}
+
+echo
+
+pull_dir ~/bin
+pull_dir ~/dotfiles
+
+if [[ $errors ]]; then
+	echo "!!! FAILED TO PUSH:$errors"
+	echo
+fi

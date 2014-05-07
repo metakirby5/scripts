@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# pushc
+# Author: Ethan Chan
+# Date: 5/5/14
+#
+# A script to push my git-maintained configs.
+
+# Pushes the directory provided as arg 1.
+push_dir() {
+	if [[ -d $1 ]]; then
+		if [[ -d $1/.git ]]; then
+			cd $1
+		else
+			echo "ERROR: $1 is not a git repository"
+			echo
+			errors=$1 $errors
+			return
+		fi
+	else
+		echo "ERROR: $1 is not a directory"
+		echo
+		errors=$1 $errors
+		return
+	fi
+
+	echo "===Pushing $1..."
+	if [[ $(git diff) ]]; then
+		git st
+		echo
+		echo "Please enter commit message."
+		read cmsg
+		if [[ $cmsg ]]; then
+			echo
+			git commit -a -m "$cmsg"
+			git push
+		else
+			echo "ERROR: No commit message entered."
+			echo
+			errors=$1 $errors
+			return
+		fi
+	else
+		echo "No updates to be made in $1."
+	fi
+	echo
+}
+
+echo
+
+push_dir ~/bin
+push_dir ~/dotfiles
+
+if [[ $errors ]]; then
+	echo "!!! FAILED TO PUSH:$errors"
+	echo
+fi
