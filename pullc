@@ -14,13 +14,13 @@ pull_dir() {
 		else
 			echo "ERROR: $1 is not a git repository"
 			echo
-			errors=$1 $errors
+			errors="$errors $1"
 			return
 		fi
 	else
 		echo "ERROR: $1 is not a directory"
 		echo
-		errors=$1 $errors
+		errors="$errors $1"
 		return
 	fi
 
@@ -30,6 +30,13 @@ pull_dir() {
 }
 
 echo
+
+# Make sure we have a vimundo directory.
+if [[ !-d ~/.vimUndo ]]; then
+	echo "Making .vimUndo directory..."
+	echo
+	mkdir ~/.vimUndo
+fi
 
 pull_dir ~/bin
 pull_dir ~/dotfiles

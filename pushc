@@ -14,13 +14,13 @@ push_dir() {
 		else
 			echo "ERROR: $1 is not a git repository"
 			echo
-			errors=$1 $errors
+			errors="$errors $1"
 			return
 		fi
 	else
 		echo "ERROR: $1 is not a directory"
 		echo
-		errors=$1 $errors
+		errors="$errors $1"
 		return
 	fi
 
@@ -37,7 +37,7 @@ push_dir() {
 		else
 			echo "ERROR: No commit message entered."
 			echo
-			errors=$1 $errors
+			errors="$errors $1"
 			return
 		fi
 	else
