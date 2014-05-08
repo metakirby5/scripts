@@ -32,7 +32,7 @@ pull_dir() {
 echo
 
 # Make sure we have a vimundo directory.
-if [[ !-d ~/.vimUndo ]]; then
+if [[ ! -d ~/.vimUndo ]]; then
 	echo "Making .vimUndo directory..."
 	echo
 	mkdir ~/.vimUndo
