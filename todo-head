@@ -1,0 +1,3 @@
+#!/bin/bash
+
+if [[ $(cat ~/todo) ]]; then head -n1 ~/todo; else echo "☺"; fi
