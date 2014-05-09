@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# todo
+# Author: Ethan Chan
+# Date: 5/8/14
+#
+# A script to manage my todo list.
+
+todofile=~/todo
+historyfile=~/.todoHistory
+
+str_usage="Usage: todo [p|up|u|q|l|h] [task]"
+str_notask="ERROR: No task provided!"
+str_badarg="ERROR: Bad argument!"
+
+# Pops from $1 onto $2
+pu() {
+	if [[ $(cat $1) ]]; then
+		if [[ $(cat $2) ]]; then
+			sed -i "1i $(head -n1 $1)" $2
+		else
+			head -n1 $1 > $2
+		fi
+		sed -i "1d" $1
+	else
+		echo "ERROR: File $1 empty!"
+	fi
+}
+
+if [[ ! -f $todofile ]]; then
+	echo "Creating $todofile..."
+	touch $todofile
+fi
+
+if [[ ! -f $historyfile ]]; then
+	echo "Creating $historyfile..."
+	touch $historyfile
+fi
+
+case "$1" in
+	e)
+		vim $todofile
+		;;
+	w)
+		cat > $todofile
+		;;
+	p)
+		pu $todofile $historyfile
+		;;
+	px)
+		sed -i "1d" $todofile
+		;;
+	up)
+		pu $historyfile $todofile
+		;;
+	u)
+		if [[ $2 ]]; then
+			if [[ $(cat $todofile) ]]; then
+				sed -i "1i $2" $todofile
+			else
+				echo "$2" > $todofile
+			fi
+		else
+			echo "$str_notask"
+		fi
+		;;
+	q)
+		if [[ $2 ]]; then
+			if [[ $(cat $todofile) ]]; then
+				echo "$2" >> $todofile
+			else
+				echo "$2" > $todofile
+			fi
+		else
+			echo "$str_notask"
+		fi
+		;;
+	l)
+		cat $todofile
+		;;
+	h)
+		cat $historyfile
+		;;
+	hx)
+		rm $historyfile
+		touch $historyfile
+		;;
+	"")
+		echo "$str_usage"
+		echo "    e - edit (with vim)"
+		echo "    w - write (with cat)"
+		echo "    p - pop"
+		echo "    px - pop (don't save in history)"
+		echo "    up - unpop"
+		echo "    u - push"
+		echo "    q - queue"
+		echo "    l - list"
+		echo "    h - history"
+		echo "    hx - clear history"
+		;;
+	*)
+		echo "$str_badarg"
+		echo "$str_usage"
+		;;
+esac
