@@ -9,7 +9,7 @@
 todofile=~/todo
 historyfile=~/.todoHistory
 
-str_usage="Usage: todo [p|up|u|q|l|h] [task]"
+str_usage="Usage: todo [p|up|u|q|l|h] (task | #)"
 str_notask="ERROR: No task provided!"
 str_badarg="ERROR: Bad argument!"
 
@@ -44,6 +44,9 @@ case "$1" in
 	w)
 		cat > $todofile
 		;;
+	x)
+		while [[ ! $(pu $todofile $historyfile) ]]; do :; done
+		;;
 	p)
 		pu $todofile $historyfile
 		;;
@@ -51,7 +54,9 @@ case "$1" in
 		sed -i "1d" $todofile
 		;;
 	up)
-		pu $historyfile $todofile
+		for i in $(seq 1 $2); do
+			pu $historyfile $todofile
+		done
 		;;
 	u)
 		if [[ $2 ]]; then
@@ -89,11 +94,12 @@ case "$1" in
 		echo "$str_usage"
 		echo "    e - edit (with vim)"
 		echo "    w - write (with cat)"
+		echo "    x - clear todo"
 		echo "    p - pop"
 		echo "    px - pop (don't save in history)"
-		echo "    up - unpop"
-		echo "    u - push"
-		echo "    q - queue"
+		echo "    up (#) - unpop # times (default 1)"
+		echo "    u [task] - push"
+		echo "    q [task] - queue"
 		echo "    l - list"
 		echo "    h - history"
 		echo "    hx - clear history"
