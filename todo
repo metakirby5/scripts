@@ -14,8 +14,8 @@ str_badarg="ERROR: Bad argument!"
 
 # Pops from $1 onto $popped
 pop() {
-	if [[ ! $1 ]]; then
-		echo "ERROR: No arg to pop from!"
+	if [[ ! -f $1 ]]; then
+		echo "ERROR: No file \"$1\" to pop from!"
 		error=1
 		return
 	fi
@@ -43,7 +43,7 @@ push() {
 	fi
 
 	if [[ ! -f $2 ]]; then
-		echo "ERROR: Could not push onto non-file $2!"
+		echo "ERROR: Could not push onto non-file \"$2\"!"
 		error=1
 		return
 	fi
@@ -68,7 +68,7 @@ queue() {
 	fi
 
 	if [[ ! -f $2 ]]; then
-		echo "ERROR: Could not push onto non-file $2!"
+		echo "ERROR: Could not push onto non-file \"$2\"!"
 		error=1
 		return
 	fi
@@ -77,6 +77,32 @@ queue() {
 		echo "$1" >> $todofile
 	else
 		echo "$1" > $todofile
+	fi
+
+	error=
+	return
+}
+
+# Echoes first $2 lines of $1
+# Default is 5
+top() {
+	if [[ ! $1 ]]; then
+		echo "ERROR: No file \"$1\" to top from!"
+		error=1
+		return
+	fi
+
+	if [[ $2 ]]; then
+		numlines=$2
+	else
+		numlines=5
+	fi
+
+	head -n $numlines $1
+
+	# if more than 5 lines ...
+	if [[ $(wc -l $1 | cut -d " " -f 1) -gt $numlines ]]; then
+		echo "..."
 	fi
 
 	error=
@@ -106,25 +132,31 @@ case "$1" in
 		;;
 	p)
 		for i in $(seq 1 $2); do
-			pop $todofile
+			pop $todofile > /dev/null
 			if [[ ! $error ]]; then
 				push "$popped" $historyfile
 			else
+				echo "End of todo reached, popped $(($i-1)) total."
 				break
 			fi
 		done
 		;;
 	px)
 		for i in $(seq 1 $2); do
-			pop $todofile
+			pop $todofile > /dev/null
+			if [[ $error ]]; then
+				echo "End of todo reached, deleted $(($i-1)) total."
+				break
+			fi
 		done
 		;;
 	up)
 		for i in $(seq 1 $2); do
-			pop $historyfile
+			pop $historyfile > /dev/null
 			if [[ ! $error ]]; then
 				push "$popped" $todofile
 			else
+				echo "End of todo reached, unpopped $(($i-1)) total."
 				break
 			fi
 		done
@@ -142,21 +174,10 @@ case "$1" in
 		done
 		;;
 	l)
-		if [[ $2 ]]; then
-			numlines=$2
-		else
-			numlines=5
-		fi
-
-		head -n $numlines $todofile
-
-		# if more than 5 lines ...
-		if [[ $(wc -l todo | cut -d " " -f 1) > $numlines ]]; then
-			echo "..."
-		fi
+		top $todofile $2
 		;;
 	h)
-		cat $historyfile
+		top $historyfile $2
 		;;
 	hx)
 		rm $historyfile
@@ -168,12 +189,12 @@ case "$1" in
 		echo "    w - write (with cat)"
 		echo "    x - clear todo"
 		echo "    p (#) - pop # times (default 1)"
-		echo "    px - pop # times, no history (default 1)"
+		echo "    px (#) - pop # times, no history (default 1)"
 		echo "    up (#) - unpop # times (default 1)"
-		echo "    u [task] - push"
-		echo "    q [task] - queue"
+		echo "    u [task] (task) (...) - push"
+		echo "    q [task] (task) (...) - queue"
 		echo "    l (#)- list first # lines of todo (default 5)"
-		echo "    h - history (reversed order for readability)"
+		echo "    h (#) - list first # lines of history (default 5)"
 		echo "    hx - clear history"
 		;;
 	*)
