@@ -10,21 +10,77 @@ todofile=~/todo
 historyfile=~/.todoHistory
 
 str_usage="Usage: todo [p|up|u|q|l|h] (task | #)"
-str_notask="ERROR: No task provided!"
 str_badarg="ERROR: Bad argument!"
 
-# Pops from $1 onto $2
-pu() {
+# Pops from $1 onto $popped
+pop() {
+	if [[ ! $1 ]]; then
+		echo "ERROR: No arg to pop from!"
+		error=1
+		return
+	fi
+
 	if [[ $(cat $1) ]]; then
-		if [[ $(cat $2) ]]; then
-			sed -i "1i $(head -n1 $1)" $2
-		else
-			head -n1 $1 > $2
-		fi
+		popped=$(head -n1 $1)
 		sed -i "1d" $1
+
+		error=
+		return
 	else
 		echo "ERROR: File $1 empty!"
+		error=1
+		return
 	fi
+}
+
+# Pushes $1 onto $2
+# $1 MUST be enclosed in quotes!
+push() {
+	if [[ ! $1 || ! $2 ]]; then
+		echo "ERROR: Not enough args for push!"
+		error=1
+		return
+	fi
+
+	if [[ ! -f $2 ]]; then
+		echo "ERROR: Could not push onto non-file $2!"
+		error=1
+		return
+	fi
+
+	if [[ $(cat $2) ]]; then
+		sed -i "1i $1" $2
+	else
+		echo "$1" > $2
+	fi
+
+	error=
+	return
+}
+
+# Queues $1 onto $2
+# $1 MUST be enclosed in quotes!
+queue() {
+	if [[ ! $1 || ! $2 ]]; then
+		echo "ERROR: Not enough args for queue!"
+		error=1
+		return
+	fi
+
+	if [[ ! -f $2 ]]; then
+		echo "ERROR: Could not push onto non-file $2!"
+		error=1
+		return
+	fi
+
+	if [[ $(cat $2) ]]; then
+		echo "$1" >> $todofile
+	else
+		echo "$1" > $todofile
+	fi
+
+	error=
+	return
 }
 
 if [[ ! -f $todofile ]]; then
@@ -45,43 +101,59 @@ case "$1" in
 		cat > $todofile
 		;;
 	x)
-		while [[ ! $(pu $todofile $historyfile) ]]; do :; done
+		# no op until error
+		while [[ ! $(pop $todofile; push $popped $historyfile) ]]; do :; done
 		;;
 	p)
-		pu $todofile $historyfile
+		for i in $(seq 1 $2); do
+			pop $todofile
+			if [[ ! $error ]]; then
+				push "$popped" $historyfile
+			else
+				break
+			fi
+		done
 		;;
 	px)
-		sed -i "1d" $todofile
+		for i in $(seq 1 $2); do
+			pop $todofile
+		done
 		;;
 	up)
 		for i in $(seq 1 $2); do
-			pu $historyfile $todofile
+			pop $historyfile
+			if [[ ! $error ]]; then
+				push "$popped" $todofile
+			else
+				break
+			fi
 		done
 		;;
 	u)
-		if [[ $2 ]]; then
-			if [[ $(cat $todofile) ]]; then
-				sed -i "1i $2" $todofile
-			else
-				echo "$2" > $todofile
-			fi
-		else
-			echo "$str_notask"
-		fi
+		shift
+		for task in "$@"; do
+			push "$task" $todofile
+		done
 		;;
 	q)
-		if [[ $2 ]]; then
-			if [[ $(cat $todofile) ]]; then
-				echo "$2" >> $todofile
-			else
-				echo "$2" > $todofile
-			fi
-		else
-			echo "$str_notask"
-		fi
+		shift
+		for task in "$@"; do
+			queue "$task" $todofile
+		done
 		;;
 	l)
-		cat $todofile
+		if [[ $2 ]]; then
+			numlines=$2
+		else
+			numlines=5
+		fi
+
+		head -n $numlines $todofile
+
+		# if more than 5 lines ...
+		if [[ $(wc -l todo | cut -d " " -f 1) > $numlines ]]; then
+			echo "..."
+		fi
 		;;
 	h)
 		cat $historyfile
@@ -95,13 +167,13 @@ case "$1" in
 		echo "    e - edit (with vim)"
 		echo "    w - write (with cat)"
 		echo "    x - clear todo"
-		echo "    p - pop"
-		echo "    px - pop (don't save in history)"
+		echo "    p (#) - pop # times (default 1)"
+		echo "    px - pop # times, no history (default 1)"
 		echo "    up (#) - unpop # times (default 1)"
 		echo "    u [task] - push"
 		echo "    q [task] - queue"
-		echo "    l - list"
-		echo "    h - history"
+		echo "    l (#)- list first # lines of todo (default 5)"
+		echo "    h - history (reversed order for readability)"
 		echo "    hx - clear history"
 		;;
 	*)
