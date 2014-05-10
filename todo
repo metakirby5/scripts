@@ -98,11 +98,15 @@ top() {
 		numlines=5
 	fi
 
-	head -n $numlines $1
+	if [[ $2 == "max" ]]; then
+		cat $1
+	else
+		head -n $numlines $1
 
-	# if more than 5 lines ...
-	if [[ $(wc -l $1 | cut -d " " -f 1) -gt $numlines ]]; then
-		echo "..."
+		# if more than $numlines lines ...
+		if [[ $(wc -l $1 | cut -d " " -f 1) -gt $numlines ]]; then
+			echo "..."
+		fi
 	fi
 
 	error=
@@ -193,8 +197,8 @@ case "$1" in
 		echo "    up (#) - unpop # times (default 1)"
 		echo "    u [task] (task) (...) - push"
 		echo "    q [task] (task) (...) - queue"
-		echo "    l (#)- list first # lines of todo (default 5)"
-		echo "    h (#) - list first # lines of history (default 5)"
+		echo "    l (# | max)- list first # lines of todo (default 5)"
+		echo "    h (# | max) - list first # lines of history (default 5)"
 		echo "    hx - clear history"
 		;;
 	*)
