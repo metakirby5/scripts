@@ -9,7 +9,7 @@
 todofile=~/todo
 historyfile=~/.todoHistory
 
-str_usage="Usage: todo [p|up|u|q|l|h] (task | #)"
+str_usage="Usage: todo [e|w|p|px|up|u|q|l|h|x|hx] (task(s) | #)"
 
 # Pops from $1 onto $popped ("return value")
 pop() {
@@ -191,7 +191,6 @@ case "$1" in
 		echo "$str_usage"
 		echo "    e - edit (with vim)"
 		echo "    w - write (with cat)"
-		echo "    x - clear todo"
 		echo "    p (#) - pop # times (default 1)"
 		echo "    px (#) - pop # times, no history (default 1)"
 		echo "    up (#) - unpop # times (default 1)"
@@ -199,6 +198,7 @@ case "$1" in
 		echo "    q [task] (task) (...) - queue"
 		echo "    l (# | max)- list first # lines of todo (default 5)"
 		echo "    h (# | max) - list first # lines of history (default 5)"
+		echo "    x - clear todo"
 		echo "    hx - clear history"
 		;;
 	*)
