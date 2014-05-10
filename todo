@@ -10,9 +10,8 @@ todofile=~/todo
 historyfile=~/.todoHistory
 
 str_usage="Usage: todo [p|up|u|q|l|h] (task | #)"
-str_badarg="ERROR: Bad argument!"
 
-# Pops from $1 onto $popped
+# Pops from $1 onto $popped ("return value")
 pop() {
 	if [[ ! -f $1 ]]; then
 		echo "ERROR: No file \"$1\" to pop from!"
@@ -33,7 +32,7 @@ pop() {
 	fi
 }
 
-# Pushes $1 onto $2
+# Pushes $1 onto $2 (file)
 # $1 MUST be enclosed in quotes!
 push() {
 	if [[ ! $1 || ! $2 ]]; then
@@ -58,7 +57,7 @@ push() {
 	return
 }
 
-# Queues $1 onto $2
+# Queues $1 onto $2 (file)
 # $1 MUST be enclosed in quotes!
 queue() {
 	if [[ ! $1 || ! $2 ]]; then
@@ -84,6 +83,7 @@ queue() {
 }
 
 # Echoes first $2 lines of $1
+# "max" is an acceptable # of lines
 # Default is 5
 top() {
 	if [[ ! $1 ]]; then
@@ -202,7 +202,7 @@ case "$1" in
 		echo "    hx - clear history"
 		;;
 	*)
-		echo "$str_badarg"
+		echo "ERROR: Bad argument!"
 		echo "$str_usage"
 		;;
 esac
