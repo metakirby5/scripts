@@ -9,7 +9,7 @@
 todofile=~/todo
 historyfile=~/.todoHistory
 
-str_usage="Usage: todo [e|w|p|px|up|u|q|l|h|x|hx] (task(s) | #)"
+str_usage="Usage: todo [e|w|p|pq|px|up|u|q|l|h|x|hx] (task(s) | #)"
 
 # Pops from $1 onto $popped ("return value")
 pop() {
@@ -147,6 +147,17 @@ case "$1" in
 			fi
 		done
 		;;
+	pq)
+		for i in $(seq 1 $2); do
+			pop $todofile > /dev/null
+			if [[ ! $error ]]; then
+				queue "$popped" $todofile
+			else
+				echo "End of todo reached, re-queued $(($i-1)) total."
+				break
+			fi
+		done
+		;;
 	px)
 		for i in $(seq 1 $2); do
 			pop $todofile > /dev/null
@@ -209,6 +220,7 @@ case "$1" in
 		echo "    e - edit (with vim)"
 		echo "    w - write (with cat)"
 		echo "    p (#) - pop # times (default 1)"
+		echo "    pq (#) - pop and re-queue # times (default 1)"
 		echo "    px (#) - pop # times, no history (default 1)"
 		echo "    up (#) - unpop # times (default 1)"
 		echo "    u [task] (task) (...) - push"
