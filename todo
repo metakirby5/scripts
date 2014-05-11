@@ -35,7 +35,7 @@ pop() {
 # Pushes $1 onto $2 (file)
 # $1 MUST be enclosed in quotes!
 push() {
-	if [[ ! $1 || ! $2 ]]; then
+	if [[ $# -lt 2 ]]; then
 		echo "ERROR: Not enough args for push!"
 		error=1
 		return
@@ -60,30 +60,26 @@ push() {
 # Queues $1 onto $2 (file)
 # $1 MUST be enclosed in quotes!
 queue() {
-	if [[ ! $1 || ! $2 ]]; then
+	if [[ $# -lt 2 ]]; then
 		echo "ERROR: Not enough args for queue!"
 		error=1
 		return
 	fi
 
 	if [[ ! -f $2 ]]; then
-		echo "ERROR: Could not push onto non-file \"$2\"!"
+		echo "ERROR: Could not queue onto non-file \"$2\"!"
 		error=1
 		return
 	fi
 
-	if [[ $(cat $2) ]]; then
-		echo "$1" >> $todofile
-	else
-		echo "$1" > $todofile
-	fi
+	echo "$1" >> $todofile
 
 	error=
 	return
 }
 
 # Echoes first $2 lines of $1
-# "max" is an acceptable # of lines
+# "all" is an acceptable # of lines
 # Default is 5
 top() {
 	if [[ ! $1 ]]; then
@@ -98,7 +94,7 @@ top() {
 		numlines=5
 	fi
 
-	if [[ $2 == "max" ]]; then
+	if [[ $2 == "all" ]]; then
 		cat $1
 	else
 		head -n $numlines $1
@@ -131,8 +127,14 @@ case "$1" in
 		cat > $todofile
 		;;
 	x)
-		# no op until error
-		while [[ ! $(pop $todofile; push $popped $historyfile) ]]; do :; done
+		while [[ ! $error ]]; do
+			pop $todofile > /dev/null
+			if [[ ! $error ]]; then
+				push "$popped" $historyfile
+			else
+				break
+			fi
+		done
 		;;
 	p)
 		for i in $(seq 1 $2); do
@@ -167,12 +169,22 @@ case "$1" in
 		;;
 	u)
 		shift
+		if [[ $# -lt 1 ]]; then
+			echo "ERROR: No tasks provided!"
+			exit 1
+		fi
+
 		for task in "$@"; do
 			push "$task" $todofile
 		done
 		;;
 	q)
 		shift
+		if [[ $# -lt 1 ]]; then
+			echo "ERROR: No tasks provided!"
+			exit 1
+		fi
+
 		for task in "$@"; do
 			queue "$task" $todofile
 		done
@@ -184,8 +196,13 @@ case "$1" in
 		top $historyfile $2
 		;;
 	hx)
-		rm $historyfile
-		touch $historyfile
+		read -n 1 -p "Really clear history? [y/n]: " input
+		echo
+		if [[ $input =~ [yY] ]]; then
+			echo "Clearing history..."
+			rm $historyfile
+			touch $historyfile
+		fi
 		;;
 	"")
 		echo "$str_usage"
@@ -196,8 +213,8 @@ case "$1" in
 		echo "    up (#) - unpop # times (default 1)"
 		echo "    u [task] (task) (...) - push"
 		echo "    q [task] (task) (...) - queue"
-		echo "    l (# | max)- list first # lines of todo (default 5)"
-		echo "    h (# | max) - list first # lines of history (default 5)"
+		echo "    l (# | all)- list first # lines of todo (default 5)"
+		echo "    h (# | all) - list first # lines of history (default 5)"
 		echo "    x - clear todo"
 		echo "    hx - clear history"
 		;;
