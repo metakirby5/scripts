@@ -6,10 +6,13 @@
 #
 # A script to manage my todo list.
 
+shopt -s extglob	# For case pattern matching
+
 todofile=~/todo
 historyfile=~/.todoHistory
 
-str_usage="Usage: todo [e|w|p|pq|px|up|u|q|l|h|x|hx] (task(s) | #)"
+todolen=$(wc -l $todofile | cut -d" " -f1)
+str_usage="Usage: todo [e|w|p|p#|pq|px|up|u|u#|q|l|la|h|ha|x|hx] (task(s) | #)"
 
 # Pops from $1 onto $popped ("return value")
 pop() {
@@ -37,6 +40,12 @@ pop() {
 push() {
 	if [[ $# -lt 2 ]]; then
 		echo "ERROR: Not enough args for push!"
+		error=1
+		return
+	fi
+
+	if [[ ! $1 ]]; then
+		echo "ERROR: Nothing to push!"
 		error=1
 		return
 	fi
@@ -167,6 +176,36 @@ case "$1" in
 			fi
 		done
 		;;
+	p+([1-9]))
+		pnum=$(echo "$1" | cut -c2-)
+		if [[ $pnum -gt $todolen ]]; then
+			echo "ERROR: Index out of bounds!"
+			echo "       Tried to pop line $pnum/$todolen."
+			exit 1
+		fi
+
+		# Get things out of the way
+		$0 p $(($pnum-1))
+
+		# Pop range
+		for i in $(seq 1 $2); do
+			pop $todofile > /dev/null
+			if [[ ! $error ]]; then
+				to_repush="$popped $to_repush"
+			else
+				echo "End of todo reached, popped $(($i-1)) total."
+				break
+			fi
+		done
+
+		# Put things back
+		$0 up $(($pnum-1))
+
+		# Push to history
+		for task in "$to_repush"; do
+			push "$task" $historyfile
+		done
+		;;
 	up)
 		for i in $(seq 1 $2); do
 			pop $historyfile > /dev/null
@@ -189,6 +228,24 @@ case "$1" in
 			push "$task" $todofile
 		done
 		;;
+	u+([1-9]))
+		pnum=$(echo "$1" | cut -c2-)
+		if [[ $pnum -gt $todolen ]]; then
+			echo "ERROR: Index out of bounds!"
+			echo "       Tried to push to line $pnum/$todolen."
+			exit 1
+		fi
+
+		# Get things out of the way
+		$0 p $(($pnum-1))
+
+		# Push the other args
+		shift
+		$0 u "$@"
+
+		# Put things back
+		$0 up $(($pnum-1))
+		;;
 	q)
 		shift
 		if [[ $# -lt 1 ]]; then
@@ -203,8 +260,14 @@ case "$1" in
 	l)
 		top $todofile $2
 		;;
+	la)
+		top $todofile all
+		;;
 	h)
 		top $historyfile $2
+		;;
+	ha)
+		top $historyfile all
 		;;
 	hx)
 		read -n 1 -p "Really clear history? [y/n]: " input
@@ -220,13 +283,17 @@ case "$1" in
 		echo "    e - edit (with vim)"
 		echo "    w - write (with cat)"
 		echo "    p (#) - pop # times (default 1)"
+		echo "    p% (#) - pop the %th line # times (default 1)"
 		echo "    pq (#) - pop and re-queue # times (default 1)"
 		echo "    px (#) - pop # times, no history (default 1)"
 		echo "    up (#) - unpop # times (default 1)"
 		echo "    u [task] (task) (...) - push"
+		echo "    u% [task] (task) (...) - push at %th line"
 		echo "    q [task] (task) (...) - queue"
-		echo "    l (# | all)- list first # lines of todo (default 5)"
+		echo "    l (# | all) - list first # lines of todo (default 5)"
+		echo "    la - shortcut for 'l all'"
 		echo "    h (# | all) - list first # lines of history (default 5)"
+		echo "    ha - shortcut for 'h all'"
 		echo "    x - clear todo"
 		echo "    hx - clear history"
 		;;
