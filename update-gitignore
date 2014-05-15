@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# update-gitignore
+#
+# A command to update the .gitignore with all currently untracked files.
+
+echo $(git status --porcelain | grep '^??' | cut -c4-) >> .gitignore
