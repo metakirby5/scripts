@@ -90,8 +90,15 @@ queue() {
 # Echoes first $2 lines of $1
 # "all" is an acceptable # of lines
 # Default is 5
+#
+# If you want to use line numbers, make $1 = -n and shift everything over
 top() {
-	if [[ ! $1 ]]; then
+    if [[ $1 == "-n" ]]; then
+        catargs="-n"
+        shift
+    fi
+
+	if [[ ! -f $1 ]]; then
 		echo "ERROR: No file \"$1\" to top from!"
 		error=1
 		return
@@ -104,13 +111,13 @@ top() {
 	fi
 
 	if [[ $2 == "all" ]]; then
-		cat $1
+		cat $catargs $1
 	else
-		head -n $numlines $1
+		cat $catargs $1 | head -n $numlines
 
 		# if more than $numlines lines ...
 		if [[ $(wc -l $1 | cut -d " " -f 1) -gt $numlines ]]; then
-			echo "..."
+			echo "   ..."
 		fi
 	fi
 
@@ -258,16 +265,16 @@ case "$1" in
 		done
 		;;
 	l)
-		top $todofile $2
+		top -n $todofile $2
 		;;
 	la)
-		top $todofile all
+		top -n $todofile all
 		;;
 	h)
-		top $historyfile $2
+		top -n $historyfile $2
 		;;
 	ha)
-		top $historyfile all
+		top -n $historyfile all
 		;;
 	hx)
 		read -n 1 -p "Really clear history? [y/n]: " input
