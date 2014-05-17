@@ -1,12 +1,17 @@
 #!/bin/bash
 
-if [[ $# < 3 ]]; then
+if [[ $# < 4 ]]; then
 	echo
-	echo "tester's all test cases found in provided files."
-	echo "Usage: multitest [local prog] [solution prog] [test case files]"
+	echo "tester's all test cases found in provided files, with provided inputs."
+	echo "Usage: multitest [inputs] [local prog] [solution prog] [test case files]"
 	echo
 	exit 1
 fi
+
+while [[ ! -x "$1" ]]; do
+    input="$1 $input"
+    shift
+done
 
 loc=$1
 shift
@@ -17,7 +22,9 @@ while [[ $# > 0 ]]; do
 	if [[ -f $1 ]]; then
 		while read line; do
 			if [[ `echo $line | grep -v ^//` ]]; then
-				testernovim $loc $soln $line
+                for i in $input; do
+                    testernovim $i $loc $soln $line
+                done
 			fi
 		done < $1
 	else
