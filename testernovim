@@ -32,9 +32,9 @@ cat $input | $soln$args >& $testdir/solution.out
 cd $testdir
 if [[ $(diff local.out solution.out) ]]; then
 	echo
-	echo "!!! DIFFERENCE FOUND FOR $loc$args"
+	echo "!!! DIFFERENCE FOUND FOR cat $input | $loc$args"
 	diff local.out solution.out
 else
 	echo
-	echo "No differences for $loc$args"
+	echo "No differences for cat $input | $loc$args"
 fi
