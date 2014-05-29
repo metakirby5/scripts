@@ -6,7 +6,8 @@
 #
 # A script to manage my todo list.
 
-shopt -s extglob	# For case pattern matching
+shopt -s extglob		# For case pattern matching
+numexp='^[0-9]+$'		# Pattern to match a number
 
 todofile=~/todo
 historyfile=~/.todoHistory
@@ -153,6 +154,11 @@ case "$1" in
 		done
 		;;
 	p)
+		if ! [[ $2 =~ $numexp ]]; then
+			echo "ERROR: Arg not a number!"
+			return 1;
+		fi
+
 		for i in $(seq 1 $2); do
 			pop $todofile > /dev/null
 			if [[ ! $error ]]; then
@@ -164,6 +170,11 @@ case "$1" in
 		done
 		;;
 	pq)
+		if ! [[ $2 =~ $numexp ]]; then
+			echo "ERROR: Arg not a number!"
+			return 1;
+		fi
+
 		for i in $(seq 1 $2); do
 			pop $todofile > /dev/null
 			if [[ ! $error ]]; then
@@ -175,6 +186,11 @@ case "$1" in
 		done
 		;;
 	px)
+		if ! [[ $2 =~ $numexp ]]; then
+			echo "ERROR: Arg not a number!"
+			return 1;
+		fi
+
 		for i in $(seq 1 $2); do
 			pop $todofile > /dev/null
 			if [[ $error ]]; then
@@ -184,6 +200,11 @@ case "$1" in
 		done
 		;;
 	p+([1-9]))
+		if ! [[ $2 =~ $numexp ]]; then
+			echo "ERROR: Arg not a number!"
+			return 1;
+		fi
+
 		pnum=$(echo "$1" | cut -c2-)
 		if [[ $pnum -gt $todolen ]]; then
 			echo "ERROR: Index out of bounds!"
@@ -214,6 +235,11 @@ case "$1" in
 		done
 		;;
 	up)
+		if ! [[ $2 =~ $numexp ]]; then
+			echo "ERROR: Arg not a number!"
+			return 1;
+		fi
+
 		for i in $(seq 1 $2); do
 			pop $historyfile > /dev/null
 			if [[ ! $error ]]; then
