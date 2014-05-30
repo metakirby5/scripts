@@ -154,9 +154,9 @@ case "$1" in
 		done
 		;;
 	p)
-		if ! [[ $2 =~ $numexp ]]; then
+		if [[ $2 && ! $2 =~ $numexp ]]; then
 			echo "ERROR: Arg not a number!"
-			return 1;
+			exit 1
 		fi
 
 		for i in $(seq 1 $2); do
@@ -170,9 +170,9 @@ case "$1" in
 		done
 		;;
 	pq)
-		if ! [[ $2 =~ $numexp ]]; then
+		if [[ $2 && ! $2 =~ $numexp ]]; then
 			echo "ERROR: Arg not a number!"
-			return 1;
+			exit 1
 		fi
 
 		for i in $(seq 1 $2); do
@@ -186,9 +186,9 @@ case "$1" in
 		done
 		;;
 	px)
-		if ! [[ $2 =~ $numexp ]]; then
+		if [[ $2 && ! $2 =~ $numexp ]]; then
 			echo "ERROR: Arg not a number!"
-			return 1;
+			exit 1
 		fi
 
 		for i in $(seq 1 $2); do
@@ -200,9 +200,9 @@ case "$1" in
 		done
 		;;
 	p+([1-9]))
-		if ! [[ $2 =~ $numexp ]]; then
+		if [[ $2 && ! $2 =~ $numexp ]]; then
 			echo "ERROR: Arg not a number!"
-			return 1;
+			exit 1
 		fi
 
 		pnum=$(echo "$1" | cut -c2-)
@@ -235,9 +235,9 @@ case "$1" in
 		done
 		;;
 	up)
-		if ! [[ $2 =~ $numexp ]]; then
+		if [[ $2 && ! $2 =~ $numexp ]]; then
 			echo "ERROR: Arg not a number!"
-			return 1;
+			exit 1
 		fi
 
 		for i in $(seq 1 $2); do
