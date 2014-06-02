@@ -13,7 +13,7 @@ usage() {
 
 echo
 
-if [[ $# == 0 ]]; then
+if [[ $# -eq 0 ]]; then
 	usage
 	echo "    Sets up multi-way write with timestamp and handle."
 	echo "    See available users using:"
@@ -22,7 +22,7 @@ if [[ $# == 0 ]]; then
 	exit 0
 fi
 
-if [[ $# < 2 ]]; then
+if [[ $# -lt 2 ]]; then
 	echo "ERROR: Missing recipients!"
 	error=1
 fi
@@ -31,7 +31,7 @@ handle=$1
 shift
 
 # Process additional args
-while [[ $# > 0 ]]; do
+while [[ $# -gt 0 ]]; do
 
 	# Process tty
 	if [[ $1 =~ ^pts/ ]]; then

@@ -6,7 +6,7 @@
 #
 # A script to test input sets and args for coding assignments.
 
-if [[ $# < 3 ]]; then
+if [[ $# -lt 3 ]]; then
 	echo
 	echo "Vimdiffs assignments if differences exist."
 	echo "Usage: tester [input sets] [local prog] [solution prog] [args]"
@@ -27,7 +27,7 @@ shift
 soln=$1
 shift
 
-while [[ $# > 0 ]]; do
+while [[ $# -gt 0 ]]; do
 	args="$args $1"
 	shift
 done

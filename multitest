@@ -6,7 +6,7 @@
 #
 # A script to test input sets and arg sets for coding assignments.
 
-if [[ $# < 4 ]]; then
+if [[ $# -lt 4 ]]; then
 	echo
 	echo "tester's all test cases found in provided files, with provided inputs."
 	echo "Usage: multitest [input sets] [local prog] [solution prog] [arg sets]"
@@ -24,7 +24,7 @@ shift
 soln=$1
 shift
 
-while [[ $# > 0 ]]; do
+while [[ $# -gt 0 ]]; do
 	if [[ -f $1 ]]; then
 		while read line; do
 			if [[ `echo $line | grep -v ^//` ]]; then
