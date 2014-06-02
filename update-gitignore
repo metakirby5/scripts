@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # update-gitignore
+# Author: ???
+# Date: ???
 #
 # A command to update the .gitignore with all currently untracked files.
 
