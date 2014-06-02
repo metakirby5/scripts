@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# indicator-string
+# Author: Ethan Chan
+# Date: 2/6/14
+#
+# A script to concatenate what I want in my indicator.
+
+echo "$(todo-head)"
