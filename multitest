@@ -14,6 +14,8 @@ if [[ $# -lt 4 ]]; then
 	exit 1
 fi
 
+make
+
 while [[ ! -x "$1" ]]; do
     input="$1 $input"
     shift
