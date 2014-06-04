@@ -9,7 +9,7 @@
 if [[ $# -lt 3 ]]; then
 	echo
 	echo "tester's all test cases found in provided files, with provided inputs."
-	echo "Usage: multitest [input sets] [local prog] [solution prog] [arg sets]"
+	echo "Usage: multitest (input sets) [local prog] [solution prog] [arg sets]"
 	echo
 	exit 1
 fi
