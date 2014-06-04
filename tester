@@ -4,49 +4,86 @@
 # Author: Ethan Chan
 # Date: 2/6/14
 #
-# A script to test input sets and args for coding assignments.
-
-if [[ $# -lt 3 ]]; then
-	echo
-	echo "Vimdiffs assignments if differences exist."
-	echo "Usage: tester [input set] [local prog] [solution prog] (args)"
-	echo
-	exit 1
-fi
+# A script to test an input set and args for coding assignments.
 
 testdir=tester_files
+locfile=local.out
+solfile=solution.out
 
 if [[ ! -d $testdir ]]; then
 	mkdir $testdir
 fi
 
-input=$1
-shift
+# -v
+if [[ "$1" == "-v" ]]; then
+	diffmethod=vimdiff
+	shift
+else
+	diffmethod=diff
+fi
+
+# -o | -e
+case "$1" in
+	-o)
+		rd1=">"
+		rd2="2> /dev/null"
+		shift
+		;;
+	-e)
+		rd1="2>"
+		rd2="> /dev/null"
+		shift
+		;;
+	*)
+		rd1=">&"
+		;;
+esac
+
+# Input set
+if ! [[ -x "$1" ]]; then
+    input="cat $1 | "
+    shift
+fi
+
+if [[ $# -lt 2 ]]; then
+	echo
+	echo "Diffs program outputs if differences exist."
+	echo "Usage: tester (-v) (-o | -e) (input set) [local prog] [solution prog] (args)"
+	echo "    -v -- vimdiff instead of diff"
+	echo "    -o -- only test stdout"
+	echo "    -e -- only test stderr"
+	echo
+	exit 1
+fi
+
+# Progs
 loc=$1
 shift
-soln=$1
+sol=$1
 shift
 
+# Args
 while [[ $# -gt 0 ]]; do
 	args="$args $1"
 	shift
 done
 
-cat $input | $loc$args >& $testdir/local.out
-cat $input | $soln$args >& $testdir/solution.out
+eval "$input$loc$args $rd1 $testdir/$locfile $rd2"
+ecode_loc=$?
+eval "$input$sol$args $rd1 $testdir/$solfile $rd2"
+ecode_sol=$?
 
 cd $testdir
-if [[ $(diff local.out solution.out) ]]; then
+if [[ $(diff $locfile $solfile) ]]; then
 	echo
-	echo "!!! DIFFERENCE FOUND FOR cat $input | $loc$args"
-	vimdiff local.out solution.out
+	echo "!!! DIFFERENCE FOUND FOR $input$loc$args"
+	$diffmethod $locfile $solfile
 else
 	echo
-	echo "No differences for cat $input | $loc$args"
+	echo "No differences for $input$loc$args"
 fi
 
-if ! [[ $ecode_loc -eq $ecode_soln ]]; then
+if ! [[ $ecode_loc -eq $ecode_sol ]]; then
+	echo
 	echo "!!! EXIT CODES DIFFER!!!"
 fi
-
-echo
