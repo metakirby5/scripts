@@ -34,7 +34,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 cat $input | $loc$args >& $testdir/local.out
+ecode_loc=$?
 cat $input | $soln$args >& $testdir/solution.out
+ecode_soln=$?
 
 cd $testdir
 if [[ $(diff local.out solution.out) ]]; then
@@ -44,4 +46,8 @@ if [[ $(diff local.out solution.out) ]]; then
 else
 	echo
 	echo "No differences for cat $input | $loc$args"
+fi
+
+if ! [[ $ecode_loc -eq $ecode_soln ]]; then
+	echo "!!! EXIT CODES DIFFER!!!"
 fi

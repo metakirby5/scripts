@@ -45,4 +45,8 @@ else
 	echo "No differences for cat $input | $loc$args"
 fi
 
+if ! [[ $ecode_loc -eq $ecode_soln ]]; then
+	echo "!!! EXIT CODES DIFFER!!!"
+fi
+
 echo
