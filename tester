@@ -6,10 +6,10 @@
 #
 # A script to test input sets and args for coding assignments.
 
-if [[ $# -lt 2 ]]; then
+if [[ $# -lt 3 ]]; then
 	echo
 	echo "Vimdiffs assignments if differences exist."
-	echo "Usage: tester (input set) [local prog] [solution prog] (args)"
+	echo "Usage: tester [input set] [local prog] [solution prog] (args)"
 	echo
 	exit 1
 fi
