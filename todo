@@ -9,8 +9,8 @@
 shopt -s extglob		# For case pattern matching
 numexp='^[0-9]+$'		# Pattern to match a number
 
-todofile=~/todo
-historyfile=~/.todoHistory
+todofile=~/todo.txt
+historyfile=~/.todoHistory.txt
 
 todolen=$(wc -l $todofile | cut -d" " -f1)
 str_usage="Usage: todo [e|w|p|p#|pq|px|up|u|u#|q|l|la|h|ha|x|hx] (task(s) | #)"
