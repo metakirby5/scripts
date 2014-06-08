@@ -7,6 +7,6 @@
 # A script to echo the first line of my todo list, if any tasks exist.
 # Otherwise, a smiley is echoed.
 
-if [[ $(cat ~/todo) ]]; then head -n1 ~/todo; else echo "☺"; fi
+if [[ $(cat ~/todo.txt) ]]; then head -n1 ~/todo.txt; else echo "☺"; fi
 
 # ☺
