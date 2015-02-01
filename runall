@@ -1,0 +1,53 @@
+#!/bin/bash
+
+if [[ "$#" -ne 3 ]]; then
+	echo "Usage: runall [program] [base dir] [inputs]"
+	exit 0
+fi
+
+program=$1
+basedir="${2%/}/"
+inputs=$3
+
+if [[ ! -d "$basedir" ]]; then
+	echo "Base directory \"$basedir\" not a directory!"
+	error=1
+fi
+
+if [[ ! -f "$inputs" ]]; then
+	echo "Inputs \"$inputs\" not found!"
+	error=1
+fi
+
+if [[ "$error" ]]; then
+	echo "Exiting due to error(s)..."
+	exit $error
+fi
+
+while read -r line; do
+	file="$basedir$line"
+	if [[ ! -f "$file" ]]; then
+		echo "=== File \"$file\" not found! Skipping..."
+	else
+		cmd="$program $file"
+		read -p "Run \"$cmd\"? [y/n]: " -n 1 run < /dev/tty
+		wait
+		echo
+		if [[ ! "$run" =~ [yY] ]]; then
+			echo "=== Skipped \"$cmd\"."
+		else
+			echo "=== Running \"$cmd\"..."
+			$cmd < /dev/tty
+			wait
+		fi
+	fi
+	read -p "Continue? [y/n]: " -n 1 cont < /dev/tty
+	wait
+	echo
+	if [[ ! "$cont" =~ [yY] ]]; then
+		echo "User aborted."
+		exit 0
+	fi
+done < $inputs
+
+echo "All files run!"
