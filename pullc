@@ -42,6 +42,6 @@ pull_dir ~/bin
 pull_dir ~/dotfiles
 
 if [[ $errors ]]; then
-	echo "!!! FAILED TO PUSH:$errors"
+	echo "!!! FAILED TO PULL:$errors"
 	echo
 fi
