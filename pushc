@@ -48,7 +48,7 @@ push_dir() {
 
 echo
 
-push_dir ~/bin
+push_dir ~/code/bash-scripts
 push_dir ~/dotfiles
 
 if [[ $errors ]]; then
