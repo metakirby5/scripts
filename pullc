@@ -40,6 +40,7 @@ fi
 
 pull_dir ~/code/bash-scripts
 pull_dir ~/dotfiles
+source ~/.bashrc
 
 if [[ $errors ]]; then
 	echo "!!! FAILED TO PULL:$errors"
