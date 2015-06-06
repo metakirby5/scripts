@@ -1,22 +1,58 @@
 #!/bin/bash
 
+frameHeight=15
+((line = $(tput lines) - frameHeight - 1))
+nframes=2
+
+sdw() {
+  case "$1" in
+    "0")
+      echo "     _              __            "
+      echo "    / '\\  (~._    ./  )          "
+      echo "    \\__/ __'-_\\__/ ./           "
+      echo "   _ \\ \\/  \\   \\ |_    __     "
+      echo " (   )  \\__/ -^    \\  /  \\     "
+      echo "  \\_/ \"  \\  | o  o  | .. / __  "
+      echo "       \\\\. -' ====  /  || /  \\ "
+      echo "         \\   .  .  |---__.\\__/  "
+      echo "         /  :     /   |   |       "
+      echo "         /   :   /     \\_/       "
+      echo "      --/ ::    (                 "
+      echo "     (  |     (  (____            "
+      echo "   .--  .. ----**.____)           "
+      echo "   \\___/                         "
+      echo
+      ;;
+    "1")
+      echo "         __              _       "
+      echo "        (  \\.    _.~)  /' \\    "
+      echo "          \\. \\__/_-'__ \\__/   "
+      echo "      __    _| /   /  \\/ / _    "
+      echo "     /  \\  /    ^- \\__/  (   ) "
+      echo "  __ \\ .. |  o  o |  /  \" \\_/ "
+      echo " /  \\ ||  \\  ==== '- .//       "
+      echo " \\__/.__---|  .  .   /          "
+      echo "    |   |   \\     :  \\         "
+      echo "     \\_/     \\   :   \\        "
+      echo "              )    :: \\--       "
+      echo "         ____)  )     |  )       "
+      echo "        (____.**---- ..  --.     "
+      echo "                       \\___/    "
+      echo
+  esac
+}
+
 if [ $EUID -ne 0 ]; then
   echo "This is a weird tree."
 else
-  echo "     _              __"
-  echo "    / \`\\  (~._    ./  )"
-  echo "    \\__/ __\`-_\\__/ ./"
-  echo "   _ \\ \\/  \\   \\ |_    __"
-  echo " (   )  \\__/ -^    \\  /  \\"
-  echo "  \\_/ \"  \\  | o  o  | .. / __"
-  echo "       \\\\. -' ====  /  || /  \\ "
-  echo "         \\   .  .  |---__.\\__/"
-  echo "         /  :     /   |   |"
-  echo "         /   :   /     \\_/"
-  echo "      --/ ::    ("
-  echo "     (  |     (  (____"
-  echo "   .--  .. ----**.____)"
-  echo "   \\___/          "
-  echo
+  i=0
+  sdw $i
+  while true; do
+    tput cup $line 0
+    sdw $i
+    tput cup $(tput lines) 0
+    (( i = (i + 1) % nframes ))
+    sleep 0.5
+  done
 fi
 
