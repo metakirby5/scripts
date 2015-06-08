@@ -1,7 +1,8 @@
 #!/bin/bash
 
 frameHeight=15
-((line = $(tput lines) - frameHeight - 1))
+((botline = $(tput lines) - 1))
+((topline = botline - frameHeight))
 nframes=2
 
 sdw() {
@@ -48,9 +49,9 @@ else
   i=0
   sdw $i
   while true; do
-    tput cup $line 0
+    tput cup $topline 0
     sdw $i
-    tput cup $(tput lines) 0
+    tput cup $botline 0
     (( i = (i + 1) % nframes ))
     sleep 0.5
   done
