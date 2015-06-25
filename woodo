@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 frameHeight=15
 ((botline = $(tput lines) - 1))

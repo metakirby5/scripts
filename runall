@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ "$#" -lt 3 || "$#" -gt 4 ]]; then
 	echo "Usage: runall [program] [base dir] [inputs] (done extension)"
