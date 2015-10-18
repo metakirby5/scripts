@@ -1,0 +1,10 @@
+#!/bin/bash
+
+key=$(cat /dev/urandom | tr -dc a-zA-Z0-9 | head -c2)
+url="http://ix.io/$key"
+
+echo "Random snippet brought to you by $url"
+echo
+curl "$url" 2>/dev/null | fold | head
+echo
+echo '...'
