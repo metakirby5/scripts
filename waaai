@@ -3,7 +3,7 @@
 # Requires jq.
 
 usage() {
-  echo "USAGE: waaai [URL]"
+  echo "USAGE: waaai (-p) (-c CUSTOM_URL) [URL]"
   exit 1
 }
 
