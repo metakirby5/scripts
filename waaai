@@ -1,12 +1,39 @@
 #!/bin/bash
 # Shortens a URL via waa.ai.
+# Requires jq.
 
 usage() {
   echo "USAGE: waaai [URL]"
   exit 1
 }
 
+# http://stackoverflow.com/a/14203146
+OPTIND=1
+custom=false
+private=false
+
+while getopts "c:p" opt; do
+  case "$opt" in
+    c)
+      custom=$OPTARG
+      ;;
+    p)
+      private=true
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
 # Sanity checks
 [ "$#" -ne 1 ] && usage
 
-curl -sf "http://api.waa.ai/shorten?url=$1" | jq .data.url | tr -d '"'
+url="http://api.waa.ai/shorten?url=$1"
+if [ ! c = false ]; then
+  url="$url&custom=$custom"
+fi
+if [ ! p = false ]; then
+  url="$url&private=true"
+fi
+
+curl -sf "$url" | jq .data.url | tr -d '"'
