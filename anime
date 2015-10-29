@@ -1,7 +1,8 @@
 #!/bin/bash
+# Gentle encouragement with anime, brought to you by 1339.cf.
 
 anime="/tmp/anime.png"
 
-curl -L "http://1339.cf/grill.php" -o "$anime" &>/dev/null
+curl -sfL "http://1339.cf/grill.php" -o "$anime"
 notify-send -i "$anime" -a "1339.cf" "頑張れ！"
 

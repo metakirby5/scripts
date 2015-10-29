@@ -1,0 +1,12 @@
+#!/bin/bash
+# Shortens a URL via waa.ai.
+
+usage() {
+  echo "USAGE: waaai [URL]"
+  exit 1
+}
+
+# Sanity checks
+[ "$#" -ne 1 ] && usage
+
+curl -sf "http://api.waa.ai/shorten?url=$1" | jq .data.url | tr -d '"'
