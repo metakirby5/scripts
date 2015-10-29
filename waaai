@@ -29,10 +29,10 @@ shift $((OPTIND-1))
 [ "$#" -ne 1 ] && usage
 
 url="http://api.waa.ai/shorten?url=$1"
-if [ ! c = false ]; then
+if [ ! $custom = false ]; then
   url="$url&custom=$custom"
 fi
-if [ ! p = false ]; then
+if [ ! $private = false ]; then
   url="$url&private=true"
 fi
 
