@@ -28,8 +28,6 @@ initializeANSI()
 # note in this first use that switching colors doesn't require a reset
 # first - the new color overrides the old one.
 
-clear 
-
 initializeANSI
 
 cat << EOF

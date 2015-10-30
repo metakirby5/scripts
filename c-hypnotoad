@@ -17,10 +17,7 @@ my $purpleFG_blueBG = "\e[1;35;44m";
 
 my $end = "\e[0m";
 
-system("clear");
-
 print "
-
                ${blackFG_yellowBG},'${blackFG_redBG}`${blackFG_yellowBG}`.._${end}   ${blackFG_yellowBG},'${blackFG_redBG}`${end}${blackFG_yellowBG}`.${end}
               ${blackFG_yellowBG}:${blackFG_redBG},${yellowFG_blackBG}--.${end}${blackFG_redBG}_${blackFG_yellowBG}:)\\,:${blackFG_redBG},${yellowFG_blackBG}._,${end}${yellowFG_redBG}.${end}${blackFG_yellowBG}:${end}
               ${blackFG_yellowBG}:`-${yellowFG_blackBG}-${end}${blackFG_yellowBG},${blackFG_yellowBG}''${end}${redFG_yellowBG}@@\@${end}${blackFG_yellowBG}:`.${yellowFG_redBG}.${end}${blackFG_yellowBG}.';\\${end}        All Glory to
@@ -40,6 +37,5 @@ print "
              ${redFG_yellowBG}`-. `.`.${end}${blackFG_yellowBG}``-----``--${end}${redFG_yellowBG},@\@.'${end}
                ${redFG_yellowBG}|/`.\\`'${end}        ${redFG_yellowBG},',');${end}
                    ${redFG_yellowBG}`${end}         ${redFG_yellowBG}(/${end}  ${redFG_yellowBG}(/${end}
-
 
 ";

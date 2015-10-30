@@ -23,7 +23,6 @@ initializeANSI()
 initializeANSI
 
 cat << EOF
-
               ${reset}${blackf}|               |               |               |               |${reset}
    ${redf}█     █${reset}    ${blackf}|${reset}    ${greenf}█     █${reset}    ${blackf}|${reset}    ${yellowf}█     █${reset}    ${blackf}|${reset}    ${bluef}█     █${reset}    ${blackf}|${reset}    ${purplef}█     █${reset}    ${blackf}|${reset}    ${cyanf}█     █${reset}
    ${redf}███████${reset}    ${blackf}|${reset}    ${greenf}███████${reset}    ${blackf}|${reset}    ${yellowf}███████${reset}    ${blackf}|${reset}    ${bluef}███████${reset}    ${blackf}|${reset}    ${purplef}███████${reset}    ${blackf}|${reset}    ${cyanf}███████${reset}
