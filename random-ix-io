@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 key=$(cat /dev/urandom | tr -dc a-zA-Z0-9 | head -c2)
 url="http://ix.io/$key"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Original: http://frexx.de/xterm-256-notes/ [dead link 2013-11-21]
 #           http://frexx.de/xterm-256-notes/data/colortable16.sh [dead link 2013-11-21]
 # Modified by Aaron Griffin

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Gentle encouragement with anime, brought to you by 1339.cf.
 
 anime="/tmp/anime.png"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
   for f in {0..6}; do
     echo -en "\033[$((f+41))m\033[$((f+30))m██▓▒░"

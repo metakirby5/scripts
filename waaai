@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Shortens a URL via waa.ai.
 # Requires jq.
 
