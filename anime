@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Gentle encouragement with anime, brought to you by 1339.cf.
 
-anime="/tmp/anime.png"
+ANIME="$(mktemp).png"
+ANIME_WIDTH="250"
 
-curl -sfL "http://1339.cf/grill.php" -o "$anime"
-notify-send -i "$anime" -a "1339.cf" "頑張れ！"
+curl -sfL "http://1339.cf/grill.php" -o "$ANIME"
+convert "$ANIME" -resize "$ANIME_WIDTH" "$ANIME"
+notify-send -i "$ANIME" -a "1339.cf" "頑張れ！"
 
