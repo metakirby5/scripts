@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runs colorz2 on an image file to get 6 colors, then stuffs those colors
 # through wzk.
+# TODO: support image downloads
 
 # http://stackoverflow.com/a/13221491
 exists() {

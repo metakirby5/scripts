@@ -3,13 +3,14 @@
 # http://stackoverflow.com/questions/18710992/how-to-add-album-art-with-ffmpeg
 
 usage() {
-  echo "USAGE: add-art -i [image file] [music file(s)]"
+  echo "USAGE: add-art -i [image file / url] [music file(s)]"
   exit 1
 }
 
 # http://stackoverflow.com/a/14203146
 OPTIND=1
 image=""
+TMP=""
 
 while getopts "i:" opt; do
   case "$opt" in
@@ -22,22 +23,33 @@ done
 shift $((OPTIND-1))
 
 # Sanity checks
-[ ! -f "$image" ] && usage
 [ "$#" -lt 1 ] && usage
 
 for file in "$@"; do
   [ ! -f "$file" ] && usage
 done
 
-# Do the tagging
+if [ ! -f "$image" ]; then
+  [[ "$image" != http* ]] && usage
+
+  # Download the image to a temporary file
+  TMP="$(mktemp).${image##*.}"
+  curl "$image" -o "$TMP" 2>/dev/null || (echo "URL invalid." && exit 1)
+  image="$TMP"
+fi
+
 for file in "$@"; do
   OUT="$(mktemp).mp3"
 
+  # Do the tagging
   yes |\
     ffmpeg -i "$file" -i "$image" \
     -map 0:0 -map 1:0 -c copy -id3v2_version 3 \
     -metadata:s:v title="Album cover" \
     -metadata:s:v comment="Cover (Front)" "$OUT" 2>/dev/null &&\
   mv "$OUT" "$file"
+
+  # Clean up
+  [ -f "$TMP" ] && rm "$TMP"
 done
 
