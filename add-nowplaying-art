@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Add album art to currently playing in mpd
+
+usage() {
+  echo "USAGE: add-nowplaying-art [image file]"
+  exit 1
+}
+
+# Sanity checks
+[ "$#" -ne 1 ] && usage
+[ ! -f "$1" ] && usage
+
+add-art -i "$1" "${XDG_MUSIC_DIR%%/}/$(mpc current --format '%file%')"
+

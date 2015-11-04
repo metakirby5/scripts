@@ -9,7 +9,7 @@ usage() {
 
 # http://stackoverflow.com/a/14203146
 OPTIND=1
-custom=false
+custom=""
 private=false
 
 while getopts "c:p" opt; do
@@ -29,10 +29,10 @@ shift $((OPTIND-1))
 [ "$#" -ne 1 ] && usage
 
 url="http://api.waa.ai/shorten?url=$1"
-if [ ! $custom = false ]; then
+if [ ! -z "$custom" ]; then
   url="$url&custom=$custom"
 fi
-if [ ! $private = false ]; then
+if [ ! "$private" = false ]; then
   url="$url&private=true"
 fi
 

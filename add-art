@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Add album art to music using ffmpeg
+# http://stackoverflow.com/questions/18710992/how-to-add-album-art-with-ffmpeg
+
+usage() {
+  echo "USAGE: add-art -i [image file] [music file(s)]"
+  exit 1
+}
+
+# http://stackoverflow.com/a/14203146
+OPTIND=1
+image=""
+
+while getopts "i:" opt; do
+  case "$opt" in
+    i)
+      image=$OPTARG
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+# Sanity checks
+[ ! -f "$image" ] && usage
+[ "$#" -lt 1 ] && usage
+
+for file in "$@"; do
+  [ ! -f "$file" ] && usage
+done
+
+# Do the tagging
+for file in "$@"; do
+  OUT="$(mktemp).mp3"
+
+  yes |\
+    ffmpeg -i "$file" -i "$image" \
+    -map 0:0 -map 1:0 -c copy -id3v2_version 3 \
+    -metadata:s:v title="Album cover" \
+    -metadata:s:v comment="Cover (Front)" "$OUT" 2>/dev/null &&\
+  mv "$OUT" "$file"
+done
+
