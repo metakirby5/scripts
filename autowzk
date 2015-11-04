@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Runs colorz2 on an image file to get 6 colors, then stuffs those colors
 # through wzk.
-# TODO: support image downloads
 
 # http://stackoverflow.com/a/13221491
 exists() {
@@ -14,12 +13,15 @@ exists() {
 }
 
 usage() {
-  echo "USAGE: autowzk [image file] (primary color) (secondary color)"
+  echo "USAGE: autowzk [image file / URL] (primary color) (secondary color)"
+  echo "If image URL provided, image will be saved at \"~/.autowzk\"."
   echo "Available colors: 2 (red),  3 (green),   4 (yellow),"
   echo "                  5 (blue), 6 (magenta), 7 (cyan)"
   echo "Defaults: primary=2, secondary=3"
   exit 1
 }
+
+IMG_DL=~/.autowzk
 
 declare -A COLORS
 COLORS=(
@@ -56,12 +58,17 @@ ncmpcpp_primary_n: "%s"
 ncmpcpp_secondary_n: "%s"
 EOM
 
-# Sanity checks
+# Sanity checks, getting args
 [ "$#" -lt 1 ] || [ "$#" -gt 3 ] && usage
-[ ! -e "$1" ] || [ -d "$1" ] && usage
 
-# Setting defaults
-img="$1"
+if [ ! -f "$1" ]; then
+  [[ "$1" != http* ]] && usage
+
+  curl "$1" -o "$IMG_DL" 2>/dev/null || (echo "URL invalid." && exit 1)
+  img="$IMG_DL"
+else
+  img="$1"
+fi
 
 if [ -z "$2" ]; then
   # Default
@@ -77,6 +84,7 @@ else
   exists "$3" in COLORS 2>/dev/null && secondary="$3" || usage
 fi
 
+# Starting...
 echo "Using primary=$primary, secondary=$secondary..."
 echo
 
