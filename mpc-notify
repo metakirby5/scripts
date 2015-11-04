@@ -13,7 +13,7 @@ mpc_format() {
 }
 
 # Get album art
-yes |\
+yes 2>/dev/null |\
   ffmpeg -i "${XDG_MUSIC_DIR%%/}/$(mpc current --format '%file%')"\
   "$ALBUM_ART" 2>/dev/null &&\
   convert "$ALBUM_ART" -resize "$ALBUM_ART_WIDTH" "$ALBUM_ART"

@@ -42,7 +42,7 @@ for file in "$@"; do
   OUT="$(mktemp).mp3"
 
   # Do the tagging
-  yes |\
+  yes 2>/dev/null |\
     ffmpeg -i "$file" -i "$image" \
     -map 0:0 -map 1:0 -c copy -id3v2_version 3 \
     -metadata:s:v title="Album cover" \
