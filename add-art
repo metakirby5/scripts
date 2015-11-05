@@ -33,7 +33,7 @@ if [ ! -f "$image" ]; then
   [[ "$image" != http* ]] && usage
 
   # Download the image to a temporary file
-  TMP="$(mktemp).${image##*.}"
+  TMP="$(mktemp)"
   curl "$image" -o "$TMP" 2>/dev/null || (echo "URL invalid." && exit 1)
   image="$TMP"
 fi
