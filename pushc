@@ -28,18 +28,20 @@ push_dir() {
 	if [[ $(git diff) ]] || [[ $(git diff origin/master..HEAD) ]]; then
 		git status
 		echo
-		echo "Please enter commit message."
-		read cmsg
-		if [[ $cmsg ]]; then
-			echo
-			git commit -a -m "$cmsg"
-			git push
-		else
-			echo "ERROR: No commit message entered."
-			echo
-			errors="$errors $1"
-			return
+		if [[ $(git diff) ]]; then
+			echo "Please enter commit message."
+			read cmsg
+			if [[ $cmsg ]]; then
+				echo
+				git commit -a -m "$cmsg"
+			else
+				echo "ERROR: No commit message entered."
+				echo
+				errors="$errors $1"
+				return
+			fi
 		fi
+		git push
 	else
 		echo "No updates to be made in $1."
 	fi
