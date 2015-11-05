@@ -33,7 +33,7 @@ if [ ! -f "$image" ]; then
   [[ "$image" != http* ]] && usage
 
   # Download the image to a temporary file
-  TMP="$(mktemp)"
+  TMP="$(mktemp).${image##*.}"
   curl "$image" -o "$TMP" 2>/dev/null || (echo "URL invalid." && exit 1)
   image="$TMP"
 fi
@@ -48,8 +48,8 @@ for file in "$@"; do
     -metadata:s:v title="Album cover" \
     -metadata:s:v comment="Cover (Front)" "$OUT" 2>/dev/null &&\
   mv "$OUT" "$file"
-
-  # Clean up
-  [ -f "$TMP" ] && rm "$TMP"
 done
+
+# Clean up
+[ -f "$TMP" ] && rm "$TMP"
 
