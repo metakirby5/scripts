@@ -5,6 +5,6 @@ ANIME="$(mktemp).png"
 ANIME_WIDTH="250"
 
 curl -sfL "http://1339.cf/grill.php" -o "$ANIME"
-convert "$ANIME" -resize "$ANIME_WIDTH" "$ANIME"
+mogrify -resize "$ANIME_WIDTH" "$ANIME"
 notify-send -i "$ANIME" -a "1339.cf" "頑張れ！"
 
