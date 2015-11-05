@@ -3,7 +3,7 @@
 # Adapted from https://bbs.archlinux.org/viewtopic.php?pid=684807#p684807
 
 ALBUM_ART="$(mktemp).png"
-ALBUM_ART_WIDTH="250"
+ALBUM_ART_WIDTH="125"
 FMT_SUMMARY="[[%title%]|[%file%]]"
 FMT_BODY="[[%artist% - ]&%album%]|[%artist%]|[%album%]"
 

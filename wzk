@@ -21,5 +21,6 @@ fi
 xrdb ~/.Xresources &>/dev/null &
 i3-msg 'restart' &>/dev/null &
 killall dunst &>/dev/null; dunst &>/dev/null &
+killall compton &>/dev/null; compton &>/dev/null &
 exit 0
 
