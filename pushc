@@ -25,7 +25,7 @@ push_dir() {
 	fi
 
 	echo "===Pushing $1..."
-	if [[ $(git diff) ]]; then
+	if [[ $(git diff) ]] || [[ $(git diff origin/master..HEAD) ]]; then
 		git status
 		echo
 		echo "Please enter commit message."
