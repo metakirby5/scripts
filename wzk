@@ -10,8 +10,11 @@ if [ "$?" -ne 0 ]; then
 fi
 
 if [ "$#" -eq 0 ]; then
-  whizkers -e $(whizkers -l |\
-    dmenu -i -f -fn "Calibri:pixelsize=28" -sb "#3f91c0" -b -h 100 -t -p 'Whizkers Scheme')
+  selected=$(whizkers -l |\
+    dmenu -i -f -fn "Calibri:pixelsize=28" -sb "#3f91c0" -b -h 100 -t \
+    -p 'Whizkers Scheme')
+  [ -z "$selected" ] && exit 0
+  whizkers -e $selected
 else
   whizkers -e "$@"
 fi
