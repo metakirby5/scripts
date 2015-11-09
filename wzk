@@ -21,9 +21,17 @@ fi
 
 [ "$?" -ne 0 ] && exit 1
 
-xrdb ~/.Xresources &>/dev/null &
+killall compton &>/dev/null
+killall conky &>/dev/null
+killall dunst &>/dev/null
 i3-msg 'restart' &>/dev/null &
-killall dunst &>/dev/null; dunst &>/dev/null &
-killall compton &>/dev/null; sleep 0.5; compton &>/dev/null &
+
+sleep 0.5
+
+xrdb ~/.Xresources &>/dev/null &
+compton &>/dev/null &
+dunst &>/dev/null &
+conky -c ~/.config/lemonbar/conkyrc &>/dev/null &
+
 exit 0
 
