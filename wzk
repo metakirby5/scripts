@@ -24,14 +24,17 @@ fi
 killall compton &>/dev/null
 killall conky &>/dev/null
 killall dunst &>/dev/null
-i3-msg 'restart' &>/dev/null &
+# killall lemonbar &>/dev/null
+i3-msg 'restart' &>/dev/null
 
 sleep 0.5
 
 xrdb ~/.Xresources &>/dev/null &
 compton &>/dev/null &
 dunst &>/dev/null &
-conky -c ~/.config/lemonbar/conkyrc &>/dev/null &
+# ~/.config/lemonbar/emit 2>/dev/null |\
+#   lemonbar -u 2 -f "M+ 1p-7" |\
+#   sh &>/dev/null &
 
 exit 0
 
