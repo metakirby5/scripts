@@ -22,9 +22,7 @@ fi
 [ "$?" -ne 0 ] && exit 1
 
 killall compton &>/dev/null
-killall conky &>/dev/null
 killall dunst &>/dev/null
-killall lemonbar &>/dev/null
 i3-msg 'restart' &>/dev/null
 
 sleep 0.5
@@ -32,7 +30,6 @@ sleep 0.5
 xrdb ~/.Xresources &>/dev/null &
 compton &>/dev/null &
 dunst &>/dev/null &
-startbar &>/dev/null &
 
 exit 0
 
