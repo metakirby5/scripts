@@ -32,9 +32,7 @@ sleep 0.5
 xrdb ~/.Xresources &>/dev/null &
 compton &>/dev/null &
 dunst &>/dev/null &
-~/.config/lemonbar/emit 2>/dev/null |\
-  lemonbar -u 2 -f "M+ 1p-7" |\
-  sh &>/dev/null &
+startbar &>/dev/null &
 
 exit 0
 
