@@ -5,6 +5,8 @@ TMPBG="$(mktemp).png"
 
 scrot "$TMPBG"
 mogrify -sample 5% -sample 2000% "$TMPBG"
-i3lock -ui "$TMPBG"
+killall -SIGUSR1 dunst # pause dunst
+i3lock -ndui "$TMPBG"
+killall -SIGUSR2 dunst # resume dunst
 rm "$TMPBG"
 
