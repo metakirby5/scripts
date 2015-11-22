@@ -20,7 +20,7 @@ yes 2>/dev/null |\
   mogrify -resize "$ALBUM_ART_WIDTH" "$ALBUM_ART"
 
 # Get the dunstify id
-[ -f "$DUNSTIFY_ID" ] && id_arg="-r $(cat "$DUNSTIFY_ID")"
+[ ! -z "$(cat "$DUNSTIFY_ID")" ] && id_arg="-r $(cat "$DUNSTIFY_ID")"
 
 dunstify \
   -a "ncmpcpp" \
