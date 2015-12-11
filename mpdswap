@@ -2,7 +2,7 @@
 # Swaps between mpd and mopidy.
 
 if pgrep -x mpd &>/dev/null; then
-  echo "Starting mopidy"
+  echo "Starting mopidy..."
   killall mpd
   sleep 0.5
   mopidy &>/dev/null &
