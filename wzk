@@ -11,7 +11,7 @@ fi
 
 if [ "$#" -eq 0 ]; then
   selected=$(whizkers -l |\
-    dmenu -i -f -fn "Calibri:pixelsize=28" -sb "#3f91c0" -b -h 100 -t \
+    dmenu -i -f -fn "Calibri:pixelsize=28" -sb "#3f91c0" -h 50 -t \
     -p 'Whizkers Scheme')
   [ -z "$selected" ] && exit 0
   whizkers -e $selected
