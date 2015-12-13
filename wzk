@@ -21,13 +21,13 @@ fi
 
 [ "$?" -ne 0 ] && exit 1
 
+xrdb -merge ~/.Xresources &>/dev/null
 killall compton &>/dev/null
 killall dunst &>/dev/null
 i3-msg 'restart' &>/dev/null
 
 sleep 0.5
 
-xrdb ~/.Xresources &>/dev/null &
 compton &>/dev/null &
 dunst &>/dev/null &
 
