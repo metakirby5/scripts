@@ -2,7 +2,7 @@
 # Sends a dunstify notification with information from mpc -f.
 # Adapted from https://bbs.archlinux.org/viewtopic.php?pid=684807#p684807
 
-DUNSTIFY_ID="/tmp/dunstify_id"
+DUNSTIFY_ID="$(mktemp)"
 ALBUM_ART="$(mktemp).png"
 ALBUM_ART_WIDTH="125"
 FMT_SUMMARY="[[%title%]|[%file%]]"
