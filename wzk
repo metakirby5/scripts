@@ -21,19 +21,7 @@ fi
 
 [ "$?" -ne 0 ] && exit 1
 
-xrdb -merge ~/.Xresources &>/dev/null
-
-# Reload colors
-for pts in /dev/pts/*; do
-	(echo -n "$(use-colors < ~/.Xresources)" > $pts) 2>/dev/null
-done
-
-killall compton &>/dev/null
-killall dunst &>/dev/null
-i3-msg 'restart' &>/dev/null
-
-compton &>/dev/null &
-dunst &>/dev/null &
+reload-desktop
 
 exit 0
 
