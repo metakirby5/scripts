@@ -2,7 +2,7 @@
 # Reload the desktop
 
 xrdb -merge ~/.Xresources &>/dev/null
-tmux source-file ~/.tmux.conf
+tmux source-file ~/.tmux.conf &>/dev/null
 
 # Reload colors
 for pts in /dev/pts/*; do
