@@ -5,7 +5,7 @@
 DUNSTIFY_ID="/tmp/mpc-notify_dunstify_id"
 ALBUM_ART="$(mktemp).png"
 ALBUM_ART_WIDTH="125"
-FMT_SUMMARY="[[%title%]|[%file%]]"
+FMT_SUMMARY="[%title%]|[%file%]"
 FMT_BODY="[[%artist% - ]&%album%]|[%artist%]|[%album%]"
 
 mpc_format() {
@@ -22,10 +22,13 @@ yes 2>/dev/null |\
 # Get the dunstify id
 [ ! -z "$(cat "$DUNSTIFY_ID")" ] && id_arg="-r $(cat "$DUNSTIFY_ID")"
 
+summary="$(mpc_format "$FMT_SUMMARY")"
+body="$(mpc_format "$FMT_BODY")"
+
 dunstify \
   -a "ncmpcpp" \
   -i "$ALBUM_ART" \
-  "$(mpc_format "$FMT_SUMMARY")" \
-  "$(mpc_format "$FMT_BODY")" \
+  "${summary:=no tunes}" \
+  "$body" \
   -p $id_arg > "$DUNSTIFY_ID"
 
