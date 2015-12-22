@@ -5,7 +5,7 @@
 exec 3<> /dev/tcp/localhost/6600
 
 # Enter message loop
-while read msg; do
+while read -u3 msg; do
 	# If we got an OK
 	if [[ "$msg" == OK* ]]; then
 		# Check if the song changed
@@ -16,5 +16,5 @@ while read msg; do
 		# Listen for next change
 		echo 'idle player playlist' >&3
 	fi
-done <&3
+done
 
