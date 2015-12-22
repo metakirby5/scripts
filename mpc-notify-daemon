@@ -4,6 +4,8 @@
 # Connect to socket
 exec 3<> /dev/tcp/localhost/6600
 
+last="$(mpc current)"
+
 # Enter message loop
 while read -u3 msg; do
 	# If we got an OK
