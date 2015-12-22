@@ -25,9 +25,9 @@ yes 2>/dev/null |\
 summary="$(mpc_format "$FMT_SUMMARY")"
 body="$(mpc_format "$FMT_BODY")"
 
-# Replace any dashes with hyphens
-summary="${summary//-/−}"
-body="${body//-/−}"
+# Summary/body can't start w/ -
+summary="${summary/#-/−}"
+body="${body/#-/−}"
 
 dunstify \
   -a "ncmpcpp" \
