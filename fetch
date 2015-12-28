@@ -18,6 +18,12 @@ color=$(tput setaf 1)
 black=$(tput setaf 0)
 blue=$(tput setaf 4)
 
+put_colors() {
+    for i in {0..7}; do
+        echo -n "$(tput setab $i)    $clear "
+    done
+}
+
 # Custom Image
 
 # If usewall=1 then fetch will use a cropped version of your wallpaper as the img
@@ -27,13 +33,13 @@ usewall=1
 img="$HOME/Pictures/avatars/gon.png"
 
 # Image width/height/offset
-width=256
-height=256
+width=312
+height=312
 yoffset=0
 xoffset=0
 
 # Padding to align text to the right
-pad="                   "
+pad="                       "
 
 # Other
 
@@ -41,14 +47,10 @@ pad="                   "
 # title can also be changed with -t
 title="$(whoami)"
 
-# Custom text to print at the bottom, configurable at launch with "-e"
-customtext=$(colors2.sh noblack 8)
-
 # Set up args
 while getopts ":c:e:w:h:t:p:x:y:" opt; do
     case $opt in
         c) color=$(tput setaf $OPTARG) ;;
-        e) customtext="$OPTARG" ;;
         w) width="$OPTARG" ;;
         h) height="$OPTARG" ;;
         t) title="$OPTARG" ;;
@@ -94,6 +96,7 @@ echo "${pad}${bold}${color}Shell${clear}: bash"
 echo "${pad}${bold}${color}Window Manager${clear}: i3"
 echo "${pad}${bold}${color}Font${clear}: PixelMPlus12"
 echo
-echo "${pad}${bold}${blue}${customtext}${clear}"
+echo "${pad}$(put_colors)"
 echo
+echo "${pad}${bold}$(put_colors)"
 echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
