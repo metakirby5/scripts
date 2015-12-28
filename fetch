@@ -1,0 +1,99 @@
+#! /usr/bin/env bash
+# Fetch info about your system
+#
+# Created by Dylan Araps
+# https://github.com/dylanaraps/dotfiles
+
+# Formatting
+
+# Set to nothing to disable bold text
+bold=$(tput bold)
+
+# Clears attributes
+clear=$(tput sgr0)
+
+# Default color
+# colors are now defined with a launch option "-c"
+color=$(tput setaf 1)
+black=$(tput setaf 0)
+blue=$(tput setaf 4)
+
+# Custom Image
+
+# If usewall=1 then fetch will use a cropped version of your wallpaper as the img
+usewall=1
+
+# The default image to use if usewall=0
+img="$HOME/Pictures/avatars/gon.png"
+
+# Image width/height/offset
+width=256
+height=256
+yoffset=0
+xoffset=0
+
+# Padding to align text to the right
+pad="                   "
+
+# Other
+
+# Title
+# title can also be changed with -t
+title="$(whoami)"
+
+# Custom text to print at the bottom, configurable at launch with "-e"
+customtext=$(colors2.sh noblack 8)
+
+# Set up args
+while getopts ":c:e:w:h:t:p:x:y:" opt; do
+    case $opt in
+        c) color=$(tput setaf $OPTARG) ;;
+        e) customtext="$OPTARG" ;;
+        w) width="$OPTARG" ;;
+        h) height="$OPTARG" ;;
+        t) title="$OPTARG" ;;
+        p) pad="$OPTARG" ;;
+        x) xoffset="$OPTARG" ;;
+        y) yoffset="$OPTARG" ;;
+    esac
+done
+
+# Clear terminal before running
+clear
+
+# Get image from wallpaper
+# Requires feh
+if [ $usewall -eq 1 ]; then
+    wallpaper=$(cat $HOME/.fehbg | awk '/feh/ {printf $3}' | sed -e "s/'//g")
+
+    # Directory to store cropped wallpapers.
+    walltempdir="$HOME/.wallpaper"
+
+    # Check if the directory exists
+    if [ ! -d "$walltempdir" ]; then
+        mkdir "$walltempdir" || echo "Failed to create wallpaper dir"; exit
+    fi
+
+    # Crop the wallpaper and save it to  the wallpaperdir
+    # By default it crops a 1080x1080 square in the center of the image.
+    [ -f "$walltempdir/$(basename $wallpaper)" ] || convert -crop 1080x1080+480+0 "$wallpaper" "$walltempdir/$(basename $wallpaper)"
+
+    # The final image
+    img="$walltempdir/$(basename $wallpaper)"
+fi
+
+# Underline title with length of title
+underline=$(printf %"${#title}"s |tr " " "=")
+
+# Start printing info
+
+echo "${pad}${bold}${blue}$title${clear}"
+echo "${pad}${bold}${black}${underline}="
+echo "${pad}${bold}${color}OS${clear}: $(cat /etc/*ease | awk '/^NAME=/' | cut -d '=' -f2)"
+echo "${pad}${bold}${color}Shell${clear}: bash"
+echo "${pad}${bold}${color}Window Manager${clear}: i3"
+echo "${pad}${bold}${color}Font${clear}: PixelMPlus12"
+echo
+echo "${pad}${bold}${blue}${customtext}${clear}"
+echo
+echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
