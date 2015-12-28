@@ -19,7 +19,7 @@ black=$(tput setaf 0)
 blue=$(tput setaf 4)
 
 put_colors() {
-    for i in {0..7}; do
+    for i in `seq $1 $2`; do
         echo -n "$(tput setab $i)    $clear "
     done
 }
@@ -96,7 +96,7 @@ echo "${pad}${bold}${color}Shell${clear}: bash"
 echo "${pad}${bold}${color}Window Manager${clear}: i3"
 echo "${pad}${bold}${color}Font${clear}: PixelMPlus12"
 echo
-echo "${pad}$(put_colors)"
+echo "${pad}$(put_colors 0 7)"
 echo
-echo "${pad}${bold}$(put_colors)"
+echo "${pad}$(put_colors 8 15)"
 echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
