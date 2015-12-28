@@ -22,6 +22,8 @@ fi
 [ "$?" -ne 0 ] && exit 1
 
 reload-desktop
+sleep 1
+fetch
 
 exit 0
 
