@@ -95,8 +95,8 @@ echo "${pad}${bold}${color}OS${clear}: $(cat /etc/*ease | awk '/^NAME=/' | cut -
 echo "${pad}${bold}${color}Shell${clear}: bash"
 echo "${pad}${bold}${color}Window Manager${clear}: i3"
 echo "${pad}${bold}${color}Font${clear}: PixelMPlus12"
+echo "${pad}${bold}${color}Waifu${clear}: Black Rock Shooter"
 echo
 echo "${pad}$(put_colors 0 7)"
-echo
 echo "${pad}$(put_colors 8 15)"
 echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
