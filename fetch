@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Fetch info about your system
 #
-# Created by Dylan Araps
+# Original by Dylan Araps
 # https://github.com/dylanaraps/dotfiles/
-# Modified by Ethan Chan
+# Created by Ethan Chan
 # https://github.com/metakirby5/dotfiles/
 
 # Config file to source
 # Can contain:
 #   TITLE=text
+#   UNDERLINE=text
 #   PRIMARY_N=0-7
 #   SECONDARY_N=0-7
 #   IMGSRC=/path/to/img
@@ -37,6 +38,7 @@ fetch_config=~/.config/fetch/config
 
 # Defaults
 title="${TITLE:="$(whoami)"}"
+underline="${UNDERLINE:="$(printf "%${#title}s" | tr ' ' '=')="}"
 primary_n="${PRIMARY_N:=1}"
 secondary_n="${SECONDARY_N:=4}"
 imgsrc="${IMGSRC:="$(cat ~/.fehbg | cut -d\' -f2)"}"
@@ -87,8 +89,7 @@ put_colors() {
 }
 
 # Calculate sizing info
-# title + underline + 3 lines of color info = 5
-numlines="$((${#info[@]} + 5))"
+numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
 isize="$(($numlines * $charheight))"
 pad="$(printf "%$(($isize / $charwidth + 2))s")" # +2 for padding
 
@@ -102,7 +103,6 @@ if [ ! -f "$img" ]; then
 fi
 
 # Order and format the info
-underline="$(printf "%${#title}s" | tr ' ' '=')="
 output=''
 tab="$(echo -e '\t')" # We use this to separate the key
 for k in "${!info[@]}"; do
