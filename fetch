@@ -46,6 +46,7 @@ secondary_n="${SECONDARY_N:=4}"
 imgsrc="${IMGSRC:="$(cat ~/.fehbg | cut -d\' -f2)"}"
 imgtempdir="${IMGTEMPDIR:=/tmp/fetch/}"
 charheight="${CHARHEIGHT:=31}"
+charwidth="${CHARWIDTH:="$(($charheight / 2))"}"
 additional_padding="${ADDITIONAL_PADDING:=3}"
 
 # Colors
@@ -74,10 +75,11 @@ put_colors() {
     done
 }
 
-# Calculate size of image from amount of info present
+# Calculate sizing info
 # title + underline + 3 lines of color info = 5
 numlines="$((${#info[@]} + 5))"
 isize="$(($numlines * $charheight))"
+pad="$(printf "%$(($isize / $charwidth + 1))s")" # +1 for padding
 
 # Prepare the image
 img="$imgtempdir/$(basename $imgsrc)"
@@ -90,7 +92,6 @@ fi
 
 # Order and format the info
 underline="$(printf "%${#title}s" | tr ' ' '=')="
-pad="$(printf "%$(($numlines * 2 + $additional_padding))s")"
 output=''
 tab="$(echo -e '\t')" # We use this to separate the key
 for k in "${!info[@]}"; do
