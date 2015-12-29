@@ -22,12 +22,12 @@
 #   # Format: ["position:title"]="info"
 #   # Any title without a position is alphabetically ordered afterwards.
 #   read -d '' INFO <<"EOF"
-#   	declare -A info=(
-#   		["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
-#   		["2:Kernel"]="$(uname -r)"
-#   		["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
-#   		# etc.
-#   	)
+#     declare -A info=(
+#       ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+#       ["2:Kernel"]="$(uname -r)"
+#       ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
+#       # etc.
+#     )
 #   EOF
 
 fetch_config=~/.config/fetch/config
@@ -50,16 +50,16 @@ additional_padding="${ADDITIONAL_PADDING:=3}"
 # Handle the array specially
 eval "$INFO"
 [ -z "${info[*]}" ] && declare -A info=(
-	["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
-	["2:Kernel"]="$(uname -r)"
-	["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
-	["4:Shell"]="$SHELL"
-	["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
-	["6:CPU"]="$(cat /proc/cpuinfo |\
-		awk -F: '/^model name/ { print $2; exit }')"
-	["7:Speed"]="$(lscpu |\
-		awk -F: '/^CPU MHz:/ { print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
-	["8:Memory"]="$(free -m | awk '/^Mem:/ { print $3 "/" $2 " MB" }')"
+  ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+  ["2:Kernel"]="$(uname -r)"
+  ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
+  ["4:Shell"]="$SHELL"
+  ["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
+  ["6:CPU"]="$(cat /proc/cpuinfo |\
+  awk -F: '/^model name/ { print $2; exit }')"
+  ["7:Speed"]="$(lscpu |\
+  awk -F: '/^CPU MHz:/ { print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
+  ["8:Memory"]="$(free -m | awk '/^Mem:/ { print $3 "/" $2 " MB" }')"
 )
 
 # Colors
@@ -70,22 +70,22 @@ bold="$(tput bold)"
 clear="$(tput sgr0)"
 
 put_color_header() {
-    local text
-    for i in `seq 0 7`; do
-        case "$i" in
-            "$primary_n")     text=' .. ' ;;
-            "$secondary_n")   text=' __ ' ;;
-            *)                text='    ' ;;
-        esac
+  local text
+  for i in `seq 0 7`; do
+    case "$i" in
+      "$primary_n")     text=' .. ' ;;
+      "$secondary_n")   text=' __ ' ;;
+      *)                text='    ' ;;
+    esac
 
-        echo -n "$(tput setaf $i)$bold$text$clear "
-    done
+    echo -n "$(tput setaf $i)$bold$text$clear "
+  done
 }
 
 put_colors() {
-    for i in `seq $1 $2`; do
-        echo -n "$(tput setab $i)    $clear "
-    done
+  for i in `seq $1 $2`; do
+    echo -n "$(tput setab $i)  $clear "
+  done
 }
 
 # Calculate sizing info
@@ -96,10 +96,10 @@ pad="$(printf "%$(($isize / $charwidth + 2))s")" # +2 for padding
 # Prepare the image
 img="$imgtempdir/$(basename $imgsrc)"
 if [ ! -f "$img" ]; then
-    [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
-    wsize="$(identify -format '%h' $imgsrc 2>/dev/null)"
-    convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" \
-      &>/dev/null
+  [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
+  wsize="$(identify -format '%h' $imgsrc 2>/dev/null)"
+  convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" \
+    &>/dev/null
 fi
 
 # Order and format the info
@@ -108,16 +108,16 @@ unordered=''
 tab="$(printf '\t')" # We use this to separate the key
 
 for k in "${!info[@]}"; do
-    cur="$pad$bold$secondary${k#*:}$clear: ${info[$k]}"
+  cur="$pad$bold$secondary${k#*:}$clear: ${info[$k]}"
 
-    # Add to ordered or unordered
-    if [[ "$k" == *:* ]]; then
-      ordered="$ordered
+  # Add to ordered or unordered
+  if [[ "$k" == *:* ]]; then
+    ordered="$ordered
 $priority${k%%:*}$tab$cur"
-    else
-      unordered="$unordered
+  else
+    unordered="$unordered
 $cur"
-    fi
+  fi
 done
 
 # Sort the ordered info, and concatenate it to unordered to make output
