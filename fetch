@@ -49,7 +49,7 @@ additional_padding="${ADDITIONAL_PADDING:=3}"
 
 # Handle the array specially
 eval "$INFO"
-[ -z "${info[@]}" ] && declare -A info=(
+[ -z "${info[*]}" ] && declare -A info=(
 	["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
 	["2:Kernel"]="$(uname -r)"
 	["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
@@ -103,15 +103,26 @@ if [ ! -f "$img" ]; then
 fi
 
 # Order and format the info
-output=''
-tab="$(echo -e '\t')" # We use this to separate the key
+ordered=''
+unordered=''
+tab="$(printf '\t')" # We use this to separate the key
+
 for k in "${!info[@]}"; do
-    # Higher priority if colon
-    [[ "$k" == *:* ]] && priority="0" || priority='1'
-    output="$output
-$priority${k%%:*}$tab$pad$bold$secondary${k#*:}$clear: ${info[$k]}"
+    cur="$pad$bold$secondary${k#*:}$clear: ${info[$k]}"
+
+    # Add to ordered or unordered
+    if [[ "$k" == *:* ]]; then
+      ordered="$ordered
+$priority${k%%:*}$tab$cur"
+    else
+      unordered="$unordered
+$cur"
+    fi
 done
-output="$(echo "$output" | sort -n | tail -n+2 | sed "s/^.\+$tab//")"
+
+# Sort the ordered info, and concatenate it to unordered to make output
+output="$(echo "$ordered" | sort -n | tail -n+2 | sed "s/^.\+$tab//")"
+output="$output$(echo "$unordered" | sort -d)"
 
 # Print info
 clear
@@ -122,7 +133,7 @@ echo "$output"
 echo "$pad$(put_color_header)"
 echo "$pad$(put_colors 0 7)"
 echo "$pad$(put_colors 8 15)"
-echo -e "0;1;$xoffset;$yoffset;$isize;$isize;;;;;$img\n4;\n3;" |\
+printf "0;1;$xoffset;$yoffset;$isize;$isize;;;;;$img\n4;\n3;" |\
   /usr/lib/w3m/w3mimgdisplay
 tput cnorm
 
