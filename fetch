@@ -7,12 +7,19 @@
 # https://github.com/metakirby5/dotfiles/
 
 # Import some variables
-color_vars=~/.color_vars
-[ -f "$color_vars" ] && source ~/.color_vars
+fetch_vars=~/.fetch_vars
+[ -f "$fetch_vars" ] && source "$fetch_vars"
 
 # Text
 title="$(whoami)"
 underline="$(printf %"${#title}"s |tr " " "=")="
+declare -A info=(
+  ["OS"]="Fedora"
+  ["Shell"]="Bash"
+  ["Window Manager"]="i3"
+  ["Font"]="PixelMPlus12"
+  ["Waifu"]="Black Rock Shooter"
+)
 
 # Colors
 primary_n="${PRIMARY_N:=1}"
@@ -27,8 +34,8 @@ put_color_header() {
     local text
     for i in `seq 0 7`; do
         case "$i" in
-            "$primary_n")     text=' #1 ' ;;
-            "$secondary_n")   text=' #2 ' ;;
+            "$primary_n")     text=' .. ' ;;
+            "$secondary_n")   text=' __ ' ;;
             *)                text='    ' ;;
         esac
 
@@ -68,11 +75,9 @@ clear
 tput civis
 echo "$pad$bold${primary}$title${clear}"
 echo "$pad$bold${black}$underline"
-echo "$pad$bold${secondary}OS${clear}: Fedora"
-echo "$pad$bold${secondary}Shell${clear}: bash"
-echo "$pad$bold${secondary}Window Manager${clear}: i3"
-echo "$pad$bold${secondary}Font${clear}: PixelMPlus12"
-echo
+for i in "${!info[@]}"; do
+    echo "$pad$bold${secondary}$i${clear}: ${info[$i]}"
+done
 echo "$pad$(put_color_header)"
 echo "$pad$(put_colors 0 7)"
 echo "$pad$(put_colors 8 15)"
