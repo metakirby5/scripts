@@ -15,12 +15,15 @@ fetch_vars=~/.fetch_vars
 # Text
 title="$(whoami)"
 underline="$(printf "%${#title}s" | tr ' ' '=')="
+
+# Format: ["position:title"]="info"
+# Any title without a position is alphabetically ordered afterwards.
 declare -A info=(
-  ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
-  ["2:Shell"]="$SHELL"
-  ["3:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
-  ["4:Font"]="$(xrdb -q | awk -F: '/font/{ print $3; exit }')"
-  ["5:Waifu"]="Black Rock Shooter"
+    ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+    ["2:Shell"]="$SHELL"
+    ["3:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
+    ["4:Font"]="$(xrdb -q | awk -F: '/font/{ print $3; exit }')"
+    ["5:Waifu"]="Black Rock Shooter"
 )
 
 # Image
@@ -82,17 +85,27 @@ if [ ! -f "$img" ]; then
     convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img"
 fi
 
+# Order and format the info
+output=''
+tab="$(echo -e '\t')" # We use this to separate the key
+for k in "${!info[@]}"; do
+    # Higher priority if colon
+    [[ "$k" == *:* ]] && priority="0" || priority='1'
+    output="$output
+$priority${k%%:*}$tab$pad$bold$secondary${k#*:}$clear: ${info[$k]}"
+done
+output="$(echo "$output" | sort | tail -n+2 | sed "s/^.\+$tab//")"
+
 # Print info
 clear
 tput civis
-echo "$pad$bold${primary}$title${clear}"
-echo "$pad$bold${black}$underline"
-for i in "${!info[@]}"; do
-    echo "$pad$bold${secondary}$i${clear}: ${info[$i]}"
-done
+echo "$pad$bold$primary$title$clear"
+echo "$pad$bold$black$underline"
+echo "$output"
 echo "$pad$(put_color_header)"
 echo "$pad$(put_colors 0 7)"
 echo "$pad$(put_colors 8 15)"
-echo -e "0;1;$xoffset;$yoffset;$isize;$isize;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
+echo -e "0;1;$xoffset;$yoffset;$isize;$isize;;;;;$img\n4;\n3;" |\
+  /usr/lib/w3m/w3mimgdisplay
 tput cnorm
 
