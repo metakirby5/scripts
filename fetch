@@ -84,7 +84,7 @@ put_color_header() {
 
 put_colors() {
   for i in `seq $1 $2`; do
-    echo -n "$(tput setab $i)  $clear "
+    echo -n "$(tput setab $i)    $clear "
   done
 }
 
