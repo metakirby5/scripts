@@ -6,34 +6,30 @@
 # Modified by Ethan Chan
 # https://github.com/metakirby5/dotfiles/
 
-# File to source
+# Config file to source
 # Can contain:
-#   export TITLE=text
-#   export PRIMARY_N=0-7
-#   export SECONDARY_N=0-7
-#   export IMGSRC=/path/to/img
-#   export IMGTEMPDIR=/some/temp/path
-#   export CHARHEIGHT=number
-#   export ADDITIONAL_PADDING=number
-fetch_config=~/.config/fetch/config
+#   TITLE=text
+#   PRIMARY_N=0-7
+#   SECONDARY_N=0-7
+#   IMGSRC=/path/to/img
+#   IMGTEMPDIR=/some/temp/path
+#   CHARHEIGHT=number
+#   ADDITIONAL_PADDING=number
+#
+#   # Info MUST be defined in this way!
+#   # It will be eval'd later, so be careful...
+#   # Format: ["position:title"]="info"
+#   # Any title without a position is alphabetically ordered afterwards.
+#   read -d '' INFO <<"EOF"
+#   	declare -A info=(
+#   		["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+#   		["2:Kernel"]="$(uname -r)"
+#   		["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
+#   		# etc.
+#   	)
+#   EOF
 
-# Format: ["position:title"]="info"
-# Any title without a position is alphabetically ordered afterwards.
-declare -A info=(
-    ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
-    ["2:Kernel"]="$(uname -r)"
-    ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
-    ["4:Shell"]="$SHELL"
-    ["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
-    ["6:CPU"]="$(cat /proc/cpuinfo |\
-      awk -F: '/^model name/ { print $2; exit }')"
-    ["7:Speed"]="$(lscpu |\
-      awk -F: '/^CPU MHz:/ { print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
-    ["8:Memory"]="$(free -m | awk '/^Mem:/ { print $3 "/" $2 " MB" }')"
-    ["9:Font"]="$(xrdb -q | awk -F: '/font/{ print $3; exit }')"
-    ["10:Song"]="$(mpc current)"
-    ["11:Waifu"]="Black Rock Shooter"
-)
+fetch_config=~/.config/fetch/config
 
 # === DO NOT EDIT BELOW THIS LINE ===
 
@@ -48,6 +44,21 @@ imgtempdir="${IMGTEMPDIR:=/tmp/fetch/}"
 charheight="${CHARHEIGHT:=31}"
 charwidth="${CHARWIDTH:="$(($charheight / 2))"}"
 additional_padding="${ADDITIONAL_PADDING:=3}"
+
+# Handle the array specially
+eval "$INFO"
+[ -z "${info[@]}" ] && declare -A info=(
+	["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+	["2:Kernel"]="$(uname -r)"
+	["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
+	["4:Shell"]="$SHELL"
+	["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
+	["6:CPU"]="$(cat /proc/cpuinfo |\
+		awk -F: '/^model name/ { print $2; exit }')"
+	["7:Speed"]="$(lscpu |\
+		awk -F: '/^CPU MHz:/ { print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
+	["8:Memory"]="$(free -m | awk '/^Mem:/ { print $3 "/" $2 " MB" }')"
+)
 
 # Colors
 primary="$(tput setaf $primary_n)"
@@ -79,7 +90,7 @@ put_colors() {
 # title + underline + 3 lines of color info = 5
 numlines="$((${#info[@]} + 5))"
 isize="$(($numlines * $charheight))"
-pad="$(printf "%$(($isize / $charwidth + 1))s")" # +1 for padding
+pad="$(printf "%$(($isize / $charwidth + 2))s")" # +2 for padding
 
 # Prepare the image
 img="$imgtempdir/$(basename $imgsrc)"
