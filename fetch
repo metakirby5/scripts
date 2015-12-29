@@ -16,11 +16,11 @@ fetch_vars=~/.fetch_vars
 title="$(whoami)"
 underline="$(printf "%${#title}s" | tr ' ' '=')="
 declare -A info=(
-  ["OS"]="Fedora"
-  ["Shell"]="Bash"
-  ["Window Manager"]="i3"
-  ["Font"]="PixelMPlus12"
-  ["Waifu"]="Black Rock Shooter"
+  ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+  ["2:Shell"]="$SHELL"
+  ["3:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
+  ["4:Font"]="$(xrdb -q | awk -F: '/font/{ print $3; exit }')"
+  ["5:Waifu"]="Black Rock Shooter"
 )
 
 # Image
