@@ -6,13 +6,15 @@
 # Modified by Ethan Chan
 # https://github.com/metakirby5/dotfiles/
 
-# Import some variables
+# File to source
+# Can contain:
+#   export PRIMARY_N=1-5
+#   export SECONDARY_N=1-5
 fetch_vars=~/.fetch_vars
-[ -f "$fetch_vars" ] && source "$fetch_vars"
 
 # Text
 title="$(whoami)"
-underline="$(printf %"${#title}"s |tr " " "=")="
+underline="$(printf "%${#title}s" | tr ' ' '=')="
 declare -A info=(
   ["OS"]="Fedora"
   ["Shell"]="Bash"
@@ -24,12 +26,14 @@ declare -A info=(
 # Image
 imgtempdir=~/.fetch
 charheight=31
-charwidth="$(($charheight / 2))"
+charwidth=$(($charheight / 2))
 
 # Comment out the line below for a custom image
 #imgsrc=/path/to/img
 
 # === DO NOT EDIT BELOW THIS LINE ===
+
+[ -f "$fetch_vars" ] && source "$fetch_vars"
 
 # Colors
 primary_n="${PRIMARY_N:=1}"
@@ -63,8 +67,8 @@ put_colors() {
 # title + underline + 3 lines of color info = 5
 isize="$(((${#info[@]} + 5) * $charheight))"
 
-# Calculate amount of padding, add 2 for reasons unknown
-pad="$(printf ' %.0s' `seq 1 $(($isize / $charwidth + 2))`)"
+# Calculate amount of padding, add 2 for padding
+pad="$(printf "%$(($isize / $charwidth + 2))s")"
 
 # If no image provided, image source is wallpaper
 [ -z "$imgsrc" ] && imgsrc="$(cat ~/.fehbg | cut -d\' -f2)"
