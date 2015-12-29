@@ -8,13 +8,13 @@
 
 # File to source
 # Can contain:
-#   export PRIMARY_N=1-5
-#   export SECONDARY_N=1-5
-fetch_vars=~/.fetch_vars
-
-# Text
-title="$(whoami)"
-underline="$(printf "%${#title}s" | tr ' ' '=')="
+#   export TITLE=text
+#   export PRIMARY_N=0-7
+#   export SECONDARY_N=0-7
+#   export IMGSRC=/path/to/img
+#   export IMGTEMPDIR=/some/temp/path
+#   export CHARHEIGHT=number
+fetch_config=~/.config/fetch/config
 
 # Format: ["position:title"]="info"
 # Any title without a position is alphabetically ordered afterwards.
@@ -34,21 +34,18 @@ declare -A info=(
     ["11:Waifu"]="Black Rock Shooter"
 )
 
-# Image
-imgtempdir=~/.fetch
-charheight=31
-charwidth=$(($charheight / 2))
-
-# Comment out the line below for a custom image
-#imgsrc=/path/to/img
-
 # === DO NOT EDIT BELOW THIS LINE ===
 
-[ -f "$fetch_vars" ] && source "$fetch_vars"
+[ -f "$fetch_config" ] && source "$fetch_config"
 
-# Colors
+# Defaults
+title="${TITLE:="$(whoami)"}"
+imgtempdir="${IMGTEMPDIR:=/tmp/fetch/}"
+charheight="${CHARHEIGHT:=31}"
 primary_n="${PRIMARY_N:=1}"
 secondary_n="${SECONDARY_N:=4}"
+
+# Colors
 primary="$(tput setaf $primary_n)"
 secondary="$(tput setaf $secondary_n)"
 black="$(tput setaf 0)"
@@ -79,21 +76,24 @@ put_colors() {
 isize="$(((${#info[@]} + 5) * $charheight))"
 
 # Calculate amount of padding, add 2 for padding
+charwidth=$(($charheight / 2))
 pad="$(printf "%$(($isize / $charwidth + 2))s")"
 
 # If no image provided, image source is wallpaper
-[ -z "$imgsrc" ] && imgsrc="$(cat ~/.fehbg | cut -d\' -f2)"
+imgsrc="${IMGSRC:="$(cat ~/.fehbg | cut -d\' -f2)"}"
 
 img="$imgtempdir/$(basename $imgsrc)"
 
 # Crop if necessary
 if [ ! -f "$img" ]; then
     [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
-    wsize="$(identify -format '%h' $imgsrc)"
-    convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img"
+    wsize="$(identify -format '%h' $imgsrc 2>/dev/null)"
+    convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" \
+      &>/dev/null
 fi
 
 # Order and format the info
+underline="$(printf "%${#title}s" | tr ' ' '=')="
 output=''
 tab="$(echo -e '\t')" # We use this to separate the key
 for k in "${!info[@]}"; do
