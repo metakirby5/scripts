@@ -21,7 +21,7 @@ underline="$(printf "%${#title}s" | tr ' ' '=')="
 declare -A info=(
     ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
     ["2:Kernel"]="$(uname -r)"
-    ["3:Uptime"]="$(uptime -p | sed -e 's/ou|ute//g')"
+    ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
     ["4:Shell"]="$SHELL"
     ["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
     ["6:CPU"]="$(cat /proc/cpuinfo |\
