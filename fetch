@@ -1,22 +1,21 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 # Fetch info about your system
 #
 # Created by Dylan Araps
-# https://github.com/dylanaraps/dotfiles
+# https://github.com/dylanaraps/dotfiles/
+# Modified by Ethan Chan
+# https://github.com/metakirby5/dotfiles/
 
-# Formatting
+# Text
+title="$(whoami)"
+underline="$(printf %"${#title}"s |tr " " "=")="
 
-# Set to nothing to disable bold text
-bold=$(tput bold)
-
-# Clears attributes
-clear=$(tput sgr0)
-
-# Default color
-# colors are now defined with a launch option "-c"
-color=$(tput setaf 1)
+# Colors
+primary=$(tput setaf 1)
+secondary=$(tput setaf 4)
 black=$(tput setaf 0)
-blue=$(tput setaf 4)
+bold=$(tput bold)
+clear=$(tput sgr0)
 
 put_colors() {
     for i in `seq $1 $2`; do
@@ -24,79 +23,41 @@ put_colors() {
     done
 }
 
-# Custom Image
-
-# If usewall=1 then fetch will use a cropped version of your wallpaper as the img
-usewall=1
-
-# The default image to use if usewall=0
-img="$HOME/Pictures/avatars/gon.png"
-
-# Image width/height/offset
+# Image
+walltempdir=~/.fetch
 width=312
 height=312
 yoffset=0
 xoffset=0
-
-# Padding to align text to the right
 pad="                       "
 
-# Other
-
-# Title
-# title can also be changed with -t
-title="$(whoami)"
-
-# Set up args
-while getopts ":c:e:w:h:t:p:x:y:" opt; do
-    case $opt in
-        c) color=$(tput setaf $OPTARG) ;;
-        w) width="$OPTARG" ;;
-        h) height="$OPTARG" ;;
-        t) title="$OPTARG" ;;
-        p) pad="$OPTARG" ;;
-        x) xoffset="$OPTARG" ;;
-        y) yoffset="$OPTARG" ;;
-    esac
-done
-
-# Clear terminal before running
-clear
-
-# Get image from wallpaper
-# Requires feh
-if [ $usewall -eq 1 ]; then
-    wallpaper=$(cat $HOME/.fehbg | awk '/feh/ {printf $3}' | sed -e "s/'//g")
-
-    # Directory to store cropped wallpapers.
-    walltempdir="$HOME/.wallpaper"
-
-    # Check if the directory exists
-    if [ ! -d "$walltempdir" ]; then
-        mkdir "$walltempdir" || echo "Failed to create wallpaper dir"; exit
-    fi
-
-    # Crop the wallpaper and save it to  the wallpaperdir
-    # By default it crops a 1080x1080 square in the center of the image.
-    [ -f "$walltempdir/$(basename $wallpaper)" ] || convert -crop 1080x1080+480+0 "$wallpaper" "$walltempdir/$(basename $wallpaper)"
-
-    # The final image
+# If no image provided
+if [ -z "$img" ]; then
+    # Image shall be the wallpaper
+    wallpaper="$(cat ~/.fehbg | cut -d\' -f2)"
     img="$walltempdir/$(basename $wallpaper)"
+
+    # Crop if necessary
+    if [ ! -f "$img" ]; then
+        [ ! -d "$walltempdir" ] && (mkdir "$walltempdir" || exit)
+        size="$(identify -format '%h' $wallpaper)"
+        convert -crop "$size"x"$size"+0+0 -gravity center "$wallpaper" -resize "$height"x"$height" "$img"
+    fi
 fi
 
-# Underline title with length of title
-underline=$(printf %"${#title}"s |tr " " "=")
-
-# Start printing info
-
-echo "${pad}${bold}${blue}$title${clear}"
-echo "${pad}${bold}${black}${underline}="
-echo "${pad}${bold}${color}OS${clear}: $(cat /etc/*ease | awk '/^NAME=/' | cut -d '=' -f2)"
-echo "${pad}${bold}${color}Shell${clear}: bash"
-echo "${pad}${bold}${color}Window Manager${clear}: i3"
-echo "${pad}${bold}${color}Font${clear}: PixelMPlus12"
-echo "${pad}${bold}${color}Waifu${clear}: Black Rock Shooter"
+# Print info
+clear
+tput civis
+echo "${pad}${bold}${primary}$title${clear}"
+echo "${pad}${bold}${black}${underline}"
+echo "${pad}${bold}${secondary}OS${clear}: Fedora"
+echo "${pad}${bold}${secondary}Shell${clear}: bash"
+echo "${pad}${bold}${secondary}Window Manager${clear}: i3"
+echo "${pad}${bold}${secondary}Font${clear}: PixelMPlus12"
+echo "${pad}${bold}${secondary}Waifu${clear}: Black Rock Shooter"
 echo
 echo "${pad}$(put_colors 0 7)"
 echo "${pad}$(put_colors 8 15)"
 echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
+tput cnorm
+
