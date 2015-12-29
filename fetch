@@ -6,17 +6,35 @@
 # Modified by Ethan Chan
 # https://github.com/metakirby5/dotfiles/
 
+# Import some variables
+color_vars=~/.color_vars
+[ -f "$color_vars" ] && source ~/.color_vars
+
 # Text
 title="$(whoami)"
 underline="$(printf %"${#title}"s |tr " " "=")="
 
 # Colors
-primary=$(tput setaf 1)
-secondary=$(tput setaf 4)
-black=$(tput setaf 0)
-bold=$(tput bold)
-clear=$(tput sgr0)
+primary_n="${PRIMARY_N:=1}"
+secondary_n="${SECONDARY_N:=4}"
+primary="$(tput setaf $primary_n)"
+secondary="$(tput setaf $secondary_n)"
+black="$(tput setaf 0)"
+bold="$(tput bold)"
+clear="$(tput sgr0)"
 
+put_color_header() {
+    local text
+    for i in `seq 0 7`; do
+        case "$i" in
+            "$primary_n")     text=' #1 ' ;;
+            "$secondary_n")   text=' #2 ' ;;
+            *)                text='    ' ;;
+        esac
+
+        echo -n "$(tput setaf $i)$bold$text$clear "
+    done
+}
 put_colors() {
     for i in `seq $1 $2`; do
         echo -n "$(tput setab $i)    $clear "
@@ -48,16 +66,16 @@ fi
 # Print info
 clear
 tput civis
-echo "${pad}${bold}${primary}$title${clear}"
-echo "${pad}${bold}${black}${underline}"
-echo "${pad}${bold}${secondary}OS${clear}: Fedora"
-echo "${pad}${bold}${secondary}Shell${clear}: bash"
-echo "${pad}${bold}${secondary}Window Manager${clear}: i3"
-echo "${pad}${bold}${secondary}Font${clear}: PixelMPlus12"
-echo "${pad}${bold}${secondary}Waifu${clear}: Black Rock Shooter"
+echo "$pad$bold${primary}$title${clear}"
+echo "$pad$bold${black}$underline"
+echo "$pad$bold${secondary}OS${clear}: Fedora"
+echo "$pad$bold${secondary}Shell${clear}: bash"
+echo "$pad$bold${secondary}Window Manager${clear}: i3"
+echo "$pad$bold${secondary}Font${clear}: PixelMPlus12"
 echo
-echo "${pad}$(put_colors 0 7)"
-echo "${pad}$(put_colors 8 15)"
+echo "$pad$(put_color_header)"
+echo "$pad$(put_colors 0 7)"
+echo "$pad$(put_colors 8 15)"
 echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
 tput cnorm
 
