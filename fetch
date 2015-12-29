@@ -21,6 +21,16 @@ declare -A info=(
   ["Waifu"]="Black Rock Shooter"
 )
 
+# Image
+imgtempdir=~/.fetch
+charheight=31
+charwidth="$(($charheight / 2))"
+
+# Comment out the line below for a custom image
+#imgsrc=/path/to/img
+
+# === DO NOT EDIT BELOW THIS LINE ===
+
 # Colors
 primary_n="${PRIMARY_N:=1}"
 secondary_n="${SECONDARY_N:=4}"
@@ -42,32 +52,30 @@ put_color_header() {
         echo -n "$(tput setaf $i)$bold$text$clear "
     done
 }
+
 put_colors() {
     for i in `seq $1 $2`; do
         echo -n "$(tput setab $i)    $clear "
     done
 }
 
-# Image
-walltempdir=~/.fetch
-width=312
-height=312
-yoffset=0
-xoffset=0
-pad="                       "
+# Calculate size of image from amount of info present
+# title + underline + 3 lines of color info = 5
+isize="$(((${#info[@]} + 5) * $charheight))"
 
-# If no image provided
-if [ -z "$img" ]; then
-    # Image shall be the wallpaper
-    wallpaper="$(cat ~/.fehbg | cut -d\' -f2)"
-    img="$walltempdir/$(basename $wallpaper)"
+# Calculate amount of padding, add 2 for reasons unknown
+pad="$(printf ' %.0s' `seq 1 $(($isize / $charwidth + 2))`)"
 
-    # Crop if necessary
-    if [ ! -f "$img" ]; then
-        [ ! -d "$walltempdir" ] && (mkdir "$walltempdir" || exit)
-        size="$(identify -format '%h' $wallpaper)"
-        convert -crop "$size"x"$size"+0+0 -gravity center "$wallpaper" -resize "$height"x"$height" "$img"
-    fi
+# If no image provided, image source is wallpaper
+[ -z "$imgsrc" ] && imgsrc="$(cat ~/.fehbg | cut -d\' -f2)"
+
+img="$imgtempdir/$(basename $imgsrc)"
+
+# Crop if necessary
+if [ ! -f "$img" ]; then
+    [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
+    wsize="$(identify -format '%h' $imgsrc)"
+    convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img"
 fi
 
 # Print info
@@ -81,6 +89,6 @@ done
 echo "$pad$(put_color_header)"
 echo "$pad$(put_colors 0 7)"
 echo "$pad$(put_colors 8 15)"
-echo -e "0;1;$xoffset;$yoffset;$width;$height;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
+echo -e "0;1;$xoffset;$yoffset;$isize;$isize;;;;;$img\n4;\n3;" | /usr/lib/w3m/w3mimgdisplay
 tput cnorm
 
