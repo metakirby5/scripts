@@ -35,7 +35,26 @@ fetch_config=~/.config/fetch/config
 
 # === DO NOT EDIT BELOW THIS LINE ===
 
+usage() {
+  echo "USAGE: $(basename "$0") [-h] [-r] [-f FUZZ]"
+  echo "  -h: help"
+  echo "  -r: remake image"
+  echo "  -f: fuzz to use in image creation"
+  exit 1
+}
+
 [ -f "$fetch_config" ] && source "$fetch_config"
+
+# Parse args
+while getopts ":f:rh" opt; do
+  case $opt in
+    h) usage ;;
+    r) remake_img=1 ;;
+    f) fuzz="$OPTARG" ;;
+    \?) echo "Invalid option: -$OPTARG" >&2; usage ;;
+    :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
+  esac
+done
 
 # Defaults
 title="${FETCH_TITLE:="$(whoami)"}"
@@ -47,6 +66,7 @@ imgtempdir="${FETCH_IMGTEMPDIR:=/tmp/fetch/}"
 charheight="${FETCH_CHARHEIGHT:=31}"
 charwidth="${FETCH_CHARWIDTH:="$(($charheight / 2))"}"
 additional_padding="${FETCH_ADDITIONAL_PADDING:=3}"
+fuzz="${fuzz:=15%}"
 
 # Handle the array specially
 eval "$FETCH_INFO"
@@ -96,11 +116,16 @@ pad="$(printf "%$(($isize / $charwidth + 2))s")" # +2 for padding
 
 # Prepare the image
 img="$imgtempdir/$(basename $imgsrc)"
-if [ ! -f "$img" ]; then
+if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
   [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
-  wsize="$(identify -format '%h' $imgsrc 2>/dev/null)"
-  convert "$imgsrc" -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" \
-    &>/dev/null
+
+  # Trim
+  convert "$imgsrc" -crop "$(convert "$imgsrc" \
+    -fuzz "$fuzz" -trim -format '%wx%h%O' info: 2>/dev/null)" \
+    +repage "$img" &>/dev/null
+
+  wsize="$(identify -format '%[fx:min(w,h)]' "$img" 2>/dev/null)"
+  mogrify -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" &>/dev/null
 fi
 
 # Order and format the info
