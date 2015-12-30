@@ -15,7 +15,7 @@
 #   FETCH_CHARHEIGHT=number
 #   FETCH_CHARWIDTH=number
 #   FETCH_ADDITIONAL_PADDING=number
-#   FETCH_IMGTEMPDIR=/some/temp/path
+#   FETCH_IMGDIR=/some/path/
 #
 #   # Info MUST be defined in this way!
 #   # You will need to escape backslashes.
@@ -66,7 +66,7 @@ secondary_n="${FETCH_SECONDARY_N:=4}"
 charheight="${FETCH_CHARHEIGHT:=31}"
 charwidth="${FETCH_CHARWIDTH:="$(($charheight / 2))"}"
 additional_padding="${FETCH_ADDITIONAL_PADDING:=2}"
-imgtempdir="${FETCH_IMGTEMPDIR:=/tmp/fetch/}"
+imgdir="${FETCH_IMGDIR:=~/.fetch_crops/}"
 
 img_src="${img_src:="$(cat ~/.fehbg | cut -d\' -f2)"}"
 fuzz="${fuzz:=15%}"
@@ -118,9 +118,9 @@ isize="$(($numlines * $charheight))"
 pad="$(printf "%$(($isize / $charwidth + $additional_padding))s")"
 
 # Prepare the image
-img="$imgtempdir/$(basename $img_src)"
+img="$imgdir/$(basename $img_src)"
 if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
-  [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
+  [ ! -d "$imgdir" ] && (mkdir "$imgdir" || exit)
 
   # Trim
   convert "$img_src" -crop "$(convert "$img_src" \
