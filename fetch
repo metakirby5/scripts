@@ -66,7 +66,7 @@ secondary_n="${FETCH_SECONDARY_N:=4}"
 charheight="${FETCH_CHARHEIGHT:=31}"
 charwidth="${FETCH_CHARWIDTH:="$(($charheight / 2))"}"
 additional_padding="${FETCH_ADDITIONAL_PADDING:=2}"
-imgdir="${FETCH_IMGDIR:=~/.fetch_crops/}"
+imgdir="${FETCH_IMGDIR:="$HOME/.fetch_crops/"}"
 
 img_src="${img_src:="$(cat ~/.fehbg | cut -d\' -f2)"}"
 fuzz="${fuzz:=15%}"
@@ -120,7 +120,9 @@ pad="$(printf "%$(($isize / $charwidth + $additional_padding))s")"
 # Prepare the image
 img="$imgdir/$(basename $img_src)"
 if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
-  [ ! -d "$imgdir" ] && (mkdir "$imgdir" || exit)
+  if [ ! -d "$imgdir" ]; then
+    mkdir "$imgdir" || exit
+  fi
 
   # Trim
   convert "$img_src" -crop "$(convert "$img_src" \
