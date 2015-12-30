@@ -8,21 +8,21 @@
 
 # Config file to source
 # Can contain:
-#   TITLE=text
-#   UNDERLINE=text
-#   PRIMARY_N=0-7
-#   SECONDARY_N=0-7
-#   IMGSRC=/path/to/img
-#   IMGTEMPDIR=/some/temp/path
-#   CHARHEIGHT=number
-#   ADDITIONAL_PADDING=number
+#   FETCH_TITLE=text
+#   FETCH_UNDERLINE=text
+#   FETCH_PRIMARY_N=0-7
+#   FETCH_SECONDARY_N=0-7
+#   FETCH_IMGSRC=/path/to/img
+#   FETCH_IMGTEMPDIR=/some/temp/path
+#   FETCH_CHARHEIGHT=number
+#   FETCH_ADDITIONAL_PADDING=number
 #
 #   # Info MUST be defined in this way!
 #   # You will need to escape backslashes.
 #   # It will be eval'd later, so be careful...
 #   # Format: ["position:title"]="info"
 #   # Any title without a position is alphabetically ordered afterwards.
-#   read -d '' INFO <<"EOF"
+#   read -d '' FETCH_INFO <<"EOF"
 #     declare -A info=(
 #       ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
 #       ["2:Kernel"]="$(uname -r)"
@@ -38,18 +38,18 @@ fetch_config=~/.config/fetch/config
 [ -f "$fetch_config" ] && source "$fetch_config"
 
 # Defaults
-title="${TITLE:="$(whoami)"}"
-underline="${UNDERLINE:="$(printf "%${#title}s" | tr ' ' '=')="}"
-primary_n="${PRIMARY_N:=1}"
-secondary_n="${SECONDARY_N:=4}"
-imgsrc="${IMGSRC:="$(cat ~/.fehbg | cut -d\' -f2)"}"
-imgtempdir="${IMGTEMPDIR:=/tmp/fetch/}"
-charheight="${CHARHEIGHT:=31}"
-charwidth="${CHARWIDTH:="$(($charheight / 2))"}"
-additional_padding="${ADDITIONAL_PADDING:=3}"
+title="${FETCH_TITLE:="$(whoami)"}"
+underline="${FETCH_UNDERLINE:="$(printf "%${#title}s" | tr ' ' '=')="}"
+primary_n="${FETCH_PRIMARY_N:=1}"
+secondary_n="${FETCH_SECONDARY_N:=4}"
+imgsrc="${FETCH_IMGSRC:="$(cat ~/.fehbg | cut -d\' -f2)"}"
+imgtempdir="${FETCH_IMGTEMPDIR:=/tmp/fetch/}"
+charheight="${FETCH_CHARHEIGHT:=31}"
+charwidth="${FETCH_CHARWIDTH:="$(($charheight / 2))"}"
+additional_padding="${FETCH_ADDITIONAL_PADDING:=3}"
 
 # Handle the array specially
-eval "$INFO"
+eval "$FETCH_INFO"
 [ -z "${info[*]}" ] && declare -A info=(
   ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
   ["2:Kernel"]="$(uname -r)"
