@@ -31,3 +31,5 @@ w3m_command="0;1;0;0;$width;$height;;;;;$FILENAME\n4;\n3;"
 clear
 tput cup $(($height/$FONTH)) 0
 echo -e $w3m_command|$W3MIMGDISPLAY
+echo "$(tput setaf 4)$FILENAME$(tput sgr0)"
+echo
