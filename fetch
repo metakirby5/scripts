@@ -18,6 +18,7 @@
 #   ADDITIONAL_PADDING=number
 #
 #   # Info MUST be defined in this way!
+#   # You will need to escape backslashes.
 #   # It will be eval'd later, so be careful...
 #   # Format: ["position:title"]="info"
 #   # Any title without a position is alphabetically ordered afterwards.
@@ -53,13 +54,13 @@ eval "$INFO"
   ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
   ["2:Kernel"]="$(uname -r)"
   ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
-  ["4:Shell"]="$SHELL"
+  ["4:Shell"]="$(basename "$SHELL")"
   ["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
   ["6:CPU"]="$(cat /proc/cpuinfo |\
-  awk -F: '/^model name/ { print $2; exit }')"
+    awk -F: '/^model name/{ gsub(/^\s+/, "", $2); print $2; exit }')"
   ["7:Speed"]="$(lscpu |\
-  awk -F: '/^CPU MHz:/ { print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
-  ["8:Memory"]="$(free -m | awk '/^Mem:/ { print $3 "/" $2 " MB" }')"
+    awk -F: '/^CPU MHz:/{ print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
+  ["8:Memory"]="$(free -m | awk '/^Mem:/{ print $3 "/" $2 " MB" }')"
 )
 
 # Colors
