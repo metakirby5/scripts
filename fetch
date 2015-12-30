@@ -12,10 +12,10 @@
 #   FETCH_UNDERLINE=text
 #   FETCH_PRIMARY_N=0-7
 #   FETCH_SECONDARY_N=0-7
-#   FETCH_IMGSRC=/path/to/img
-#   FETCH_IMGTEMPDIR=/some/temp/path
 #   FETCH_CHARHEIGHT=number
+#   FETCH_CHARWIDTH=number
 #   FETCH_ADDITIONAL_PADDING=number
+#   FETCH_IMGTEMPDIR=/some/temp/path
 #
 #   # Info MUST be defined in this way!
 #   # You will need to escape backslashes.
@@ -36,19 +36,21 @@ fetch_config=~/.config/fetch/config
 # === DO NOT EDIT BELOW THIS LINE ===
 
 usage() {
-  echo "USAGE: $(basename "$0") [-h] [-r] [-f FUZZ]"
-  echo "  -h: help"
-  echo "  -r: remake image"
-  echo "  -f: fuzz to use in image creation"
+  echo "USAGE: $(basename "$0") [-h] [-i] [-r] [-f FUZZ]"
+  echo "  -h              help"
+  echo "  -i IMG_SRC      image source"
+  echo "  -r              remake image"
+  echo "  -f FUZZ         fuzz to use in image creation"
   exit 1
 }
 
 [ -f "$fetch_config" ] && source "$fetch_config"
 
 # Parse args
-while getopts ":f:rh" opt; do
+while getopts ":hi:rf:" opt; do
   case $opt in
     h) usage ;;
+    i) img_src="$OPTARG" ;;
     r) remake_img=1 ;;
     f) fuzz="$OPTARG" ;;
     \?) echo "Invalid option: -$OPTARG" >&2; usage ;;
@@ -61,11 +63,12 @@ title="${FETCH_TITLE:="$(whoami)"}"
 underline="${FETCH_UNDERLINE:="$(printf "%${#title}s" | tr ' ' '=')="}"
 primary_n="${FETCH_PRIMARY_N:=1}"
 secondary_n="${FETCH_SECONDARY_N:=4}"
-imgsrc="${FETCH_IMGSRC:="$(cat ~/.fehbg | cut -d\' -f2)"}"
-imgtempdir="${FETCH_IMGTEMPDIR:=/tmp/fetch/}"
 charheight="${FETCH_CHARHEIGHT:=31}"
 charwidth="${FETCH_CHARWIDTH:="$(($charheight / 2))"}"
-additional_padding="${FETCH_ADDITIONAL_PADDING:=3}"
+additional_padding="${FETCH_ADDITIONAL_PADDING:=2}"
+imgtempdir="${FETCH_IMGTEMPDIR:=/tmp/fetch/}"
+
+img_src="${img_src:="$(cat ~/.fehbg | cut -d\' -f2)"}"
 fuzz="${fuzz:=15%}"
 
 # Handle the array specially
@@ -112,15 +115,15 @@ put_colors() {
 # Calculate sizing info
 numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
 isize="$(($numlines * $charheight))"
-pad="$(printf "%$(($isize / $charwidth + 2))s")" # +2 for padding
+pad="$(printf "%$(($isize / $charwidth + $additional_padding))s")"
 
 # Prepare the image
-img="$imgtempdir/$(basename $imgsrc)"
+img="$imgtempdir/$(basename $img_src)"
 if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
   [ ! -d "$imgtempdir" ] && (mkdir "$imgtempdir" || exit)
 
   # Trim
-  convert "$imgsrc" -crop "$(convert "$imgsrc" \
+  convert "$img_src" -crop "$(convert "$img_src" \
     -fuzz "$fuzz" -trim -format '%wx%h%O' info: 2>/dev/null)" \
     +repage "$img" &>/dev/null
 
