@@ -115,7 +115,9 @@ put_colors() {
 # Calculate sizing info
 numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
 isize="$(($numlines * $charheight))"
-pad="$(printf "%$(($isize / $charwidth + $additional_padding))s")"
+padlen="$(($isize / $charwidth + $additional_padding))"
+linelen="$(($(tput cols) - $padlen))"
+pad="$(printf "%${padlen}s")"
 
 # Prepare the image
 img="$imgdir/$(basename $img_src)"
@@ -139,7 +141,15 @@ unordered=''
 tab="$(printf '\t')" # We use this to separate the key
 
 for k in "${!info[@]}"; do
-  cur="$pad$bold$secondary${k#*:}$clear: ${info[$k]}"
+  cur="$bold$secondary${k#*:}$clear: ${info[$k]}"
+
+  # Do some truncation
+  len="$(echo -n "${k#*:}: ${info[$k]}" | wc -c)"
+  invis_len="$(($(echo -n "$cur" | wc -c) - $len))"
+  [ "$len" -gt "$linelen" ] &&\
+    cur="$(echo "$cur" | cut -c-$(($linelen + $invis_len - 2)))…"
+
+  cur="$pad$cur"
 
   # Add to ordered or unordered
   if [[ "$k" == *:* ]]; then
