@@ -134,13 +134,18 @@ if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
     mkdir "$imgdir" || exit "$?"
   fi
 
-  # Trim
-  convert "$img_src" -crop "$(convert "$img_src" \
-    -fuzz "$fuzz" -trim -format '%wx%h%O' info: 2>/dev/null)" \
-    +repage "$img" &>/dev/null
+  # Can we use smartcrop?
+  if command -v smartcrop &>/dev/null; then
+    smartcrop "$img_src" "$img"
+  else # Use imagemagick
+    # Trim
+    convert "$img_src" -crop "$(convert "$img_src" \
+      -fuzz "$fuzz" -trim -format '%wx%h%O' info: 2>/dev/null)" \
+      +repage "$img" &>/dev/null
 
-  wsize="$(identify -format '%[fx:min(w,h)]' "$img" 2>/dev/null)"
-  mogrify -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" &>/dev/null
+    wsize="$(identify -format '%[fx:min(w,h)]' "$img" 2>/dev/null)"
+    mogrify -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" &>/dev/null
+  fi
 
   if [ ! -f "$img" ]; then
     echo "Image \"$img_src\" not fond!"
