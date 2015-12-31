@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# anime quotes
+
+usage() {
+  echo "USAGE: aquote [hummingbird.me anime id]"
+  exit 1
+}
+
+[ "$#" -ne 1 ] && usage
+
+anime="$1"
+
+notify() {
+	notify-send -a 'aquote' "$1" "$2"
+}
+
+json="$(curl -s \
+	-H 'Accept: application/json' \
+	-H 'X-Requested-With: XMLHttpRequest' \
+	"https://hummingbird.me/quotes?anime_id=$anime")"
+
+num_quotes="$(echo "$json" | jq '.quotes | length')"
+if [ "$num_quotes" -eq 0 ]; then
+	notify "Anime \"$anime\" not found!"
+	exit 1
+fi
+
+selected_num="$((RANDOM % $num_quotes))"
+selected="$(echo "$json" | jq ".quotes[$selected_num]")"
+quote="$(echo "$selected" | jq -r ".content")"
+who="$(echo "$selected" | jq -r ".character_name")"
+
+notify "$(echo "$anime" | sed 's/\b\(.\)/\u\1/g')" \
+  "$quote\n\n\t-$who"
+
