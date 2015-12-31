@@ -17,19 +17,13 @@
 #   FETCH_ADDITIONAL_PADDING=number
 #   FETCH_IMGDIR=/some/path/
 #
-#   # Info MUST be defined in this way!
-#   # You will need to escape backslashes.
-#   # It will be eval'd later, so be careful...
-#   # Format: ["position:title"]="info"
-#   # Any title without a position is alphabetically ordered afterwards.
-#   read -d '' FETCH_INFO <<"EOF"
-#     declare -A info=(
-#       ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
-#       ["2:Kernel"]="$(uname -r)"
-#       ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
-#       # etc.
-#     )
-#   EOF
+#   # Anything behind the first colon is colored $FETCH_SECONDARY.
+#   FETCH_INFO=(
+#     "OS: $(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+#     "Kernel: $(uname -r)"
+#     "Uptime: $(uptime -p | sed 's/ou\|ute//g')"
+#     # etc.
+#   )
 
 fetch_config=~/.config/fetch/config
 
@@ -61,35 +55,34 @@ while getopts ":hli:rf:" opt; do
 done
 
 # Defaults
-title="${FETCH_TITLE:="$(whoami)"}"
-underline="${FETCH_UNDERLINE:="$(printf "%${#title}s" | tr ' ' '=')="}"
-primary_n="${FETCH_PRIMARY_N:=1}"
-secondary_n="${FETCH_SECONDARY_N:=4}"
-charheight="${FETCH_CHARHEIGHT:=31}"
-charwidth="${FETCH_CHARWIDTH:="$(($charheight / 2))"}"
-additional_padding="${FETCH_ADDITIONAL_PADDING:=2}"
-imgdir="${FETCH_IMGDIR:="$HOME/.fetch_crops/"}"
+title="${FETCH_TITLE:-"$(whoami)"}"
+underline="${FETCH_UNDERLINE:-"$(printf "%${#title}s" | tr ' ' '=')="}"
+primary_n="${FETCH_PRIMARY_N:-1}"
+secondary_n="${FETCH_SECONDARY_N:-4}"
+charheight="${FETCH_CHARHEIGHT:-31}"
+charwidth="${FETCH_CHARWIDTH:-"$(($charheight / 2))"}"
+additional_padding="${FETCH_ADDITIONAL_PADDING:-2}"
+imgdir="${FETCH_IMGDIR:-"$HOME/.fetch_crops/"}"
 
-img_src="${img_src:="$(cat ~/.fehbg | cut -d\' -f2)"}"
-fuzz="${fuzz:=15%}"
+img_src="${img_src:-"$(cat ~/.fehbg | cut -d\' -f2)"}"
+fuzz="${fuzz:-15%}"
 
-# Handle the array specially
-eval "$FETCH_INFO"
-[ -z "${info[*]}" ] && declare -A info=(
-  ["1:OS"]="$(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
-  ["2:Kernel"]="$(uname -r)"
-  ["3:Uptime"]="$(uptime -p | sed 's/ou\|ute//g')"
-  ["4:Shell"]="$(basename "$SHELL")"
-  ["5:Window Manager"]="$(wmctrl -m | awk '/^Name:/{ print $2}')"
-  ["6:CPU"]="$(cat /proc/cpuinfo |\
+default_info=(
+  "OS: $(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
+  "Kernel: $(uname -r)"
+  "Uptime: $(uptime -p | sed 's/ou\|ute//g')"
+  "Shell: $(basename "$SHELL")"
+  "Window Manager: $(wmctrl -m | awk '/^Name:/{ print $2}')"
+  "CPU: $(cat /proc/cpuinfo |\
     awk -F: '/^model name/{ gsub(/^\s+/, "", $2); print $2; exit }')"
-  ["7:Speed"]="$(lscpu |\
+  "Speed: $(lscpu |\
     awk -F: '/^CPU MHz:/{ print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
-  ["8:Memory"]="$(free -m | awk '/^Mem:/{ print $3 "/" $2 " MB" }')"
+  "Memory: $(free -m | awk '/^Mem:/{ print $3 "/" $2 " MB" }')"
 )
+info=("${FETCH_INFO[@]:-"${default_info[@]}"}")
 
 # Other actions
-if [ ! -z "$list_img" ]; then
+if [ -n "$list_img" ]; then
   ls "$imgdir"
   exit 0
 fi
@@ -97,7 +90,6 @@ fi
 # Colors
 primary="$(tput setaf $primary_n)"
 secondary="$(tput setaf $secondary_n)"
-black="$(tput setaf 0)"
 bold="$(tput bold)"
 clear="$(tput sgr0)"
 
@@ -129,7 +121,7 @@ pad="$(printf "%${padlen}s")"
 
 # Prepare the image
 img="${imgdir%/}/$(basename "$img_src")"
-if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
+if [ ! -f "$img" ] || [ -n "$remake_img" ]; then
   if [ ! -d "$imgdir" ]; then
     mkdir "$imgdir" || exit "$?"
   fi
@@ -153,42 +145,31 @@ if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
   fi
 fi
 
-# Order and format the info
-ordered=''
-unordered=''
-tab="$(printf '\t')" # We use this to separate the key
-
-for k in "${!info[@]}"; do
-  cur="$bold$secondary${k#*:}$clear: ${info[$k]}"
-
-  # Do some truncation
-  len="$(echo -n "${k#*:}: ${info[$k]}" | wc -c)"
-  invis_len="$(($(echo -n "$cur" | wc -c) - $len))"
-  [ "$len" -gt "$linelen" ] &&\
-    cur="$(echo "$cur" | cut -c-$(($linelen + $invis_len - 2)))…"
-
-  cur="$pad$cur"
-
-  # Add to ordered or unordered
-  if [[ "$k" == *:* ]]; then
-    ordered="$ordered
-$priority${k%%:*}$tab$cur"
-  else
-    unordered="$unordered
-$cur"
-  fi
-done
-
-# Sort the ordered info, and concatenate it to unordered to make output
-output="$(echo "$ordered" | sort -n | tail -n+2 | sed "s/^.\+$tab//")"
-output="$output$(echo "$unordered" | sort -d)"
-
 # Print info
 clear
 tput civis
 echo "$pad$bold$primary$title$clear"
-echo "$pad$bold$black$underline"
-echo "$output"
+echo "$pad$primary$underline$clear"
+
+for line in "${info[@]}"; do
+  # If it has a colon, add some colors
+  if [[ "$line" == *:* ]]; then
+    cur="$bold$secondary${line%%:*}$clear:${line#*:}"
+  else
+    cur="$line"
+  fi
+
+  # Do some truncation
+  len="$(echo -n "$line" | wc -c)"
+  clen="$(($(echo -n "$cur" | wc -c) - $len))"
+  if [ "$len" -gt "$linelen" ]; then
+    # Need to account for length of non-printing characters
+    cur="$(echo "$cur" | cut -c-$(($linelen + $clen - 1)))…"
+  fi
+
+  echo "$pad$cur"
+done
+
 echo "$pad$(put_color_header)"
 echo "$pad$(put_colors 0 7)"
 echo "$pad$(put_colors 8 15)"
