@@ -120,10 +120,10 @@ linelen="$(($(tput cols) - $padlen))"
 pad="$(printf "%${padlen}s")"
 
 # Prepare the image
-img="$imgdir/$(basename $img_src)"
+img="${imgdir%/}/$(basename $img_src)"
 if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
   if [ ! -d "$imgdir" ]; then
-    mkdir "$imgdir" || exit
+    mkdir "$imgdir" || exit "$?"
   fi
 
   # Trim
@@ -133,6 +133,11 @@ if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
 
   wsize="$(identify -format '%[fx:min(w,h)]' "$img" 2>/dev/null)"
   mogrify -crop "$wsize"x"$wsize"+0+0 -gravity center "$img" &>/dev/null
+
+  if [ ! -f "$img" ]; then
+    echo "Image \"$img_src\" not fond!"
+    exit 1
+  fi
 fi
 
 # Order and format the info
