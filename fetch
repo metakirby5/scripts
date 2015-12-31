@@ -38,6 +38,7 @@ fetch_config=~/.config/fetch/config
 usage() {
   echo "USAGE: $(basename "$0") [-h] [-i] [-r] [-f FUZZ]"
   echo "  -h              help"
+  echo "  -l              list available images"
   echo "  -i IMG_SRC      image source"
   echo "  -r              remake image"
   echo "  -f FUZZ         fuzz to use in image creation"
@@ -47,9 +48,10 @@ usage() {
 [ -f "$fetch_config" ] && source "$fetch_config"
 
 # Parse args
-while getopts ":hi:rf:" opt; do
+while getopts ":hli:rf:" opt; do
   case $opt in
     h) usage ;;
+    l) list_img=1 ;;
     i) img_src="$OPTARG" ;;
     r) remake_img=1 ;;
     f) fuzz="$OPTARG" ;;
@@ -85,6 +87,12 @@ eval "$FETCH_INFO"
     awk -F: '/^CPU MHz:/{ print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
   ["8:Memory"]="$(free -m | awk '/^Mem:/{ print $3 "/" $2 " MB" }')"
 )
+
+# Other actions
+if [ ! -z "$list_img" ]; then
+  ls "$imgdir"
+  exit 0
+fi
 
 # Colors
 primary="$(tput setaf $primary_n)"
