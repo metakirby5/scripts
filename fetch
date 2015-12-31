@@ -136,7 +136,7 @@ if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
 
   # Can we use smartcrop?
   if command -v smartcrop &>/dev/null; then
-    smartcrop "$img_src" "$img"
+    smartcrop "$img_src" "$img" &>/dev/null
   else # Use imagemagick
     # Trim
     convert "$img_src" -crop "$(convert "$img_src" \
