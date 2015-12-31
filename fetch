@@ -12,12 +12,15 @@
 #   FETCH_UNDERLINE=text
 #   FETCH_PRIMARY_N=0-7
 #   FETCH_SECONDARY_N=0-7
+#   FETCH_PRIMARY_CHAR=character to mark primary color with
+#   FETCH_SECONDARY_CHAR=character to mark secondary color with
+#   FETCH_OTHER_CHAR=character to mark other colors with
 #   FETCH_CHARHEIGHT=number
 #   FETCH_CHARWIDTH=number
 #   FETCH_ADDITIONAL_PADDING=number
 #   FETCH_IMGDIR=/some/path/
 #
-#   # Anything behind the first colon is colored $FETCH_SECONDARY.
+#   # Anything before the first colon is colored $FETCH_SECONDARY.
 #   FETCH_INFO=(
 #     "OS: $(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
 #     "Kernel: $(uname -r)"
@@ -54,11 +57,20 @@ while getopts ":hli:rf:" opt; do
   esac
 done
 
+# Other actions
+if [ -n "$list_img" ]; then
+  ls "$imgdir"
+  exit 0
+fi
+
 # Defaults
 title="${FETCH_TITLE:-"$(whoami)"}"
 underline="${FETCH_UNDERLINE:-"$(printf "%${#title}s" | tr ' ' '=')="}"
 primary_n="${FETCH_PRIMARY_N:-1}"
 secondary_n="${FETCH_SECONDARY_N:-4}"
+primary_char="${FETCH_PRIMARY_CHAR:-"."}"
+secondary_char="${FETCH_SECONDARY_CHAR:-"_"}"
+other_char="${FETCH_OTHER_CHAR:-" "}"
 charheight="${FETCH_CHARHEIGHT:-31}"
 charwidth="${FETCH_CHARWIDTH:-"$(($charheight / 2))"}"
 additional_padding="${FETCH_ADDITIONAL_PADDING:-2}"
@@ -81,11 +93,20 @@ default_info=(
 )
 info=("${FETCH_INFO[@]:-"${default_info[@]}"}")
 
-# Other actions
-if [ -n "$list_img" ]; then
-  ls "$imgdir"
-  exit 0
-fi
+# Calculate sizing info
+numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
+isize="$(($numlines * $charheight))"
+padlen="$(($isize / $charwidth + $additional_padding))"
+linelen="$(($(tput cols) - $padlen))"
+colorlen="$(($linelen / 8 - 1))" # 8 colors, one space in between
+
+# Sizing-dependent strings
+pad="$(printf "%${padlen}s")"
+color="$(printf "%${colorlen}s")"
+markerseq="$(seq 1 $colorlen)"
+pmarker="$(printf "$primary_char%.0s" $markerseq)"
+smarker="$(printf "$secondary_char%.0s" $markerseq)"
+omarker="$(printf "$other_char%.0s" $markerseq)"
 
 # Colors
 primary="$(tput setaf $primary_n)"
@@ -97,9 +118,9 @@ put_color_header() {
   local text
   for i in `seq 0 7`; do
     case "$i" in
-      "$primary_n")     text=' .. ' ;;
-      "$secondary_n")   text=' __ ' ;;
-      *)                text='    ' ;;
+      "$primary_n")     text="$pmarker" ;;
+      "$secondary_n")   text="$smarker" ;;
+      *)                text="$omarker" ;;
     esac
 
     echo -n "$(tput setaf $i)$bold$text$clear "
@@ -108,16 +129,9 @@ put_color_header() {
 
 put_colors() {
   for i in `seq $1 $2`; do
-    echo -n "$(tput setab $i)    $clear "
+    echo -n "$(tput setab $i)$color$clear "
   done
 }
-
-# Calculate sizing info
-numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
-isize="$(($numlines * $charheight))"
-padlen="$(($isize / $charwidth + $additional_padding))"
-linelen="$(($(tput cols) - $padlen))"
-pad="$(printf "%${padlen}s")"
 
 # Prepare the image
 img="${imgdir%/}/$(basename "$img_src")"
