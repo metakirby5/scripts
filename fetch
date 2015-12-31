@@ -128,7 +128,7 @@ linelen="$(($(tput cols) - $padlen))"
 pad="$(printf "%${padlen}s")"
 
 # Prepare the image
-img="${imgdir%/}/$(basename $img_src)"
+img="${imgdir%/}/$(basename "$img_src")"
 if [ ! -f "$img" ] || [ ! -z "$remake_img" ]; then
   if [ ! -d "$imgdir" ]; then
     mkdir "$imgdir" || exit "$?"
