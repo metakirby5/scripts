@@ -14,15 +14,15 @@ if [ "$#" -eq 0 ]; then
     dmenu -i -f -fn "Calibri:pixelsize=28" -sb "#3f91c0" -h 50 -t \
     -p 'Whizkers')
   [ -z "$selected" ] && exit 0
-  whizkers -e $selected
+  whizkers -e $selected >/dev/null
 else
-  whizkers -e "$@"
+  whizkers -e "$@" >/dev/null
 fi
 
 [ "$?" -ne 0 ] && exit 1
 
 reload-desktop
-[ "$#" -ne 0 ] && sleep 1 && fetch
+[ "$#" -ne 0 ] && sleep 0.5 && fetch
 
 exit 0
 
