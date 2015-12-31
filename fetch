@@ -98,15 +98,15 @@ numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
 isize="$(($numlines * $charheight))"
 padlen="$(($isize / $charwidth + $additional_padding))"
 linelen="$(($(tput cols) - $padlen))"
-colorlen="$(($linelen / 8 - 1))" # 8 colors, one space in between
+colorlen="$(($linelen / 8))" # 8 colors
 
 # Sizing-dependent strings
 pad="$(printf "%${padlen}s")"
 color="$(printf "%${colorlen}s")"
-markerseq="$(seq 1 $colorlen)"
-pmarker="$(printf "$primary_char%.0s" $markerseq)"
-smarker="$(printf "$secondary_char%.0s" $markerseq)"
-omarker="$(printf "$other_char%.0s" $markerseq)"
+markerseq="$(seq 1 $(($colorlen - 2)))" # space at start and end
+pmarker=" $(printf "$primary_char%.0s" $markerseq) "
+smarker=" $(printf "$secondary_char%.0s" $markerseq) "
+omarker=" $(printf "$other_char%.0s" $markerseq) "
 
 # Colors
 primary="$(tput setaf $primary_n)"
@@ -123,13 +123,13 @@ put_color_header() {
       *)                text="$omarker" ;;
     esac
 
-    echo -n "$(tput setaf $i)$bold$text$clear "
+    echo -n "$(tput setaf $i)$bold$text$clear"
   done
 }
 
 put_colors() {
   for i in `seq $1 $2`; do
-    echo -n "$(tput setab $i)$color$clear "
+    echo -n "$(tput setab $i)$color$clear"
   done
 }
 
