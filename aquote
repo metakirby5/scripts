@@ -31,6 +31,6 @@ selected="$(echo "$json" | jq ".quotes[$selected_num]")"
 quote="$(echo "$selected" | jq -r ".content" | fold -sw "$len")"
 who="$(echo "$selected" | jq -r ".character_name")"
 
-notify "$(echo "$anime" | sed 's/\b\(.\)/\u\1/g')" \
+notify "$(echo "$anime" | sed 's/\b\(.\)/\u\1/g' | sed 's/-/ /g' )" \
   "$quote\n\n\t-$who"
 
