@@ -13,5 +13,9 @@ elif pgrep -x mopidy &>/dev/null; then
   mpd &>/dev/null &
 else # default to mpd
   echo "No mpd-like daemons running, starting mpd..."
-  mpd &>/dev/null
+  mpd &>/dev/null &
 fi
+
+sleep 0.5
+startbar &>/dev/null
+
