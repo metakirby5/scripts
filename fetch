@@ -79,7 +79,7 @@ imgdir="${FETCH_IMGDIR:-"$HOME/.fetch_crops/"}"
 img_src="${img_src:-"$(cat ~/.fehbg | cut -d\' -f2)"}"
 fuzz="${fuzz:-15%}"
 
-default_info=(
+[ -n "${FETCH_INFO+1}" ] && info=("${FETCH_INFO[@]}") || info=(
   "OS: $(cat /etc/*ease | awk -F= '/^NAME=/{ print $2 }')"
   "Kernel: $(uname -r)"
   "Uptime: $(uptime -p | sed 's/ou\|ute//g')"
@@ -91,7 +91,6 @@ default_info=(
     awk -F: '/^CPU MHz:/{ print "scale=1;" $2 "/ 1000" }' | bc -l)GHz"
   "Memory: $(free -m | awk '/^Mem:/{ print $3 "/" $2 " MB" }')"
 )
-info=("${FETCH_INFO[@]:-"${default_info[@]}"}")
 
 # Calculate sizing info
 numlines="$((${#info[@]} + 5))" # title + underline + 3x color info = 5
