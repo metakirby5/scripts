@@ -9,6 +9,6 @@ usage() {
 # Sanity checks
 [ "$#" -lt 2 ] && usage
 
-ffmpeg -i "$1" -vf scale=-1:${3:=900} -c:v libvpx -qmin 1 -qmax ${4:=10} \
+ffmpeg -i "$1" -vf scale=-1:${3:-900} -c:v libvpx -qmin 1 -qmax ${4:-10} \
 	-an -threads 0 -slices 8 -auto-alt-ref 1 -lag-in-frames 16 \
 	-f webm "$2"
