@@ -38,19 +38,21 @@ usage() {
   echo "  -l              list available images"
   echo "  -i IMG_SRC      image source"
   echo "  -r              remake image"
-  echo "  -f FUZZ         fuzz to use in image creation"
+  echo "  -m              use imagemagick instead of smartcrop"
+  echo "  -f FUZZ         fuzz to use in imagemagick cropping"
   exit 1
 }
 
 [ -f "$fetch_config" ] && source "$fetch_config"
 
 # Parse args
-while getopts ":hli:rf:" opt; do
+while getopts ":hli:rmf:" opt; do
   case $opt in
     h) usage ;;
     l) list_img=1 ;;
     i) img_src="$OPTARG" ;;
     r) remake_img=1 ;;
+    m) use_imagemagick=1 ;;
     f) fuzz="$OPTARG" ;;
     \?) echo "Invalid option: -$OPTARG" >&2; usage ;;
     :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
@@ -139,8 +141,8 @@ if [ ! -f "$img" ] || [ -n "$remake_img" ]; then
     mkdir "$imgdir" || exit "$?"
   fi
 
-  # Can we use smartcrop?
-  if command -v smartcrop &>/dev/null; then
+  # Should we use smartcrop?
+  if [ -z "$use_imagemagick" ] && command -v smartcrop &>/dev/null; then
     smartcrop "$img_src" "$img" &>/dev/null
   else # Use imagemagick
     # Trim
