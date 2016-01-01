@@ -8,7 +8,8 @@ usage() {
 
 [ "$#" -ne 1 ] && usage
 
-anime="$1"
+anime="$(echo "$1" |\
+  tr '[:upper:]' '[:lower:]' | awk '{$1=$1};1' | tr ' ' '-')"
 len=50
 
 notify() {
@@ -31,6 +32,6 @@ selected="$(echo "$json" | jq ".quotes[$selected_num]")"
 quote="$(echo "$selected" | jq -r ".content" | fold -sw "$len")"
 who="$(echo "$selected" | jq -r ".character_name")"
 
-notify "$(echo "$anime" | sed 's/\b\(.\)/\u\1/g' | sed 's/-/ /g' )" \
+notify "$(echo "$anime" | sed 's/\b\(.\)/\u\1/g' | tr '-' ' ')" \
   "$quote\n\n\t-$who"
 
