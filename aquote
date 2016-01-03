@@ -29,8 +29,8 @@ fi
 
 selected_num="$((RANDOM % $num_quotes))"
 selected="$(echo "$json" | jq ".quotes[$selected_num]")"
-quote="$(echo "$selected" | jq -r ".content" | fold -sw "$len")"
-who="$(echo "$selected" | jq -r ".character_name")"
+quote="$(echo "$selected" | jq -r '.content' | fold -sw "$len")"
+who="$(echo "$selected" | jq -r '.character_name')"
 
 notify "$(echo "$anime" | sed 's/\b\(.\)/\u\1/g' | tr '-' ' ')" \
   "$quote\n\n\t-$who"

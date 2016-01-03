@@ -36,4 +36,4 @@ if [ ! "$private" = false ]; then
   url="$url&private=true"
 fi
 
-curl -sf "$url" | jq .data.url | tr -d '"'
+curl -sf "$url" | jq -r '.data.url'
