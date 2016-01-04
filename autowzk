@@ -2,60 +2,56 @@
 # Runs colorz2 on an image file to get 6 colors, then stuffs those colors
 # through wzk.
 
-# http://stackoverflow.com/a/13221491
-exists() {
-  if [ "$2" != in ]; then
-    echo "Incorrect usage."
-    echo "Correct usage: exists {key} in {array}"
-    return
-  fi
-  eval '[ ${'$3'[$1]+muahaha} ]'
-}
-
 usage() {
   echo "USAGE: autowzk [image file / URL] (primary color) (secondary color)"
   echo "If image URL provided, image will be saved at \"~/.autowzk\"."
-  echo "Available colors: 2 (red),  3 (green),   4 (yellow),"
-  echo "                  5 (blue), 6 (magenta), 7 (cyan)"
-  echo "Defaults: primary=2, secondary=3"
+  echo "Available colors: red,  green,   yellow,"
+  echo "                  blue, magenta, cyan"
+  echo "Defaults: primary = red, secondary = blue"
   exit 1
 }
 
 SRC=~/.autowzk
 
-declare -A COLORS
 COLORS=(
-  [2]=red
-  [3]=green
-  [4]=yellow
-  [5]=blue
-  [6]=magenta
-  [7]=cyan
+  red
+  green
+  yellow
+  blue
+  magenta
+  cyan
 )
+
+is_a_color() {
+  [[ " ${COLORS[*]} " == *" $1 "* ]]
+  return $?
+}
 
 read -r -d '' TEMPLATE << EOM
 wallpapers: "%s"
 
-n_red: "%s"
-b_red: "%s"
-n_green: "%s"
-b_green: "%s"
-n_yellow: "%s"
-b_yellow: "%s"
-n_blue: "%s"
-b_blue: "%s"
-n_magenta: "%s"
-b_magenta: "%s"
-n_cyan: "%s"
-b_cyan: "%s"
-
-n_primary: "%s"
-b_primary: "%s"
-
-ncmpcpp_primary: "%s"
-ncmpcpp_secondary: "%s"
-ncmpcpp_primary_n: "%s"
-ncmpcpp_secondary_n: "%s"
+colors:
+  name:         "%s"
+  primary:      "%s"
+  secondary:    "%s"
+  red:
+    normal:     "%s"
+    bold:       "%s"
+  green:
+    normal:     "%s"
+    bold:       "%s"
+  yellow:
+    normal:     "%s"
+    bold:       "%s"
+  blue:
+    normal:     "%s"
+    bold:       "%s"
+  magenta:
+    normal:     "%s"
+    bold:       "%s"
+  cyan:
+    normal:     "%s"
+    bold:       "%s"
 EOM
 
 # Sanity checks, getting args
@@ -71,32 +67,30 @@ fi
 
 if [ -z "$2" ]; then
   # Default
-  primary="2"
+  primary="red"
 else
-  exists "$2" in COLORS 2>/dev/null && primary="$2" || usage
+  is_a_color "$2" && primary="$2" || usage
 fi
 
 if [ -z "$3" ]; then
   # Default
-  secondary="3"
+  secondary="blue"
 else
-  exists "$3" in COLORS 2>/dev/null && secondary="$3" || usage
+  is_a_color "$3" && secondary="$3" || usage
 fi
 
 # Starting...
-echo "Using primary=$primary, secondary=$secondary..."
+echo "Using primary = $primary, secondary = $secondary..."
 echo
 
 colors="$(colorz2 --no-preview -n 6 "$SRC")"
 [ "${PIPESTATUS[0]}" -ne 0 ] && exit 1
 
-primaries="$(echo "$colors" | sed -n "$((primary - 1))p")"
-
 yaml="$(echo \
-  "$colors" "$primaries" \
-  "${COLORS[$primary]}" "${COLORS[$secondary]}" \
-  "$primary"            "$secondary" |\
-  xargs printf "$TEMPLATE" "$(readlink -f "$SRC")")"
+  "$(readlink -f "$SRC")" "$(basename "$1" | cut -f 1 -d .)" \
+  "$primary" "$secondary" \
+  "$colors" |\
+xargs printf "$TEMPLATE")"
 
 echo "Generated YAML:"
 echo "$yaml"

@@ -144,6 +144,12 @@ if [ ! -f "$img" ] || [ -n "$remake_img" ]; then
   # Should we use smartcrop?
   if [ -z "$use_imagemagick" ] && command -v smartcrop &>/dev/null; then
     smartcrop "$img_src" "$img" &>/dev/null
+
+    # If we failed, it's probably b/c we had no extension
+    if [ $? -eq 1 ]; then
+      smartcrop "$img_src" "${img}.png" &>/dev/null
+      mv "${img}.png" "$img"
+    fi
   else # Use imagemagick
     # Trim
     convert "$img_src" -crop "$(convert "$img_src" \
@@ -155,7 +161,7 @@ if [ ! -f "$img" ] || [ -n "$remake_img" ]; then
   fi
 
   if [ ! -f "$img" ]; then
-    echo "Image \"$img_src\" not fond!"
+    echo "Image \"$img_src\" not found!"
     exit 1
   fi
 fi
