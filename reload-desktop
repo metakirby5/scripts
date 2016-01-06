@@ -9,6 +9,10 @@ for pts in /dev/pts/*; do
 	(echo -n "$(use-colors < ~/.Xresources)" > $pts) 2>/dev/null
 done
 
+# GTK
+oomox whizkers
+gtkrc-reload
+
 killall compton &>/dev/null
 killall dunst &>/dev/null
 i3-msg 'restart' &>/dev/null
