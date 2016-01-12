@@ -97,5 +97,5 @@ echo "$yaml"
 echo
 
 echo "Running wzk..."
-rm "~/.fetch_crops/$SRC" &>/dev/null
+rm "$HOME/.fetch_crops/$(basename $SRC)" &>/dev/null
 wzk <(echo "$yaml")

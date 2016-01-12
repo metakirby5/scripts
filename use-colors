@@ -2,8 +2,12 @@
 # http://superuser.com/a/921802
 
 tr -d ' \t' | sed -n '
-s/.*background:/\x1b]11;/p
-s/.*foreground:/\x1b]10;/p
-s/.*borderColor:/\x1b]708;/p
-s/.*color\([0-9][^:]*\):/\x1b]4;\1;/p
+s/.*\.font:/\x1b]710;/p
+s/.*\.boldFont:/\x1b]711;/p
+s/.*\.italicFont:/\x1b]712;/p
+s/.*\.boldItalicFont:/\x1b]713;/p
+s/.*\.background:/\x1b]11;/p
+s/.*\.foreground:/\x1b]10;/p
+s/.*\.borderColor:/\x1b]708;/p
+s/.*\.color\([0-9][^:]*\):/\x1b]4;\1;/p
 ' | tr \\n \\a
