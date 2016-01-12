@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# https://github.com/DanielFGray/dotfiles/blob/master/bash_utils
+
+mapfile -t songs < <(mpc listall | sort -r | fzf --reverse -m -e +s)
+if (( ${#songs[@]} > 0 )); then
+  printf '%s\n' "${songs[@]}" | mpc -q add
+  index=$(mpc playlist | wc -l)
+  if (( ${#songs[@]} > 1 )); then
+    index=$(( $index - ${#songs[@]} + 1))
+  fi
+  mpc -q play "$index"
+fi
