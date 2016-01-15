@@ -4,7 +4,12 @@
 TMPBG="$(mktemp).png"
 
 scrot "$TMPBG"
-mogrify -sample 5% -sample 2000% "$TMPBG"
+mogrify \
+	-sample 5% -sample 2000% \
+	-fill black -colorize 50% \
+	-font "PixelMPlus12-Regular" -kerning 5 -pointsize 100 \
+	-fill white -gravity center -annotate +0+0 "locked" \
+	"$TMPBG"
 killall -SIGUSR1 dunst # pause dunst
 i3lock -ndui "$TMPBG"
 killall -SIGUSR2 dunst # resume dunst
