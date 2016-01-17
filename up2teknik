@@ -12,4 +12,4 @@ usage() {
 [ ! -e "$1" ] || [ -d "$1" ] && usage
 
 curl -sfF file="@$1" https://api.teknik.io/upload/post |\
-  jq -r '.[0].results.file.url'
+  jq -r '.[0].results.file.url' | xargs echo -n
