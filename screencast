@@ -77,8 +77,8 @@ fi
 notify-send "Desktop is no longer being recorded. Video is now being converted to webm."
 
 # Convert Video: mkv -> webm
-ffmpeg -i "$TMP" -c:v libvpx -qmin 1 -qmax $QMAX -an -threads 0 -slices 8 -auto-alt-ref 1 -lag-in-frames 16 -pass 1 -f webm /dev/null -y|| ERROR=1
-ffmpeg -i "$TMP" -c:v libvpx -qmin 1 -qmax $QMAX -an -threads 0 -slices 8 -auto-alt-ref 1 -lag-in-frames 16 -pass 2 "$OUTPUT" -y|| ERROR=1
+ffmpeg -i "$TMP" -c:v libvpx -qmin 1 -qmax $QMAX -an -threads 4 -slices 8 -auto-alt-ref 1 -lag-in-frames 16 -pass 1 -f webm /dev/null -y|| ERROR=1
+ffmpeg -i "$TMP" -c:v libvpx -qmin 1 -qmax $QMAX -an -threads 4 -slices 8 -auto-alt-ref 1 -lag-in-frames 16 -pass 2 "$OUTPUT" -y|| ERROR=1
 rm ffmpeg2pass*.log
 if [[ -f "$TMP" && "$KEEP" = false ]]; then rm -f "$TMP"; fi
 
