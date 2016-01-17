@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 # Reload the desktop
 
-xrdb -merge ~/.Xresources &>/dev/null
-tmux source-file ~/.tmux.conf &>/dev/null
+killall compton dunst
+
+i3-msg 'restart' &>/dev/null &
+compton &>/dev/null &
+dunst &>/dev/null &
+
+xrdb -merge ~/.Xresources &>/dev/null &
+tmux source-file ~/.tmux.conf &>/dev/null &
 
 # Reload colors
 for pts in /dev/pts/*; do
-	(echo -n "$(use-colors < ~/.Xresources)" > $pts) 2>/dev/null
-done
+	(echo -n "$(use-colors < ~/.Xresources)" > $pts) 2>/dev/null &
+done &
 
 # GTK
-oomox whizkers
-gtkrc-reload
+oomox whizkers &>/dev/null && gtkrc-reload &>/dev/null &
 
-killall compton &>/dev/null
-killall dunst &>/dev/null
-i3-msg 'restart' &>/dev/null
-
-compton &>/dev/null &
-dunst &>/dev/null &
+# Chrome
+make-chrome-theme-images &>/dev/null &
 
