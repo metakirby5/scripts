@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Assumes you have chrome open and a reasonably fast computer...
+# This script is disgusting
+
+google-chrome &>/dev/null
+
+chrome="$(xdotool getactivewindow)"
+
+xdotool key -window "$chrome" \
+  ctrl+l c h r o m e colon slash slash e x t e n s i o n s Return
+
+# Wait for page to load
+sleep 1
+
+xdotool key -window "$chrome" \
+  Tab Tab Return
+
+# Wait for dialog to load
+sleep 0.2
+
+dialog="$(xdotool getactivewindow)"
+
+xdotool mousemove --window "$dialog" 100 260 click 1
+
+xdotool key -window "$dialog" \
+  ctrl+a asciitilde slash period w h i z k e r s underscore o u t p u t \
+	slash c h r o m e underscore t h e m e slash Return
+
+# Wait for dialog to close
+sleep 0.2
+
+# Close the window
+xdotool key -window "$chrome" ctrl+w
