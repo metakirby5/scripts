@@ -7,7 +7,7 @@ while true; do
 	percent="$(upower -i /org/freedesktop/UPower/devices/battery_BAT1 |\
 		awk '/percentage/{ gsub(/%/, ""); print $2 }')"
 
-	if [ "$percent" -le 100 ]; then
+	if [ "$percent" -le 15 ]; then
 		# Get the dunstify id
 		[ ! -z "$(cat "$DUNSTIFY_ID")" ] && id_arg="-r $(cat "$DUNSTIFY_ID")"
 
