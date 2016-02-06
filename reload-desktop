@@ -10,9 +10,9 @@ dunst &>/dev/null &
 xrdb -merge ~/.Xresources &>/dev/null &
 tmux source-file ~/.tmux.conf &>/dev/null &
 
-# Reload colors
+# Reload colors, fonts, etc.
 for pts in /dev/pts/*; do
-	(echo -n "$(use-colors < ~/.Xresources)" > $pts) 2>/dev/null &
+	(echo -n "$(use-xresources < ~/.Xresources)" > $pts) 2>/dev/null &
 done &
 
 # GTK
