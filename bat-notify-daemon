@@ -21,6 +21,7 @@ notify() {
 }
 
 acpi_listen | while read -r line && [[ "$line" == ac_adapter* ]]; do
+	sleep 5
 	notify
 done &
 
