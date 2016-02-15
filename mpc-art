@@ -52,7 +52,12 @@ while read -u3 msg; do
   if [[ "$msg" == OK* ]]; then
     # Check if the song changed
     song="$(mpc current)"
-    [[ "$song" != "$last" ]] && put_art && display_art
+
+    if [[ "$song" != "$last" ]]; then
+      put_art
+      display_art
+    fi
+
     last="$song"
 
     # Listen for next change
