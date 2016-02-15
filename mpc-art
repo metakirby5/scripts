@@ -8,32 +8,43 @@ CHARWIDTH=15
 PAD=0
 
 ALBUM_ART="$(mktemp).png"
+NO_ART="$(mktemp).png"
+convert -size 1 xc:transparent "$NO_ART"
 
-display_art() {
-  width="$(($(tput cols) * $CHARWIDTH - 2 * $PAD))"
-  height="$(($(tput lines) * $CHARHEIGHT - 2 * $PAD))"
-  size="$(($width < $height ? $width : $height))"
-  x="$((($width - $size) / 2 + $PAD))"
-  y="$((($height - $size) / 2 + $PAD))"
+put_art() {
+	rm "$ALBUM_ART" &>/dev/null
 
   # Get album art
   ffmpeg -y -i "${XDG_MUSIC_DIR%%/}/$(mpc current --format '%file%')" \
     "$ALBUM_ART" 2>/dev/null
+}
 
-  [[ ! $? == 0 ]] && convert -size "$size" xc:transparent "$ALBUM_ART"
+display_art() {
+	local win_width="$(($(tput cols) * $CHARWIDTH))"
+	local win_height="$(($(tput lines) * $CHARHEIGHT))"
+  local width="$(($win_width - 2 * $PAD))"
+  local height="$(($win_height - 2 * $PAD))"
+  local size="$(($width < $height ? $width : $height))"
+  local x="$((($width - $size) / 2 + $PAD))"
+  local y="$((($height - $size) / 2 + $PAD))"
 
+	# Clears the screen
   clear
+  printf "0;1;;;$win_width;$win_height;;;;;$NO_ART\n4;\n3;" |\
+    /usr/lib/w3m/w3mimgdisplay
+
   printf "0;1;$x;$y;$size;$size;;;;;$ALBUM_ART\n4;\n3;" |\
     /usr/lib/w3m/w3mimgdisplay
 }
 
-# Connect to socket
-exec 3<> /dev/tcp/localhost/6600
-
-last="$(mpc current)"
+# Initial display
 clear
 tput civis
-display_art
+put_art && display_art
+
+# Connect to socket
+exec 3<> /dev/tcp/localhost/6600
+last="$(mpc current)"
 
 # Enter message loop
 while read -u3 msg; do
@@ -41,11 +52,28 @@ while read -u3 msg; do
   if [[ "$msg" == OK* ]]; then
     # Check if the song changed
     song="$(mpc current)"
-    [[ "$song" != "$last" ]] && display_art
+    [[ "$song" != "$last" ]] && put_art && display_art
     last="$song"
 
     # Listen for next change
     echo 'idle player playlist' >&3
   fi
-done
+done &
 
+# Also display on screen size change
+prev_width="$(tput cols)"
+prev_height="$(tput lines)"
+while true; do
+	width="$(tput cols)"
+	height="$(tput lines)"
+	[[ "$width" != "$prev_width" || "$height" != "$prev_height" ]] \
+		&& display_art
+	prev_width="$width"
+	prev_height="$height"
+	sleep 1
+done &
+
+# Also display on keypress
+while read -rsn1; do
+	display_art
+done
