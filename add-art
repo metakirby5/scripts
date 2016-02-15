@@ -42,12 +42,11 @@ for file in "$@"; do
   OUT="$(mktemp).mp3"
 
   # Do the tagging
-  yes 2>/dev/null |\
-    ffmpeg -i "$file" -i "$image" \
+  ffmpeg -y -i "$file" -i "$image" \
     -map 0:0 -map 1:0 -c copy -id3v2_version 3 \
     -metadata:s:v title="Album cover" \
     -metadata:s:v comment="Cover (Front)" "$OUT" 2>/dev/null &&\
-  mv "$OUT" "$file"
+    mv "$OUT" "$file"
 done
 
 # Clean up
