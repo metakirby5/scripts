@@ -12,7 +12,7 @@ NO_ART="$(mktemp).png"
 convert -size 1 xc:transparent "$NO_ART"
 
 put_art() {
-	rm "$ALBUM_ART" &>/dev/null
+  rm "$ALBUM_ART" &>/dev/null
 
   # Get album art
   ffmpeg -y -i "${XDG_MUSIC_DIR%%/}/$(mpc current --format '%file%')" \
@@ -20,15 +20,15 @@ put_art() {
 }
 
 display_art() {
-	local win_width="$(($(tput cols) * $CHARWIDTH))"
-	local win_height="$(($(tput lines) * $CHARHEIGHT))"
+  local win_width="$(($(tput cols) * $CHARWIDTH))"
+  local win_height="$(($(tput lines) * $CHARHEIGHT))"
   local width="$(($win_width - 2 * $PAD))"
   local height="$(($win_height - 2 * $PAD))"
   local size="$(($width < $height ? $width : $height))"
   local x="$((($width - $size) / 2 + $PAD))"
   local y="$((($height - $size) / 2 + $PAD))"
 
-	# Clears the screen
+  # Clears the screen
   clear
   printf "0;1;;;$win_width;$win_height;;;;;$NO_ART\n4;\n3;" |\
     /usr/lib/w3m/w3mimgdisplay
@@ -64,16 +64,16 @@ done &
 prev_width="$(tput cols)"
 prev_height="$(tput lines)"
 while true; do
-	width="$(tput cols)"
-	height="$(tput lines)"
-	[[ "$width" != "$prev_width" || "$height" != "$prev_height" ]] \
-		&& display_art
-	prev_width="$width"
-	prev_height="$height"
-	sleep 1
+  width="$(tput cols)"
+  height="$(tput lines)"
+  [[ "$width" != "$prev_width" || "$height" != "$prev_height" ]] \
+    && display_art
+  prev_width="$width"
+  prev_height="$height"
+  sleep 1
 done &
 
 # Also display on keypress
 while read -rsn1; do
-	display_art
+  display_art
 done
