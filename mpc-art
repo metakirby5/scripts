@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Display album art in term, auto-change on song change
+# Note that this will make your cursor invisible. Restore with `tput cnorm`
+# metakirby5
+
+CHARHEIGHT=31
+CHARWIDTH=15
+PAD=0
+
+ALBUM_ART="$(mktemp).png"
+
+display_art() {
+  width="$(($(tput cols) * $CHARWIDTH - 2 * $PAD))"
+  height="$(($(tput lines) * $CHARHEIGHT - 2 * $PAD))"
+  size="$(($width < $height ? $width : $height))"
+  x="$((($width - $size) / 2 + $PAD))"
+  y="$((($height - $size) / 2 + $PAD))"
+
+  # Get album art
+  ffmpeg -y -i "${XDG_MUSIC_DIR%%/}/$(mpc current --format '%file%')" \
+    "$ALBUM_ART" 2>/dev/null
+
+  [[ ! $? == 0 ]] && convert -size "$size" xc:transparent "$ALBUM_ART"
+
+  clear
+  printf "0;1;$x;$y;$size;$size;;;;;$ALBUM_ART\n4;\n3;" |\
+    /usr/lib/w3m/w3mimgdisplay
+}
+
+# Connect to socket
+exec 3<> /dev/tcp/localhost/6600
+
+last="$(mpc current)"
+clear
+tput civis
+display_art
+
+# Enter message loop
+while read -u3 msg; do
+  # If we got an OK
+  if [[ "$msg" == OK* ]]; then
+    # Check if the song changed
+    song="$(mpc current)"
+    [[ "$song" != "$last" ]] && display_art
+    last="$song"
+
+    # Listen for next change
+    echo 'idle player playlist' >&3
+  fi
+done
+
