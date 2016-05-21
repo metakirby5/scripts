@@ -5,6 +5,7 @@ reorders accordingly. Executes dmenu as provided by
 the remaining arguments.
 """
 
+import os
 import sys
 import json
 import argparse
@@ -25,7 +26,7 @@ parser.add_argument('-counter',
     by default.
     """,
     type=str,
-    default='~/.dmenu_counter.json')
+    default=os.path.join(os.getenv('HOME'), '.dmenu_counter.json'))
 args, dmenu = parser.parse_known_args()
 
 counter_file = args.counter
@@ -65,7 +66,7 @@ selected = dmenu_proc.communicate('\n'.join(items))[0].split('\n')[0]
 # Record the results
 if selected:
   counter[selected] += 1
-with open(counter_file, 'w') as f:
+with open(counter_file, 'w+') as f:
   json.dump(counter, f, indent=2)
 
 # Output our selection
