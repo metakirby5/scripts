@@ -2,10 +2,10 @@
 # Runs whizkers with environment variable support, asks for a theme using
 # dmenu, and reloads the desktop.
 
-yes 2>/dev/null | relink-dots >/dev/null
+yes 2>/dev/null | restow-dots >/dev/null
 
 if [ "$?" -ne 0 ]; then
-  echo 'relink-dots FAILED'
+  echo 'restow-dots FAILED'
   exit 1
 fi
 
