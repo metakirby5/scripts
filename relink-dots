@@ -4,7 +4,7 @@
 ### CONFIG
 
 # Base directory to link from
-BASE_DIR=~/dotfiles
+BASE_DIR=~/.dots
 
 # Associative array: to link -> real
 declare -A TO_LINK
