@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# True version of brew leaves.
+
+for f in `brew list`;
+  do [ ! "$(brew uses --installed "$f")" ] && echo "$f"; 
+done
