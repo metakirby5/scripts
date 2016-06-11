@@ -39,7 +39,7 @@ if [[ ! -d ~/.vimUndo ]]; then
 fi
 
 pull_dir ~/code/bash-scripts
-pull_dir ~/dotfiles
+pull_dir ~/.dots
 
 if [[ $errors ]]; then
 	echo "!!! FAILED TO PULL:$errors"

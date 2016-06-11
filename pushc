@@ -51,7 +51,7 @@ push_dir() {
 echo
 
 push_dir ~/code/bash-scripts
-push_dir ~/dotfiles
+push_dir ~/.dots
 
 if [[ $errors ]]; then
 	echo "!!! FAILED TO PUSH:$errors"
