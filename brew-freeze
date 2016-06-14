@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# True version of brew leaves.
+# `brew leaves` with some flags.
 
-for f in `brew list`;
-  do [ ! "$(brew uses --installed "$f")" ] && echo "$f"; 
-done
+brew leaves |\
+  sed '/^macvim$/ s/$/ --with-lua --with-override-system-vim/'
