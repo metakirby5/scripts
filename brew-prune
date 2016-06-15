@@ -2,7 +2,7 @@
 # A script to prune the leaves of your brew packages.
 # Requires beeftornado/homebrew-rmtree
 
-for formula in $(brew-freeze); do
+for formula in $(brew leaves); do
   read -p "Keep $(brew desc "$formula")? [Y/n] " keep
   case $keep in
     [Nn])

@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# `brew leaves` with some flags.
-
-add-flags() {
-  sed "/^$1\$/ s/\$/ $2/"
-}
-
-brew leaves |\
-  add-flags 'macvim' '--with-lua --with-override-system-vim'
