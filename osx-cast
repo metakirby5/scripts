@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-osascript << EOF
+osascript >/dev/null << EOF
 tell application "QuickTime Player"
    activate
    new screen recording
