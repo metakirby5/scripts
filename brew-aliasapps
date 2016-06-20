@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# https://github.com/Homebrew/legacy-homebrew/issues/16639#issuecomment-42813448
+
+find /Applications -maxdepth 1 -type l | while read f; do
+  osascript -e \
+    "tell app \"Finder\" to make new alias file at \
+    POSIX file \"/Applications\" to POSIX file \"$(stat -f%Y "$f")\""
+  rm "$f"
+done
