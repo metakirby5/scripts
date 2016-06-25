@@ -1,8 +1,0 @@
-#!/usr/bin/env osascript
-
-tell application "QuickTime Player"
-   activate
-   new screen recording
-end tell
-
-return
