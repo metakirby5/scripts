@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Simple script to list global npm leaves
+
+npm list -g --depth 0 | awk 'NF == 2 { sub(/@.*$/, "", $2); print $2 }'
