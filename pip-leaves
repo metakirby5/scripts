@@ -2,4 +2,4 @@
 # A script to bundle up only leaf pip dependencies.
 # Requires pipdeptree.
 
-pipdeptree --freeze -w silence | grep '^[^ ]'
+pipdeptree --freeze -w silence | grep -o '^[^ =]\+'
