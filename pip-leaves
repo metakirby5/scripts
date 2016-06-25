@@ -3,3 +3,4 @@
 # Requires pipdeptree.
 
 pipdeptree --freeze -w silence | grep -o '^[^ =]\+'
+echo 'pipdeptree'
