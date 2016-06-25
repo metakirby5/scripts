@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-# A script to bundle up only leaf pip dependencies.
-# Requires pipdeptree.
-
-pipdeptree --freeze -w silence | grep -o '^[^ =]\+'
-echo 'pipdeptree'
