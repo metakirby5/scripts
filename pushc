@@ -50,8 +50,10 @@ push_dir() {
 
 echo
 
-push_dir ~/code/bash-scripts
-push_dir ~/.dots
+IFS=':' read -ra PATHS <<< "$GIT_UPDATE_PATHS"
+for path in ${PATHS[@]}; do
+	push_dir "$path"
+done
 
 if [[ $errors ]]; then
 	echo "!!! FAILED TO PUSH:$errors"

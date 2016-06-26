@@ -38,8 +38,10 @@ if [[ ! -d ~/.vimUndo ]]; then
 	mkdir ~/.vimUndo
 fi
 
-pull_dir ~/code/bash-scripts
-pull_dir ~/.dots
+IFS=':' read -ra PATHS <<< "$GIT_UPDATE_PATHS"
+for path in ${PATHS[@]}; do
+	pull_dir "$path"
+done
 
 if [[ $errors ]]; then
 	echo "!!! FAILED TO PULL:$errors"

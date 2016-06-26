@@ -13,7 +13,15 @@ anime="$(echo "$1" |\
 len=50
 
 notify() {
-	notify-send -a 'aquote' "$1" "$2"
+  if which notify-send &>/dev/null; then
+    notify-send -a 'aquote' "$1" "$2"
+  elif which osascript &>/dev/null; then
+    osascript -e "display notification \"$(tr -d \" <<< "$2")\" \
+with title \"$(tr -d \" <<< "$1")\""
+  else
+    echo 'No notifier available.'
+    exit 1
+  fi
 }
 
 json="$(curl -s \
