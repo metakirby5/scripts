@@ -56,7 +56,7 @@ by_id = {
 }
 
 # Get currently airing anime
-print('Fetching currently airing series...')
+print('Fetching currently airing series from anichart.net...')
 try:
     ac = requests.get(AC_URL).json()
 except requests.exceptions.ConnectionError:
