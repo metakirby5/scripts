@@ -55,12 +55,6 @@ by_id = {
     for a in hb['anime']
 }
 
-lib = {}
-for l in hb['library_entries']:
-    info = by_id[l['anime_id']]
-    info.update(l)
-    lib[to_cmp(info['romaji_title'])] = info
-
 # Get currently airing anime
 print('Fetching currently airing series...')
 try:
@@ -69,15 +63,18 @@ except requests.exceptions.ConnectionError:
     red("Could not reach anichart.net.")
     exit(1)
 
+airing = {
+    to_cmp(a['title_romaji']): a['airing']
+    for a in ac
+}
+
 # Create list of series
 anime = []
-for a in ac:
-    try:
-        info = lib[to_cmp(a['title_romaji'])]
-        info.update(a['airing'])
-        anime.append(info)
-    except KeyError:
-        pass
+for info in hb['library_entries']:
+    info.update(by_id[info['anime_id']])
+    # For currently airing shows, pull in next episode info
+    info.update(airing.get(to_cmp(info['romaji_title']), {}))
+    anime.append(info)
 anime.sort(key=lambda i: i['canonical_title'])
 
 # Print info
@@ -87,15 +84,42 @@ if not anime:
 for a in anime:
     title = a['canonical_title']
     cur = a['episodes_watched']
-    available = a['next_episode'] - 1
-    time = naturaltime(
-        datetime.now() + timedelta(seconds=a['countdown'])
-    ).replace(' from now', '')
+    total = a['episode_count']
 
-    # If we're waiting for next episode
-    if cur >= available:
-        green("{} in {}".format(title, time))
-    # If we're behind
+    try:
+        available = a['next_episode'] - 1
+    except KeyError:
+        available = total
+
+    # Print format: [7 chars] series_name
+    # Only bother if we haven't finished the series
+    if cur < total:
+        # If we're waiting for next episode
+        if cur == available:
+            # Create human-readable countdown
+            try:
+                time = naturaltime(
+                    datetime.now() + timedelta(seconds=a['countdown'])
+                ).replace(
+                    ' from now', ''
+                ).replace(
+                    'hours', 'hrs'
+                ).replace(
+                    'minutes', 'mins'
+                ).replace(
+                    'seconds', 'secs'
+                )
+            # Unknown time
+            except KeyError:
+                time = '   ?   '
+            green("[{:>7}] {}".format(time, title))
+        # If we're behind
+        elif cur < available:
+            yellow("[{:>3}/{:>3}] {}".format(cur, available, title))
+        # Invalid state
+        else:
+            red("[INVALID] {}".format(title))
+    # We need to mark this as complete
     else:
-        yellow("{} at {}/{}".format(title, cur, available))
+        red("[COMPLTE] {}".format(title))
 print
