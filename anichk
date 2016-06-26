@@ -2,10 +2,13 @@
 
 """
 Uses the hummingbird.me API and anichart.net API to tell you what episodes
-you need to catch up on.
+you need to catch up on. You can specify the username either via argument or
+the ANICHK_USERNAME environment variable.
 """
 
 import requests
+from sys import exit
+from os import environ
 from datetime import datetime, timedelta
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from humanize import naturaltime
@@ -17,6 +20,7 @@ AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 
 to_cmp = lambda s: ''.join(c.lower() for c in s if c.isalnum())
+red = lambda s: '\033[31m' + s + END
 green = lambda s: '\033[32m' + s + END
 yellow = lambda s: '\033[33m' + s + END
 
@@ -25,8 +29,12 @@ parser = ArgumentParser(description=__doc__,
                         formatter_class=RawDescriptionHelpFormatter)
 parser.add_argument('username',
                     help="hummingbird.me username",
+                    nargs='?',
                     type=str)
-username = parser.parse_args().username
+username = parser.parse_args().username or environ.get('ANICHK_USERNAME')
+if not username:
+    print(red("No username provided."))
+    exit(1)
 
 # Get your currently watching anime
 print('Fetching hummingbird.me profile for {}...'.format(username))
