@@ -38,7 +38,7 @@ if [[ ! -d ~/.vimUndo ]]; then
 	mkdir ~/.vimUndo
 fi
 
-IFS=':' read -ra PATHS <<< "$GIT_UPDATE_PATHS"
+IFS=':' read -ra PATHS <<< "$UPDATEC_PATH"
 for path in ${PATHS[@]}; do
 	pull_dir "$path"
 done

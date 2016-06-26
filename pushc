@@ -50,7 +50,7 @@ push_dir() {
 
 echo
 
-IFS=':' read -ra PATHS <<< "$GIT_UPDATE_PATHS"
+IFS=':' read -ra PATHS <<< "$UPDATEC_PATH"
 for path in ${PATHS[@]}; do
 	push_dir "$path"
 done
