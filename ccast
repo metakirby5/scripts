@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Uses castnow and provides embedded srt subtitles.
+
+vtt="$(mktemp).vtt"
+ffmpeg -i "$1" -f webvtt -y "$vtt" 2>/dev/null
+castnow "$@" --subtitles "$vtt"
+rm "$vtt"
