@@ -20,15 +20,11 @@ AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 
 to_cmp = lambda s: ''.join(c.lower() for c in s if c.isalnum())
-def red(s):
-    print('\033[31m' + s + END)
-def green(s):
-    print('\033[32m' + s + END)
-def yellow(s):
-    print('\033[33m' + s + END)
+red = lambda s: '\033[31m{}{}'.format(s, END)
+green = lambda s: '\033[32m{}{}'.format(s,END)
+yellow = lambda s: '\033[33m{}{}'.format(s, END)
 def exit_with(s):
-    red(s)
-    print
+    print('{}\n'.format(red(s)))
     exit(1)
 
 # Parse args
@@ -91,7 +87,6 @@ for a in anime:
     except KeyError:
         available = total
 
-    # Print format: [7 chars] series_name
     # Only bother if we haven't finished the series
     if cur < total:
         # If we're waiting for next episode
@@ -111,15 +106,18 @@ for a in anime:
                 )
             # Unknown time
             except KeyError:
-                time = '   ?   '
-            green("[{:>7}] {}".format(time, title))
+                time = 'UNKNOWN'
+            status = green(time)
         # If we're behind
         elif cur < available:
-            yellow("[{:>3}/{:>3}] {}".format(cur, available, title))
+            status = yellow('{}/{}'.format(cur, available))
         # Invalid state
         else:
-            red("[INVALID] {}".format(title))
+            status = red('INVALID')
     # We need to mark this as complete
     else:
-        red("[COMPLTE] {}".format(title))
+        status = red('COMPLTE')
+
+    # Status must be colored to be padded correctly
+    print("[{:>16}] {}".format(status, title))
 print
