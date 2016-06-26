@@ -61,10 +61,11 @@ try:
 except requests.exceptions.ConnectionError:
     exit_with("Could not reach anichart.net.")
 
-airing = {
-    to_cmp(a['title_romaji']): a['airing']
-    for a in ac
-}
+airing = {}
+for a in ac:
+    airing[to_cmp(a['title_romaji'])] = a['airing']
+    # Sometimes hummingbird.me will put english for romaji...
+    airing[to_cmp(a['title_eng'])] = a['airing']
 
 # Create list of series
 anime = []
@@ -88,7 +89,7 @@ for a in anime:
         available = total
 
     # Only bother if we haven't finished the series
-    if cur < total:
+    if not total or cur < total:
         # If we're waiting for next episode
         if cur == available:
             # Create human-readable countdown
@@ -111,6 +112,9 @@ for a in anime:
         # If we're behind
         elif cur < available:
             status = yellow('{}/{}'.format(cur, available))
+        # If no information available
+        elif not available:
+            status = yellow('NO INFO')
         # Invalid state
         else:
             status = red('INVALID')
