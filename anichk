@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+
+"""
+Uses the hummingbird.me API and anichart.net API to tell you what episodes
+you need to catch up on.
+"""
+
+import requests
+from datetime import datetime, timedelta
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from humanize import naturaltime
+
+# Constants and helpers
+HB_URL = ('https://hummingbird.me/library_entries'
+          '?status=Currently+Watching&user_id={}')
+AC_URL = 'http://anichart.net/api/chart/airing'
+END = '\033[0m'
+
+to_cmp = lambda s: ''.join(c.lower() for c in s if c.isalnum())
+green = lambda s: '\033[32m' + s + END
+yellow = lambda s: '\033[33m' + s + END
+
+# Parse args
+parser = ArgumentParser(description=__doc__,
+                        formatter_class=RawDescriptionHelpFormatter)
+parser.add_argument('username',
+                    help="hummingbird.me username",
+                    type=str)
+username = parser.parse_args().username
+
+# Get your currently watching anime
+print('Fetching hummingbird.me profile for {}...'.format(username))
+hb = requests.get(HB_URL.format(username)).json()
+
+by_id = {
+    a['id']: a
+    for a in hb['anime']
+}
+
+lib = {}
+for l in hb['library_entries']:
+    info = by_id[l['anime_id']]
+    info.update(l)
+    lib[to_cmp(info['romaji_title'])] = info
+
+# Get currently airing anime
+print('Fetching currently airing series...')
+ac = requests.get(AC_URL).json()
+
+# Create list of series
+anime = []
+for a in ac:
+    try:
+        info = lib[to_cmp(a['title_romaji'])]
+        info.update(a['airing'])
+        anime.append(info)
+    except KeyError:
+        pass
+anime.sort(key=lambda i: i['canonical_title'])
+
+# Print info
+print
+for a in anime:
+    title = a['canonical_title']
+    cur = a['episodes_watched']
+    available = a['next_episode'] - 1
+    time = naturaltime(
+        datetime.now() + timedelta(seconds=a['countdown'])
+    ).replace(' from now', '')
+
+    # If we're waiting for next episode
+    if cur >= available:
+        print(green('{} in {}'.format(title, time)))
+    # If we're behind
+    else:
+        print(yellow('{} at {}/{}'.format(title, cur, available)))
+print
