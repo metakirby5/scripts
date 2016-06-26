@@ -20,9 +20,12 @@ AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 
 to_cmp = lambda s: ''.join(c.lower() for c in s if c.isalnum())
-red = lambda s: '\033[31m' + s + END
-green = lambda s: '\033[32m' + s + END
-yellow = lambda s: '\033[33m' + s + END
+def red(s):
+    print('\033[31m' + s + END)
+def green(s):
+    print('\033[32m' + s + END)
+def yellow(s):
+    print('\033[33m' + s + END)
 
 # Parse args
 parser = ArgumentParser(description=__doc__,
@@ -33,12 +36,19 @@ parser.add_argument('username',
                     type=str)
 username = parser.parse_args().username or environ.get('ANICHK_USERNAME')
 if not username:
-    print(red("No username provided."))
+    red("No username provided.")
     exit(1)
 
 # Get your currently watching anime
 print('Fetching hummingbird.me profile for {}...'.format(username))
-hb = requests.get(HB_URL.format(username)).json()
+try:
+    hb = requests.get(HB_URL.format(username)).json()
+except ValueError:
+    red("User {} not found.".format(username))
+    exit(1)
+except requests.exceptions.ConnectionError:
+    red("Could not reach hummingbird.me.")
+    exit(1)
 
 by_id = {
     a['id']: a
@@ -53,7 +63,11 @@ for l in hb['library_entries']:
 
 # Get currently airing anime
 print('Fetching currently airing series...')
-ac = requests.get(AC_URL).json()
+try:
+    ac = requests.get(AC_URL).json()
+except requests.exceptions.ConnectionError:
+    red("Could not reach anichart.net.")
+    exit(1)
 
 # Create list of series
 anime = []
@@ -68,6 +82,8 @@ anime.sort(key=lambda i: i['canonical_title'])
 
 # Print info
 print
+if not anime:
+    red("{} isn't watching anything currently airing.".format(username))
 for a in anime:
     title = a['canonical_title']
     cur = a['episodes_watched']
@@ -78,8 +94,8 @@ for a in anime:
 
     # If we're waiting for next episode
     if cur >= available:
-        print(green('{} in {}'.format(title, time)))
+        green("{} in {}".format(title, time))
     # If we're behind
     else:
-        print(yellow('{} at {}/{}'.format(title, cur, available)))
+        yellow("{} at {}/{}".format(title, cur, available))
 print
