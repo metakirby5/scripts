@@ -6,6 +6,7 @@ to tell you what episodes you need to catch up on. You can specify the
 username either via argument or the ANICHK_USERNAME environment variable.
 """
 
+import re
 import requests
 from sys import exit
 from os import environ
@@ -19,7 +20,10 @@ HB_URL = ('https://hummingbird.me/library_entries'
 AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 
-to_cmp = lambda s: ''.join(c.lower() for c in s if c.isalnum())
+long_vowels = re.compile(r'([aeiou])\1+')
+to_cmp = lambda s: long_vowels.sub(
+    r'\1', ''.join(c.lower() for c in s if c.isalnum())
+)
 red = lambda s: '\033[31m{}{}'.format(s, END)
 green = lambda s: '\033[32m{}{}'.format(s,END)
 yellow = lambda s: '\033[33m{}{}'.format(s, END)
