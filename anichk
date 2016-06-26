@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 """
-Uses the hummingbird.me API and anichart.net API to tell you what episodes
-you need to catch up on. You can specify the username either via argument or
-the ANICHK_USERNAME environment variable.
+Uses the (undocumented) hummingbird.me API and (undocumented) anichart.net API
+to tell you what episodes you need to catch up on. You can specify the
+username either via argument or the ANICHK_USERNAME environment variable.
 """
 
 import requests
