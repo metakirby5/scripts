@@ -50,7 +50,6 @@ except requests.exceptions.ConnectionError:
     exit_with("Could not reach hummingbird.me.")
 except ValueError:
     exit_with("{} isn't on hummingbird.me.".format(username))
-
 if not hb['library_entries']:
     exit_with("{} isn't watching anything.".format(username))
 
