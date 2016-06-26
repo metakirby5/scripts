@@ -46,10 +46,13 @@ if not username:
 print('Fetching hummingbird.me profile for {}...'.format(username))
 try:
     hb = requests.get(HB_URL.format(username)).json()
-except ValueError:
-    exit_with("User {} not found.".format(username))
 except requests.exceptions.ConnectionError:
     exit_with("Could not reach hummingbird.me.")
+except ValueError:
+    exit_with("{} isn't on hummingbird.me.".format(username))
+
+if not hb['library_entries']:
+    exit_with("{} isn't watching anything.".format(username))
 
 by_id = {
     a['id']: a
@@ -79,8 +82,6 @@ anime.sort(key=lambda i: i['canonical_title'])
 
 # Print info
 print
-if not anime:
-    red("{} isn't watching anything currently airing.".format(username))
 for a in anime:
     title = a['canonical_title']
     cur = a['episodes_watched']
