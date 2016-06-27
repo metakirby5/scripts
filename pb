@@ -2,7 +2,9 @@
 
 usage() {
   echo "Usage:"
-  echo "  pb [-h] [-o] [-u] [-p] [-s SECONDS] [-v VANITY]"
+  echo "  pb [-h] [-o] [-u] [-p] [-s SECONDS] [-v VANITY] [FILE]"
+  echo
+  echo "If FILE is not provided, stdin is used."
   echo
   echo "Options:"
   echo "  -h  help"
