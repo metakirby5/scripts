@@ -127,5 +127,5 @@ for a in anime:
         status = red('COMPLTE')
 
     # Status must be colored to be padded correctly
-    print(u'[{:>16}] {}'.format(status, title))
+    print(u'{:>16} {}'.format(status, title))
 print
