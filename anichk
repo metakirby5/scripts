@@ -103,11 +103,11 @@ for a in anime:
                 ).replace(
                     ' from now', ''
                 ).replace(
-                    'hours', 'hrs'
+                    'hour', 'hr'
                 ).replace(
-                    'minutes', 'mins'
+                    'minute', 'min'
                 ).replace(
-                    'seconds', 'secs'
+                    'second', 'sec'
                 )
             # Unknown time
             except KeyError:
