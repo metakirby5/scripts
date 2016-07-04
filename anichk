@@ -21,7 +21,7 @@ AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 
 long_vowels = re.compile(r'([aeiou])\1+')
-to_cmp = lambda s: long_vowels.sub(
+normalize = lambda s: long_vowels.sub(
     r'\1', ''.join(c.lower() for c in s if c.isalnum())
 )
 red = lambda s: '\033[31m{}{}'.format(s, END)
@@ -67,16 +67,16 @@ except requests.exceptions.ConnectionError:
 
 airing = {}
 for a in ac:
-    airing[to_cmp(a['title_romaji'])] = a['airing']
+    airing[normalize(a['title_romaji'])] = a['airing']
     # Sometimes hummingbird.me will put english for romaji...
-    airing[to_cmp(a['title_eng'])] = a['airing']
+    airing[normalize(a['title_eng'])] = a['airing']
 
 # Create list of series
 anime = []
 for info in hb['library_entries']:
     info.update(by_id[info['anime_id']])
     # For currently airing shows, pull in next episode info
-    info.update(airing.get(to_cmp(info['romaji_title']), {}))
+    info.update(airing.get(normalize(info['romaji_title']), {}))
     anime.append(info)
 anime.sort(key=lambda i: i['canonical_title'])
 
