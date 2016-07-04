@@ -3,8 +3,9 @@
 """
 A personal script to mpv an anime episode.
 
-The base URL to search from must be specified with the
-ANISTRM_URL environment variable.
+Required environment variables:
+    `ANISTRM_URL`: The base URL to search from
+    `ANISTRM_EXT`: The extension of expected videos
 """
 
 import re
@@ -37,20 +38,19 @@ parser.add_argument('search_terms',
 search_terms = normalize(' '.join(parser.parse_args().search_terms))
 
 try:
-    ANISTRM_URL = environ['ANISTRM_URL']
+    base = environ['ANISTRM_URL']
+    ext = environ['ANISTRM_EXT']
 except KeyError:
-    exit_with("You need ANISTRM_URL.")
+    exit_with("You need ANISTRM_URL and ANISTRM_EXT.")
 
-link = ANISTRM_URL
-while True:
+link = base
+while not link.endswith(ext):
+    print('-> {}'.format(link))
+
     try:
         req = requests.get(link)
     except requests.exceptions.ConnectionError:
         exit_with("Could not reach \"{}\".".format(link))
-
-    # Bail if content-type matched
-    if req.headers['content-type'].startswith('video'):
-        break
 
     links = BeautifulSoup(req.text).findAll('a')
     if not links:
@@ -62,5 +62,5 @@ while True:
         fuzz.token_set_ratio
     )
 
-    link = urljoin(ANISTRM_URL, choice.get('href'))
+    link = urljoin(base, choice.get('href'))
 call(['mpv', link])
