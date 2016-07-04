@@ -31,11 +31,18 @@ def exit_with(s):
 
 parser = ArgumentParser(description=__doc__,
                         formatter_class=RawDescriptionHelpFormatter)
+parser.add_argument('--program',
+                    help="program to use on the link",
+                    nargs='?',
+                    default='mpv',
+                    type=str)
 parser.add_argument('search_terms',
                     help="anime series + episode number",
                     nargs='+',
                     type=str)
-search_terms = normalize(' '.join(parser.parse_args().search_terms))
+args = parser.parse_args()
+program = args.program.split(' ')
+search_terms = normalize(' '.join(args.search_terms))
 
 try:
     base = environ['ANISTRM_URL']
@@ -63,4 +70,5 @@ while not link.endswith(ext):
     )
 
     link = urljoin(base, choice.get('href'))
-call(['mpv', link])
+program.append(link)
+call(program)
