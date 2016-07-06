@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+show="$(anichk --porcelain | shuf | head -n1)"
+echo "$show"
+anistrm "$show"
