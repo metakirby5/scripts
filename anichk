@@ -34,16 +34,32 @@ def exit_with(s):
 # Parse args
 parser = ArgumentParser(description=__doc__,
                         formatter_class=RawDescriptionHelpFormatter)
+parser.add_argument('--porcelain',
+                    help="only output unwatched as [series] [episode #]",
+                    action='store_true')
 parser.add_argument('username',
                     help="hummingbird.me username",
                     nargs='?',
-                    type=str)
-username = parser.parse_args().username or environ.get('ANICHK_USERNAME')
+                    type=str,
+                    default=environ.get('ANICHK_USERNAME'))
+args = parser.parse_args()
+porcelain = args.porcelain
+username = args.username
+
 if not username:
     exit_with("No username provided.")
 
+# Printing functions
+def human(s=''):
+    if not porcelain:
+        print(s)
+
+def machine(s=''):
+    if porcelain:
+        print(s)
+
 # Get your currently watching anime
-print('Fetching hummingbird.me profile for {}...'.format(username))
+human('Fetching hummingbird.me profile for {}...'.format(username))
 try:
     hb = requests.get(HB_URL.format(username)).json()
 except requests.exceptions.ConnectionError:
@@ -59,7 +75,7 @@ by_id = {
 }
 
 # Get currently airing anime
-print('Fetching currently airing series from anichart.net...')
+human('Fetching currently airing series from anichart.net...')
 try:
     ac = requests.get(AC_URL).json()
 except requests.exceptions.ConnectionError:
@@ -81,7 +97,7 @@ for info in hb['library_entries']:
 anime.sort(key=lambda i: i['canonical_title'])
 
 # Print info
-print
+human()
 for a in anime:
     title = a['canonical_title']
     cur = a['episodes_watched']
@@ -116,6 +132,7 @@ for a in anime:
         # If we're behind
         elif cur < available:
             status = yellow('{}/{}'.format(cur, available))
+            machine('{} {}'.format(title, cur + 1))
         # If no information available
         elif not available:
             status = yellow('NO INFO')
@@ -127,5 +144,5 @@ for a in anime:
         status = red('COMPLTE')
 
     # Status must be colored to be padded correctly
-    print(u'{:>16} {}'.format(status, title))
-print
+    human(u'{:>16} {}'.format(status, title))
+human()
