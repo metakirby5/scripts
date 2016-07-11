@@ -135,7 +135,7 @@ for a in anime:
         # If we're behind
         elif cur < available:
             status = yellow('{}/{}'.format(cur, available))
-            machine('{} {}'.format(title, cur + 1))
+            machine(u'{} {}'.format(title, cur + 1))
         # If no information available
         elif not available:
             status = yellow('NO INFO')
