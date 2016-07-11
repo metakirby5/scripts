@@ -55,8 +55,6 @@ except KeyError:
 
 link = base
 while not link.endswith(ext):
-    print('-> {}'.format(link))
-
     try:
         req = requests.get(link)
     except requests.exceptions.ConnectionError:
@@ -73,5 +71,6 @@ while not link.endswith(ext):
     )
 
     link = urljoin(base, choice.get('href'))
+    print('-> {}'.format(link))
 program.append(link)
 call(program)
