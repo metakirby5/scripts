@@ -31,13 +31,6 @@ pull_dir() {
 
 echo
 
-# Make sure we have a vimundo directory.
-if [[ ! -d ~/.vimUndo ]]; then
-	echo "Making .vimUndo directory..."
-	echo
-	mkdir ~/.vimUndo
-fi
-
 IFS=':' read -ra PATHS <<< "$UPDATEC_PATH"
 for path in ${PATHS[@]}; do
 	pull_dir "$path"
