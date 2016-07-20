@@ -199,7 +199,7 @@ case "$1" in
 			fi
 		done
 		;;
-	p+([1-9]))
+	p+([0-9]))
 		if [[ $2 && ! $2 =~ $numexp ]]; then
 			echo "ERROR: Arg not a number!"
 			exit 1
@@ -261,7 +261,7 @@ case "$1" in
 			push "$task" $todofile
 		done
 		;;
-	u+([1-9]))
+	u+([0-9]))
 		pnum=$(echo "$1" | cut -c2-)
 		if [[ $pnum -gt $todolen ]]; then
 			echo "ERROR: Index out of bounds!"
