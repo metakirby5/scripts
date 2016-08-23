@@ -8,9 +8,10 @@ username either via argument or the ANICHK_USERNAME environment variable.
 """
 
 import re
-import requests
+import json
 from sys import exit
 from os import environ
+from subprocess import check_output
 from datetime import datetime, timedelta
 from humanize import naturaltime
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -61,11 +62,15 @@ def machine(s=''):
     if porcelain:
         print(s)
 
+# For some reason, hummingbird.me doesn't like Python, so use curl.
+def curl(url):
+    return json.loads(check_output(['curl', '-sf', url]))
+
 # Get your currently watching anime
 human('Fetching hummingbird.me profile for {}...'.format(username))
 try:
-    hb = requests.get(HB_URL.format(username)).json()
-except requests.exceptions.ConnectionError:
+    hb = curl(HB_URL.format(username))
+except OSError:
     exit_with("Could not reach hummingbird.me.")
 except ValueError:
     exit_with("{} isn't on hummingbird.me.".format(username))
@@ -80,9 +85,11 @@ by_id = {
 # Get currently airing anime
 human('Fetching currently airing series from anichart.net...')
 try:
-    ac = requests.get(AC_URL).json()
-except requests.exceptions.ConnectionError:
+    ac = curl(AC_URL)
+except OSError:
     exit_with("Could not reach anichart.net.")
+except ValueError:
+    exit_with("Malformed anichart.net JSON.")
 
 airing = {}
 for a in ac:
