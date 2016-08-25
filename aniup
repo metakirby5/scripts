@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Quick and dirty script to increment the watched count for an episode.
+# Dependencies: curl, jq, fzf
+
+# Check for required variables
+if [ -z "$ANIUP_USERNAME" -o -z "$ANIUP_PASS" ]; then
+  echo 'Both $ANIUP_USERNAME and $ANIUP_PASS required.'
+  exit 1
+fi
+
+# Constants
+base="https://hummingbird.me/api/v1"
+chk_url="$base/users/$ANIUP_USERNAME/library?status=currently-watching"
+auth_url="$base/users/authenticate"
+auth_data="username=$ANIUP_USERNAME&password=$ANIUP_PASS"
+
+# JSON parse script
+jqscript='
+.[] |
+.episodes_watched as $watched |
+.anime |
+"\(.id)\t\($watched)\t\(.title)"
+'
+
+# Fetch entries
+entries="$(curl -sf "$chk_url" | jq -r "$jqscript")"
+if [ -z "$entries" ]; then
+  echo "No entries found for $ANIUP_USERNAME."
+  exit 0
+fi
+
+# Get user selection
+selection="$(fzf --with-nth 2.. <<< "$entries")"
+[ -z "$selection" ] && exit 0
+id="$(cut -f1 <<< "$selection")"
+anime="$(cut -f3- <<< "$selection")"
+
+# Authenticate user
+token="$(curl -sf "$auth_url" -X POST -d "$auth_data" |
+         jq -r 'if type == "string" then . else "" end')"
+if [ -z "$token" ]; then
+  echo "Unable to authenticate as $ANIUP_USERNAME".
+  exit 1
+fi
+
+# Update the entry
+update_url="$base/libraries/$id"
+update_data="auth_token=$token&id=$id&increment_episodes=true"
+ep="$(curl -sf "$update_url" -X POST -d "$update_data" |
+      jq -r '.episodes_watched')"
+if [ -z "$ep" ]; then
+  echo "Unable to update watched count for \"$anime\"."
+  exit 1
+fi
+
+echo "Updated \"$anime\" to episode $ep."
