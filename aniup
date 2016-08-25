@@ -2,6 +2,16 @@
 # Quick and dirty script to increment the watched count for an episode.
 # Dependencies: curl, jq, fzf
 
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep curl)$(checkdep jq)$(checkdep fzf)"
+if [ "$missing" ]; then
+  echo "The following dependencies are missing:$missing"
+  exit 1
+fi
+
 # Check for required variables
 if [ -z "$ANIUP_USERNAME" -o -z "$ANIUP_PASS" ]; then
   echo 'Both $ANIUP_USERNAME and $ANIUP_PASS required.'
