@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Runs colorz2 on an image file to get 6 colors, then stuffs those colors
-# through sanpai.
+# through zenbu.
 
 usage() {
-  echo "USAGE: autopai [image file / URL] (primary color) (secondary color)"
-  echo "If image URL provided, image will be saved at \"~/.autopai\"."
+  echo "USAGE: autozb [image file / URL] (primary color) (secondary color)"
+  echo "If image URL provided, image will be saved at \"~/.autozb\"."
   echo "Available colors: red,  green,   yellow,"
   echo "                  blue, magenta, cyan"
   echo "Defaults: primary = red, secondary = blue"
@@ -14,7 +14,7 @@ usage() {
 # Sanity checks, getting args
 [ "$#" -lt 1 ] || [ "$#" -gt 3 ] && usage
 
-SRC=~/.autopai
+SRC=~/.autozb
 
 COLORS=(
   red
@@ -96,5 +96,5 @@ echo "Generated YAML:"
 echo "$yaml"
 echo
 
-echo "Running sanpai..."
-sanpai -e <(echo "$yaml")
+echo "Running zenbu..."
+zenbu -e <(echo "$yaml")
