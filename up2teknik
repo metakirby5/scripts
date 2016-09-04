@@ -11,6 +11,7 @@ usage() {
 [ "$#" -ne 1 ] && usage
 [ ! -e "$1" ] || [ -d "$1" ] && usage
 
-curl -sfF contentType="$(mime "$1")" -F file="@$1" \
-	https://api.teknik.io/v1/Upload |\
+curl -sfF contentType="$(file --mime "$1" | cut -d' ' -f2 | cut -d';' -f1)" \
+  -F file="@$1" \
+  https://api.teknik.io/v1/Upload |\
   jq -r '.result.url' | xargs echo -n
