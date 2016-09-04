@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs colorz2 on an image file to get 6 colors, then stuffs those colors
+# Runs colorz on an image file to get 6 colors, then stuffs those colors
 # through zenbu.
 
 usage() {
@@ -83,7 +83,7 @@ fi
 echo "Using primary = $primary, secondary = $secondary..."
 echo
 
-colors="$(colorz2 --no-preview -n 6 "$SRC")"
+colors="$(colorz --no-preview -n 6 "$SRC")"
 [ "${PIPESTATUS[0]}" -ne 0 ] && exit 1
 
 yaml="$(echo \
