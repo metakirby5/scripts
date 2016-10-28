@@ -15,21 +15,23 @@ from sys import exit
 from os import environ
 from subprocess import call
 from BeautifulSoup import BeautifulSoup
+from urllib import unquote_plus
 from urlparse import urljoin
 from fuzzywuzzy import fuzz, process
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from argcomplete import autocomplete
 
-END = '\033[0m'
+NUMS = re.compile(r'\b0+(\d)')
 
-nums = re.compile(r'\b0+(\d)')
-normalize = lambda s: nums.sub(r'\1', s)
-red = lambda s: '\033[31m{}{}'.format(s, END)
-green = lambda s: '\033[32m{}{}'.format(s,END)
-yellow = lambda s: '\033[33m{}{}'.format(s, END)
+
 def exit_with(s):
-    print('{}\n'.format(red(s)))
+    print('\033[31m{}\033[0m\n'.format(s))
     exit(1)
+
+
+def normalize(s):
+    return NUMS.sub(r'\1', s)
+
 
 parser = ArgumentParser(description=__doc__,
                         formatter_class=RawDescriptionHelpFormatter)
@@ -71,6 +73,6 @@ while not link.endswith(ext):
     )
 
     link = urljoin(base, choice.get('href'))
-    print('-> {}'.format(link))
+    print('-> {}'.format(unquote_plus(link)))
 program.append(link)
 call(program)
