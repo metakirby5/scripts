@@ -22,17 +22,29 @@ HB_URL = ('https://hummingbird.me/library_entries'
           '?status=Currently+Watching&user_id={}')
 AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
+LONG_VOWELS = re.compile(r'([aeiou])\1+')
 
-long_vowels = re.compile(r'([aeiou])\1+')
-normalize = lambda s: long_vowels.sub(
-    r'\1', ''.join(c.lower() for c in s if c.isalnum())
-)
-red = lambda s: '\033[31m{}{}'.format(s, END)
-green = lambda s: '\033[32m{}{}'.format(s,END)
-yellow = lambda s: '\033[33m{}{}'.format(s, END)
+
+def normalize(s):
+    return LONG_VOWELS.sub(r'\1', ''.join(c.lower() for c in s if c.isalnum()))
+
+
+def red(s):
+    return '\033[31m{}{}'.format(s, END)
+
+
+def green(s):
+    return '\033[32m{}{}'.format(s, END)
+
+
+def yellow(s):
+    return '\033[33m{}{}'.format(s, END)
+
+
 def exit_with(s):
     print('{}\n'.format(red(s)))
     exit(1)
+
 
 # Parse args
 parser = ArgumentParser(description=__doc__,
@@ -53,18 +65,22 @@ username = args.username
 if not username:
     exit_with("No username provided.")
 
+
 # Printing functions
 def human(s=''):
     if not porcelain:
         print(s.encode('UTF-8'))
 
+
 def machine(s=''):
     if porcelain:
         print(s.encode('UTF-8'))
 
+
 # For some reason, hummingbird.me doesn't like Python, so use curl.
 def curl(url):
     return json.loads(check_output(['curl', '-sf', url]))
+
 
 # Get your currently watching anime
 human('Fetching hummingbird.me profile for {}...'.format(username))
