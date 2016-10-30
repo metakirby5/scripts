@@ -56,11 +56,11 @@ if not username:
 # Printing functions
 def human(s=''):
     if not porcelain:
-        print(s)
+        print(s.encode('UTF-8'))
 
 def machine(s=''):
     if porcelain:
-        print(s)
+        print(s.encode('UTF-8'))
 
 # For some reason, hummingbird.me doesn't like Python, so use curl.
 def curl(url):
