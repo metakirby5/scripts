@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Updates nginx letsencrypt domains.
+
+domains="$(grep -r '^\s*server_name\s\+[a-zA-Z0-9.-]\+;$' /etc/nginx/ |
+           cut -d' ' -f2 | cut -d';' -f1 | sed 's/^/-d /')"
+
+/opt/letsencrypt/letsencrypt-auto \
+           certonly -a webroot --webroot-path=/var/www/ssl $domains
