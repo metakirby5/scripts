@@ -136,6 +136,7 @@ anime.sort(key=lambda i: i['canonicalTitle'])
 
 # Print info
 human()
+now = datetime.now()
 for a in anime:
     title = a['canonicalTitle']
     cur = a['progress']
@@ -153,7 +154,7 @@ for a in anime:
             # Create human-readable countdown
             try:
                 time = naturaltime(
-                    datetime.now() + timedelta(seconds=a['countdown'])
+                    now + timedelta(seconds=a['countdown'])
                 ).replace(
                     ' from now', ''
                 ).replace(
