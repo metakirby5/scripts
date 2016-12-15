@@ -2,9 +2,9 @@
 # PYTHON_ARGCOMPLETE_OK
 
 """
-Uses the (undocumented) hummingbird.me API and (undocumented) anichart.net API
-to tell you what episodes you need to catch up on. You can specify the
-username either via argument or the ANICHK_USERNAME environment variable.
+Uses the (unstable) kitsu.io API and (undocumented) anichart.net API to tell
+you what episodes you need to catch up on. You can specify the username either
+via argument or the ANICHK_USERNAME environment variable.
 """
 
 import re
@@ -18,8 +18,13 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from argcomplete import autocomplete
 
 # Constants and helpers
-HB_URL = ('https://hummingbird.me/library_entries'
-          '?status=Currently+Watching&user_id={}')
+KT_USER = 'https://kitsu.io/api/edge/users?filter\[name\]={}'
+KT_LIB = ('https://kitsu.io/api/edge/library-entries?'
+          'page\[limit\]=1000000&'
+          'include=media&'
+          'filter\[status\]=current&'
+          'filter\[mediaType\]=Anime&'
+          'filter\[userId\]={}')
 AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
@@ -53,7 +58,7 @@ parser.add_argument('--porcelain',
                     help="only output unwatched as [series] [episode #]",
                     action='store_true')
 parser.add_argument('username',
-                    help="hummingbird.me username",
+                    help="kitsu.io username",
                     nargs='?',
                     type=str,
                     default=environ.get('ANICHK_USERNAME'))
@@ -77,25 +82,31 @@ def machine(s=''):
         print(s.encode('UTF-8'))
 
 
-# For some reason, hummingbird.me doesn't like Python, so use curl.
+# curl is more consistent than requests.get...
 def curl(url):
     return json.loads(check_output(['curl', '-sf', url]))
 
 
-# Get your currently watching anime
-human('Fetching hummingbird.me profile for {}...'.format(username))
+# Get user ID
+human('Fetching kitsu.io profile for {}...'.format(username))
 try:
-    hb = curl(HB_URL.format(username))
+    uid = curl(KT_USER.format(username))['data'][0]['id']
 except OSError:
-    exit_with("Could not reach hummingbird.me.")
+    exit_with("Could not reach kitsu.io.")
 except ValueError:
-    exit_with("{} isn't on hummingbird.me.".format(username))
-if not hb['library_entries']:
+    exit_with("{} isn't on kitsu.io.".format(username))
+
+# Get your currently watching anime
+human('Fetching library entries for user id {}...'.format(uid))
+
+kt = curl(KT_LIB.format(uid))
+
+if not kt['data']:
     exit_with("{} isn't watching anything.".format(username))
 
 by_id = {
-    a['id']: a
-    for a in hb['anime']
+    a['id']: a['attributes']
+    for a in kt['included']
 }
 
 # Get currently airing anime
@@ -110,24 +121,25 @@ except ValueError:
 airing = {}
 for a in ac:
     airing[normalize(a['title_romaji'])] = a['airing']
-    # Sometimes hummingbird.me will put english for romaji...
+    # Sometimes kitsu.io will put english for romaji...
     airing[normalize(a['title_eng'])] = a['airing']
 
 # Create list of series
 anime = []
-for info in hb['library_entries']:
-    info.update(by_id[info['anime_id']])
-    # For currently airing shows, pull in next episode info
-    info.update(airing.get(normalize(info['romaji_title']), {}))
-    anime.append(info)
-anime.sort(key=lambda i: i['canonical_title'])
+for info in kt['data']:
+    attrs = info['attributes']
+    attrs.update(by_id[info['relationships']['media']['data']['id']])
+    # For currently airing shows, pull in next episode attrs
+    attrs.update(airing.get(normalize(attrs['titles']['en_jp']), {}))
+    anime.append(attrs)
+anime.sort(key=lambda i: i['canonicalTitle'])
 
 # Print info
 human()
 for a in anime:
-    title = a['canonical_title']
-    cur = a['episodes_watched']
-    total = a['episode_count']
+    title = a['canonicalTitle']
+    cur = a['progress']
+    total = a['episodeCount']
 
     try:
         available = a['next_episode'] - 1
