@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 
 """
@@ -74,17 +74,17 @@ if not username:
 # Printing functions
 def human(s=''):
     if not porcelain:
-        print(s.encode('UTF-8'))
+        print(s)
 
 
 def machine(s=''):
     if porcelain:
-        print(s.encode('UTF-8'))
+        print(s)
 
 
 # curl is more consistent than requests.get...
 def curl(url):
-    return json.loads(check_output(['curl', '-sf', url]))
+    return json.loads(check_output(['curl', '-sf', url]).decode('utf-8'))
 
 
 # Get user ID
