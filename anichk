@@ -14,6 +14,7 @@ from os import environ
 from subprocess import check_output
 from datetime import datetime, timedelta
 from humanize import naturaltime
+from unidecode import unidecode
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from argcomplete import autocomplete
 
@@ -28,10 +29,15 @@ KT_LIB = ('https://kitsu.io/api/edge/library-entries?'
 AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
-
+OVERRIDES = {
+    'Youjo Senki: Saga of Tanya the Evil': 'Youjo Senki',
+    'Kobayashi-san Chi no Maid Dragon': 'Kobayashi-san Chi no Maidragon',
+}
 
 def normalize(s):
-    return LONG_VOWELS.sub(r'\1', ''.join(c.lower() for c in s if c.isalnum()))
+    s = OVERRIDES.get(s, s)
+    alnum = ''.join(c.lower() for c in unidecode(s) if c.isalnum())
+    return LONG_VOWELS.sub(r'\1', alnum)
 
 
 def red(s):
@@ -139,8 +145,8 @@ human()
 now = datetime.now()
 for a in anime:
     title = a['canonicalTitle']
-    cur = a['progress']
-    total = a['episodeCount']
+    cur = a['progress'] or 0
+    total = a['episodeCount'] or 0
 
     try:
         available = a['next_episode'] - 1
