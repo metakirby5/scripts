@@ -23,6 +23,7 @@ initializeANSI()
 initializeANSI
 
 cat << EOF
+
               ${reset}${blackf}|               |               |               |               |${reset}
    ${redf}█     █${reset}    ${blackf}|${reset}    ${greenf}█     █${reset}    ${blackf}|${reset}    ${yellowf}█     █${reset}    ${blackf}|${reset}    ${bluef}█     █${reset}    ${blackf}|${reset}    ${purplef}█     █${reset}    ${blackf}|${reset}    ${cyanf}█     █${reset}
    ${redf}███████${reset}    ${blackf}|${reset}    ${greenf}███████${reset}    ${blackf}|${reset}    ${yellowf}███████${reset}    ${blackf}|${reset}    ${bluef}███████${reset}    ${blackf}|${reset}    ${purplef}███████${reset}    ${blackf}|${reset}    ${cyanf}███████${reset}
@@ -31,4 +32,5 @@ cat << EOF
   ${redf}█ █ ${boldon}█${reset} ${redf}█ █${reset}   ${blackf}|${reset}   ${greenf}█ █ ${boldon}█${reset} ${greenf}█ █${reset}   ${blackf}|${reset}   ${yellowf}█ █ ${boldon}█${reset} ${yellowf}█ █${reset}   ${blackf}|${reset}   ${bluef}█ █ ${boldon}█${reset} ${bluef}█ █${reset}   ${blackf}|${reset}   ${purplef}█ █ ${boldon}█${reset} ${purplef}█ █${reset}   ${blackf}|${reset}   ${cyanf}█ █ ${boldon}█${reset} ${cyanf}█ █${reset}
     ${redf}█   █${reset}     ${blackf}|${reset}     ${greenf}█   █${reset}     ${blackf}|${reset}     ${yellowf}█   █${reset}     ${blackf}|${reset}     ${bluef}█   █${reset}     ${blackf}|${reset}     ${purplef}█   █${reset}     ${blackf}|${reset}     ${cyanf}█   █${reset}
               ${blackf}|               |               |               |               |${reset}
+
 EOF

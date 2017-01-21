@@ -31,6 +31,7 @@ initializeANSI()
 initializeANSI
 
 cat << EOF
+
  ${boldon}${whitef}    ▄▄▄${reset}
  ${boldon}${whitef} ▄█████▄▄ ${reset}
  ${boldon}${whitef}███${cyanb}▀▀▀▀${blackb}▀${cyanb}▀${blackb}▀${cyanb}▀${reset}
@@ -39,4 +40,5 @@ cat << EOF
  ${boldoff}${redf}▀▀${reset}${boldon}${redb}${whitef}▄${cyanb}▄   ${redb}▄▄▄${reset}${boldoff}${redf}▀██▀${reset}
  ${boldon}${whitef} ██▀▀▀██▀  ${boldoff}${redf}▀${reset}
  ${boldon}${whitef} ▀▀▀▀ ▀▀▀▀${reset}
+
 EOF

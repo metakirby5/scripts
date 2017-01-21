@@ -43,3 +43,5 @@ cat << EOF
   ${redf}███▀▀▀███${reset}    ${greenf}███▀▀▀███${reset}    ${yellowf}███▀▀▀███${reset}    ${bluef}███▀▀▀███${reset}    ${purplef}███▀▀▀███${reset}    ${cyanf}███▀▀▀███${reset}
   ${redf}███ █ ███${reset}    ${greenf}███ █ ███${reset}    ${yellowf}███ █ ███${reset}    ${bluef}███ █ ███${reset}    ${purplef}███ █ ███${reset}    ${cyanf}███ █ ███${reset}
   ${redf}██ ▀▀▀ ██${reset}    ${greenf}██ ▀▀▀ ██${reset}    ${yellowf}██ ▀▀▀ ██${reset}    ${bluef}██ ▀▀▀ ██${reset}    ${purplef}██ ▀▀▀ ██${reset}    ${cyanf}██ ▀▀▀ ██${reset}  
+
+EOF

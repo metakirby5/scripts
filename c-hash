@@ -30,6 +30,7 @@ initializeANSI()
  
 initializeANSI
  
+echo
 echo "${reset}${redf}  ██  ██   ${reset}${greenf}   ██  ██   ${reset}${yellowf}   ██  ██   ${reset}${bluef}   ██  ██   ${reset}${purplef}   ██  ██   ${reset}${cyanf}   ██  ██   ${reset}"
 echo "${reset}${redf}██████████ ${reset}${greenf} ██████████ ${reset}${yellowf} ██████████ ${reset}${bluef} ██████████ ${reset}${purplef} ██████████ ${reset} ${cyanf}██████████ ${reset}"
 echo "${reset}${redf}  ██${boldon}██${boldoff}██   ${reset}${greenf}   ██${boldon}██${boldoff}██   ${reset}${yellowf}   ██${boldon}██${boldoff}██   ${reset}${bluef}   ██${boldon}██${boldoff}██ ${reset}${purplef}     ██${boldon}██${boldoff}██   ${reset}${cyanf}   ██${boldon}██${boldoff}██   ${reset}"
