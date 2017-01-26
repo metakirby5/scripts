@@ -7,6 +7,10 @@ A personal script to mpv an anime episode.
 Required environment variables:
     `ANISTRM_URL`: The base URL to search from
     `ANISTRM_EXT`: The extension of expected videos
+
+Optional environment variables:
+    `ANISTRM_PROGRAM`: The program to use to play anime. Defaults to 'mpv',
+    and can be overridden with the `--program` flag.
 """
 
 import re
@@ -38,7 +42,7 @@ parser = ArgumentParser(description=__doc__,
 parser.add_argument('--program',
                     help="program to use on the link",
                     nargs='?',
-                    default='mpv',
+                    default=environ.get('ANISTRM_PROGRAM', 'mpv'),
                     type=str)
 parser.add_argument('search_terms',
                     help="anime series + episode number",
