@@ -82,6 +82,7 @@ if [[ $error ]]; then
 	exit $error
 fi
 
+mesg y  # Turn on messages
 echo "====================Now chatting!===================="
 echo "Chatting with:$HRPeople"
 
