@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# Bail on error
+set -e
+
+# Print in a color
+color() {
+    c="$1"
+    shift
+    echo -e "\x1B[${c}m${@}\x1B[0m"
+}
+
+# Display usage
+print_usage () {
+    echo
+    echo "Usage: let-ssh [GITHUB USERNAME]..."
+    echo
+}
+
+# Display help if requested
+while getopts h opt; do
+    case "$opt" in
+        *)
+            echo "Temporarily allow SSH access by GitHub username."
+            print_usage
+            exit
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+# Check for usernames
+if [[ $# -lt 1 ]]; then
+    color 31 "At least one username is required."
+    print_usage
+    exit 1
+fi
+
+USERKEYS=()
+ERRS=false
+
+# Get user keys from GitHub
+for USERNAME in "$@"; do
+    USERKEY="$(curl -s "https://github.com/$USERNAME.keys")"
+
+    if [[ "$?" != 0 ]]; then
+        color 31 "Could not connect to GitHub."
+        exit 1
+    elif [[ -z "$USERKEY" ]]; then
+        color 31 "$USERNAME: has no keys in GitHub."
+        ERRS=true
+    elif [[ "$USERKEY" == "Not Found" ]]; then
+        color 31 "$USERNAME: not found in GitHub."
+        ERRS=true
+    elif ! ssh-keygen -lf <(echo "$USERKEY") &> /dev/null; then
+        color 31 "$USERNAME: keys are invalid."
+        ERRS=true
+    else
+        color 32 "$USERNAME: keys retrieved"
+        USERKEYS+=("$USERKEY")
+    fi
+done
+echo
+
+[[ "$ERRS" == true ]] && exit 1
+
+USERKEYS_STR="$(printf '%s\n' "${USERKEYS[@]}")"
+KEYS_FILE=~/.ssh/authorized_keys
+
+# Make a backup and add the keys
+mkdir -p "$(dirname "$KEYS_FILE")"
+touch "$KEYS_FILE"
+cp "$KEYS_FILE" "$KEYS_FILE.bak"
+echo "$USERKEYS_STR" >> "$KEYS_FILE"
+
+teardown() {
+    local DEAUTHED="$(grep -vFf <(echo "$USERKEYS_STR") "$KEYS_FILE")"
+    echo "$DEAUTHED" > "$KEYS_FILE"
+    echo
+    echo
+}
+trap "teardown; exit 0" SIGHUP SIGINT SIGTERM
+
+echo "Authorized keys for GitHub users:"
+printf '    %s\n' "$@"
+echo "Your local IP is $(ipconfig getifaddr en0)."
+echo "A backup of  $KEYS_FILE"
+echo "is stored at $KEYS_FILE.bak."
+echo "Press ^C to deauthorize and exit."
+
+sleep infinity &
+wait
