@@ -12,6 +12,16 @@ numexp='^[0-9]+$'		# Pattern to match a number
 todofile=~/todo.txt
 historyfile=~/.todoHistory.txt
 
+if [[ ! -f $todofile ]]; then
+	echo "Creating $todofile..."
+	touch $todofile
+fi
+
+if [[ ! -f $historyfile ]]; then
+	echo "Creating $historyfile..."
+	touch $historyfile
+fi
+
 todolen=$(wc -l $todofile | cut -d" " -f1)
 str_usage="Usage: todo [e|w|p|p#|pq|px|up|u|u#|q|l|la|h|ha|x|hx] (task(s) | #)"
 
@@ -125,16 +135,6 @@ top() {
 	error=
 	return
 }
-
-if [[ ! -f $todofile ]]; then
-	echo "Creating $todofile..."
-	touch $todofile
-fi
-
-if [[ ! -f $historyfile ]]; then
-	echo "Creating $historyfile..."
-	touch $historyfile
-fi
 
 case "$1" in
 	e)
