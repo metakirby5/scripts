@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+wget -nd -nc -q --show-progress -e robots=off \
+  -rHD i.4cdn.org -A '*.*' -R '*s.*,*.tmp' "$@"
