@@ -47,6 +47,7 @@ SEASONS = (
 OVERRIDES = {
     'Youjo Senki: Saga of Tanya the Evil': 'Youjo Senki',
     'Kobayashi-san Chi no Maid Dragon': 'Kobayashi-san Chi no Maidragon',
+    'Boku no Hero Academia 2nd Season': 'Boku no Hero Academia 2',
 }
 
 
@@ -165,11 +166,12 @@ human('Fetching currently airing series from anilist.co...')
 now = datetime.now()
 try:
     ac = []
-    for season in SEASONS[now.month]:
+    for season in SEASONS[now.month - 1]:
         ac += get_json(
             AC_BROWSE,
             params={
                 'access_token': token['access_token'],
+                'status': 'currently airing',
                 'year': now.year,
                 'season': season,
                 'full_page': True,
@@ -192,7 +194,7 @@ for info in kt['data']:
     attrs = info['attributes']
     attrs.update(by_id[info['relationships']['media']['data']['id']])
     # For currently airing shows, pull in next episode attrs
-    attrs.update(airing.get(normalize(attrs['titles']['en_jp']), {}))
+    attrs.update(airing.get(normalize(attrs['titles']['en_jp'])) or {})
     anime.append(attrs)
 anime.sort(key=lambda i: i['canonicalTitle'])
 
