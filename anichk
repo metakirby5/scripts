@@ -8,10 +8,10 @@ via argument or the ANICHK_USERNAME environment variable.
 """
 
 import re
+import requests
 import json
 from sys import exit
 from os import environ
-from subprocess import check_output
 from datetime import datetime, timedelta
 from humanize import naturaltime
 from unidecode import unidecode
@@ -19,13 +19,13 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from argcomplete import autocomplete
 
 # Constants and helpers
-KT_USER = 'https://kitsu.io/api/edge/users?filter\[name\]={}'
+KT_USER = 'https://kitsu.io/api/edge/users?filter[name]={}'
 KT_LIB = ('https://kitsu.io/api/edge/library-entries?'
-          'page\[limit\]=1000000&'
+          'page[limit]=1000000&'
           'include=media&'
-          'filter\[status\]=current&'
-          'filter\[mediaType\]=Anime&'
-          'filter\[userId\]={}')
+          'filter[status]=current&'
+          'filter[mediaType]=Anime&'
+          'filter[userId]={}')
 AC_URL = 'http://anichart.net/api/chart/airing'
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
@@ -33,6 +33,7 @@ OVERRIDES = {
     'Youjo Senki: Saga of Tanya the Evil': 'Youjo Senki',
     'Kobayashi-san Chi no Maid Dragon': 'Kobayashi-san Chi no Maidragon',
 }
+
 
 def normalize(s):
     s = OVERRIDES.get(s, s)
@@ -88,15 +89,14 @@ def machine(s=''):
         print(s)
 
 
-# curl is more consistent than requests.get...
-def curl(url):
-    return json.loads(check_output(['curl', '-sf', url]).decode('utf-8'))
+def get_json(url):
+    return json.loads(requests.get(url).content)
 
 
 # Get user ID
 human('Fetching kitsu.io profile for {}...'.format(username))
 try:
-    uid = curl(KT_USER.format(username))['data'][0]['id']
+    uid = get_json(KT_USER.format(username))['data'][0]['id']
 except OSError:
     exit_with("Could not reach kitsu.io.")
 except ValueError:
@@ -105,7 +105,7 @@ except ValueError:
 # Get your currently watching anime
 human('Fetching library entries for user id {}...'.format(uid))
 
-kt = curl(KT_LIB.format(uid))
+kt = get_json(KT_LIB.format(uid))
 
 if not kt['data']:
     exit_with("{} isn't watching anything.".format(username))
@@ -118,7 +118,7 @@ by_id = {
 # Get currently airing anime
 human('Fetching currently airing series from anichart.net...')
 try:
-    ac = curl(AC_URL)
+    ac = get_json(AC_URL)
 except OSError:
     exit_with("Could not reach anichart.net.")
 except ValueError:
