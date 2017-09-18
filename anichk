@@ -5,6 +5,8 @@
 Uses the (unstable) kitsu.io API and (undocumented) anichart.net API to tell
 you what episodes you need to catch up on. You can specify the username either
 via argument or the ANICHK_USERNAME environment variable.
+
+Series limit is 500.
 """
 
 import re
@@ -21,7 +23,7 @@ from argcomplete import autocomplete
 # Constants and helpers
 KT_USER = 'https://kitsu.io/api/edge/users?filter[name]={}'
 KT_LIB = ('https://kitsu.io/api/edge/library-entries?'
-          'page[limit]=1000000&'
+          'page[limit]=500&'
           'include=media&'
           'filter[status]=current&'
           'filter[mediaType]=Anime&'
