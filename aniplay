@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo "Querying your list..."
 show="$(anichk --porcelain | shuf | head -n1)"
-echo "$show"
+echo "Let's watch $show!"
 anistrm "$show"
