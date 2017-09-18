@@ -2,16 +2,22 @@
 # PYTHON_ARGCOMPLETE_OK
 
 """
-Uses the (unstable) kitsu.io API and (undocumented) anichart.net API to tell
+Uses the (unstable) kitsu.io API and anilist.co API to tell
 you what episodes you need to catch up on. You can specify the username either
 via argument or the ANICHK_USERNAME environment variable.
 
 Series limit is 500.
+
+Requires environment variables $ANICHK_ID and $ANICHK_SECRET,
+from anilist.co api.
 """
 
+import os
 import re
 import requests
 import json
+import pytz
+import tzlocal
 from sys import exit
 from os import environ
 from datetime import datetime, timedelta
@@ -28,9 +34,16 @@ KT_LIB = ('https://kitsu.io/api/edge/library-entries?'
           'filter[status]=current&'
           'filter[mediaType]=Anime&'
           'filter[userId]={}')
-AC_URL = 'http://anichart.net/api/chart/airing'
+AC_TOKEN = os.path.expanduser('~/.anilist_token')
+AC_AUTH = 'https://anilist.co/api/auth/access_token'
+AC_BROWSE = 'https://anilist.co/api/browse/anime'
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
+SEASONS = (
+    [('fall', 'winter')] * 3 +
+    [('winter', 'spring')] * 3 +
+    [('spring', 'summer')] * 3 +
+    [('summer', 'fall')] * 3)
 OVERRIDES = {
     'Youjo Senki: Saga of Tanya the Evil': 'Youjo Senki',
     'Kobayashi-san Chi no Maid Dragon': 'Kobayashi-san Chi no Maidragon',
@@ -58,6 +71,14 @@ def yellow(s):
 def exit_with(s):
     print('{}\n'.format(red(s)))
     exit(1)
+
+
+# Get environment variables
+try:
+    AC_ID = os.environ['ANICHK_ID']
+    AC_SECRET = os.environ['ANICHK_SECRET']
+except KeyError:
+    exit_with('Environment variables $ANICHK_ID and $ANICHK_SECRET required.')
 
 
 # Parse args
@@ -91,8 +112,8 @@ def machine(s=''):
         print(s)
 
 
-def get_json(url):
-    return json.loads(requests.get(url).content)
+def get_json(url, params={}):
+    return json.loads(requests.get(url, params=params).content)
 
 
 # Get user ID
@@ -117,12 +138,45 @@ by_id = {
     for a in kt['included']
 }
 
-# Get currently airing anime
-human('Fetching currently airing series from anichart.net...')
+# Get anilist.co credentials if needed
+human('Authenticating with anilist.co...')
 try:
-    ac = get_json(AC_URL)
+    now_utc = datetime.now(tzlocal.get_localzone()).astimezone(pytz.utc)
+    with open(AC_TOKEN, 'r') as f:
+        token = json.load(f)
+        expiry = datetime.fromtimestamp(
+            token['expires'] - 60, pytz.utc)
+        if expiry < now_utc:
+            raise IOError
+except IOError:
+    content = requests.post(
+        AC_AUTH,
+        params={
+            'grant_type': 'client_credentials',
+            'client_id': AC_ID,
+            'client_secret': AC_SECRET,
+        }).content
+    with open(AC_TOKEN, 'wb') as f:
+        f.write(content)
+    token = json.loads(content)
+
+# Get currently airing anime
+human('Fetching currently airing series from anilist.co...')
+now = datetime.now()
+try:
+    ac = []
+    for season in SEASONS[now.month]:
+        ac += get_json(
+            AC_BROWSE,
+            params={
+                'access_token': token['access_token'],
+                'year': now.year,
+                'season': season,
+                'full_page': True,
+                'airing_data': True,
+            })
 except OSError:
-    exit_with("Could not reach anichart.net.")
+    exit_with("Could not reach anilist.co.")
 except ValueError:
     exit_with("Malformed anichart.net JSON.")
 
@@ -130,7 +184,7 @@ airing = {}
 for a in ac:
     airing[normalize(a['title_romaji'])] = a['airing']
     # Sometimes kitsu.io will put english for romaji...
-    airing[normalize(a['title_eng'])] = a['airing']
+    airing[normalize(a['title_english'])] = a['airing']
 
 # Create list of series
 anime = []
@@ -144,7 +198,6 @@ anime.sort(key=lambda i: i['canonicalTitle'])
 
 # Print info
 human()
-now = datetime.now()
 for a in anime:
     title = a['canonicalTitle']
     cur = a['progress'] or 0
