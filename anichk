@@ -27,16 +27,9 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from argcomplete import autocomplete
 
 # Constants and helpers
-KT_USER = 'https://kitsu.io/api/edge/users?filter[name]={}'
-KT_LIB = ('https://kitsu.io/api/edge/library-entries?'
-          'page[limit]=500&'
-          'include=media&'
-          'filter[status]=current&'
-          'filter[mediaType]=Anime&'
-          'filter[userId]={}')
-AC_TOKEN = os.path.expanduser('~/.anilist_token')
-AC_AUTH = 'https://anilist.co/api/auth/access_token'
-AC_BROWSE = 'https://anilist.co/api/browse/anime'
+KT_API = 'https://kitsu.io/api/edge/'
+AL_API = 'https://anilist.co/api/'
+AL_TOKEN = os.path.expanduser('~/.anilist_token')
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
 SEASONS = (
@@ -76,8 +69,8 @@ def exit_with(s):
 
 # Get environment variables
 try:
-    AC_ID = os.environ['ANICHK_ID']
-    AC_SECRET = os.environ['ANICHK_SECRET']
+    AL_ID = os.environ['ANICHK_ID']
+    AL_SECRET = os.environ['ANICHK_SECRET']
 except KeyError:
     exit_with('Environment variables $ANICHK_ID and $ANICHK_SECRET required.')
 
@@ -114,13 +107,15 @@ def machine(s=''):
 
 
 def get_json(url, params={}):
-    return json.loads(requests.get(url, params=params).content)
+    return json.loads(requests.get(url, params=params).content.decode('utf8'))
 
 
 # Get user ID
 human('Fetching kitsu.io profile for {}...'.format(username))
 try:
-    uid = get_json(KT_USER.format(username))['data'][0]['id']
+    uid = get_json(KT_API + 'users', params={
+        'filter[name]': username,
+    })['data'][0]['id']
 except OSError:
     exit_with("Could not reach kitsu.io.")
 except ValueError:
@@ -128,8 +123,13 @@ except ValueError:
 
 # Get your currently watching anime
 human('Fetching library entries for user id {}...'.format(uid))
-
-kt = get_json(KT_LIB.format(uid))
+kt = get_json(KT_API + 'library-entries', params={
+    'page[limit]': 500,
+    'include': 'media',
+    'filter[status]': 'current',
+    'filter[mediaType]': 'Anime',
+    'filter[userId]': uid,
+})
 
 if not kt['data']:
     exit_with("{} isn't watching anything.".format(username))
@@ -143,7 +143,7 @@ by_id = {
 human('Authenticating with anilist.co...')
 try:
     now_utc = datetime.now(tzlocal.get_localzone()).astimezone(pytz.utc)
-    with open(AC_TOKEN, 'r') as f:
+    with open(AL_TOKEN, 'r') as f:
         token = json.load(f)
         expiry = datetime.fromtimestamp(
             token['expires'] - 60, pytz.utc)
@@ -151,15 +151,15 @@ try:
             raise IOError
 except IOError:
     content = requests.post(
-        AC_AUTH,
+        AL_API + 'auth/access_token',
         params={
             'grant_type': 'client_credentials',
-            'client_id': AC_ID,
-            'client_secret': AC_SECRET,
+            'client_id': AL_ID,
+            'client_secret': AL_SECRET,
         }).content
-    with open(AC_TOKEN, 'wb') as f:
+    with open(AL_TOKEN, 'wb') as f:
         f.write(content)
-    token = json.loads(content)
+    token = json.loads(content.decode('utf8'))
 
 # Get currently airing anime
 human('Fetching currently airing series from anilist.co...')
@@ -168,7 +168,7 @@ try:
     ac = []
     for season in SEASONS[now.month - 1]:
         ac += get_json(
-            AC_BROWSE,
+            AL_API + 'browse/anime',
             params={
                 'access_token': token['access_token'],
                 'status': 'currently airing',
