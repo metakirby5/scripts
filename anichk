@@ -155,7 +155,7 @@ try:
 except IOError:
     content = requests.post(
         AL_API + 'auth/access_token',
-        params={
+        data={
             'grant_type': 'client_credentials',
             'client_id': AL_ID,
             'client_secret': AL_SECRET,
