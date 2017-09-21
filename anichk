@@ -8,7 +8,7 @@ via argument or the ANICHK_USERNAME environment variable.
 
 Series limit is 500.
 
-Requires environment variables $ANICHK_ID and $ANICHK_SECRET,
+Requires environment variables $OAUTH2_ANILIST_ID and $OAUTH2_ANILIST_SECRET,
 from anilist.co api.
 """
 
@@ -69,10 +69,11 @@ def exit_with(s):
 
 # Get environment variables
 try:
-    AL_ID = os.environ['ANICHK_ID']
-    AL_SECRET = os.environ['ANICHK_SECRET']
+    AL_ID = os.environ['OAUTH2_ANILIST_ID']
+    AL_SECRET = os.environ['OAUTH2_ANILIST_SECRET']
 except KeyError:
-    exit_with('Environment variables $ANICHK_ID and $ANICHK_SECRET required.')
+    exit_with('Environment variables $OAUTH2_ANILIST_ID '
+              'and $OAUTH2_ANILIST_SECRET required.')
 
 
 # Parse args
