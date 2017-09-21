@@ -115,6 +115,7 @@ def get_json(url, params={}):
 human('Fetching kitsu.io profile for {}...'.format(username))
 try:
     uid = get_json(KT_API + 'users', params={
+        'fields[users]': 'id',
         'filter[name]': username,
     })['data'][0]['id']
 except OSError:
@@ -126,16 +127,17 @@ except ValueError:
 human('Fetching library entries for user id {}...'.format(uid))
 kt = get_json(KT_API + 'library-entries', params={
     'page[limit]': 500,
-    'include': 'media',
+    'include': 'anime',
+    'fields[libraryEntries]': 'progress,anime',
+    'fields[anime]': 'titles,canonicalTitle,episodeCount',
     'filter[status]': 'current',
-    'filter[mediaType]': 'Anime',
     'filter[userId]': uid,
 })
 
 if not kt['data']:
     exit_with("{} isn't watching anything.".format(username))
 
-by_id = {
+anime_by_id = {
     a['id']: a['attributes']
     for a in kt['included']
 }
@@ -193,7 +195,7 @@ for a in ac:
 anime = []
 for info in kt['data']:
     attrs = info['attributes']
-    attrs.update(by_id[info['relationships']['media']['data']['id']])
+    attrs.update(anime_by_id[info['relationships']['anime']['data']['id']])
     # For currently airing shows, pull in next episode attrs
     attrs.update(airing.get(normalize(attrs['titles']['en_jp'])) or {})
     anime.append(attrs)
