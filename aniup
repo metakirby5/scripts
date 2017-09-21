@@ -46,11 +46,9 @@ entries=$(wget -qO- \
     .included |
     map({key: .id,
          value: {title: .attributes.canonicalTitle,
-                 eps: .attributes.episodeCount}}) |
-    from_entries) as $index |
-    .data[] |
-    $index[.relationships.anime.data.id] as $entry |
-    "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')
+                 eps: .attributes.episodeCount}}) | from_entries
+  ) as $index | .data[] | $index[.relationships.anime.data.id] as $entry |
+  "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')
 
 if [ -z "$entries" ]; then
   echo "No entries found for $ANIUP_USERNAME."
