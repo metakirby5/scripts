@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Quick and dirty script to increment the watched count for an episode.
 # $ANIUP_USERNAME should be your kitsu.io username.
-# $OAUTH2_KITSU_ID and $OAUTH2_KITSU_SECRET are required.
 # Dependencies: wget, jq, fzf
 
 checkdep() {
@@ -15,10 +14,8 @@ if [ "$missing" ]; then
 fi
 
 # Check for required variables
-if [ -z "$ANIUP_USERNAME" \
-  -o -z "$OAUTH2_KITSU_ID" \
-  -o -z "$OAUTH2_KITSU_SECRET" ]; then
-  echo 'Required: $ANIUP_USERNAME, $OAUTH2_KITSU_ID, $OAUTH2_KITSU_SECRET'
+if [ -z "$ANIUP_USERNAME" ]; then
+  echo 'Required: $ANIUP_USERNAME'
   exit 1
 fi
 
