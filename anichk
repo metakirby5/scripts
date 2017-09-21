@@ -124,7 +124,7 @@ except ValueError:
     exit_with("{} isn't on kitsu.io.".format(username))
 
 # Get your currently watching anime
-human('Fetching library entries for user id {}...'.format(uid))
+human('Fetching library entries for user ID {}...'.format(uid))
 kt = get_json(KT_API + 'library-entries', params={
     'page[limit]': 500,
     'include': 'anime',

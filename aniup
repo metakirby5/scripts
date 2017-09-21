@@ -25,7 +25,7 @@ fi
 api="https://kitsu.io/api/edge"
 
 # Get user ID
-echo "Getting ID for $ANIUP_USERNAME..."
+echo "Fetching kitsu.io profile for $ANIUP_USERNAME..."
 uid="$(wget -qO- \
   "$api/users\
 ?fields[users]=id\
@@ -33,7 +33,7 @@ uid="$(wget -qO- \
   jq -r '.data[0].id')"
 
 # Fetch entries
-echo "Getting library entries..."
+echo "Fetching library entries for user ID $uid..."
 entries=$(wget -qO- \
   "$api/library-entries\
 ?page[limit]=500\
