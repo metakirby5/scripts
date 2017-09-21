@@ -1,38 +1,57 @@
 #!/usr/bin/env bash
 # Quick and dirty script to increment the watched count for an episode.
-# $ANIUP_USERNAME should be your hummingbird.me username.
-# $ANIUP_TOKEN should be an api token as per
-#   https://github.com/hummingbird-me/hummingbird/wiki/API-v1-Methods#user--authenticate
-# Dependencies: curl, jq, fzf
+# $ANIUP_USERNAME should be your kitsu.io username.
+# $OAUTH2_KITSU_ID and $OAUTH2_KITSU_SECRET are required.
+# Dependencies: wget, jq, fzf
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
 
-missing="$(checkdep curl)$(checkdep jq)$(checkdep fzf)"
+missing="$(checkdep wget)$(checkdep jq)$(checkdep fzf)"
 if [ "$missing" ]; then
   echo "The following dependencies are missing:$missing"
   exit 1
 fi
 
 # Check for required variables
-if [ -z "$ANIUP_USERNAME" -o -z "$ANIUP_TOKEN" ]; then
-  echo 'Both $ANIUP_USERNAME and $ANIUP_TOKEN required.'
+if [ -z "$ANIUP_USERNAME" \
+  -o -z "$OAUTH2_KITSU_ID" \
+  -o -z "$OAUTH2_KITSU_SECRET" ]; then
+  echo 'Required: $ANIUP_USERNAME, $OAUTH2_KITSU_ID, $OAUTH2_KITSU_SECRET'
   exit 1
 fi
 
-# JSON parse script
-jqscript='
-.[] |
-.episodes_watched as $watched |
-.anime |
-"\(.id)\t\($watched)\t\(.title)"
-'
+api="https://kitsu.io/api/edge"
+
+# Get user ID
+echo "Getting ID for $ANIUP_USERNAME..."
+uid="$(wget -qO- \
+  "$api/users\
+?fields[users]=id\
+&filter[name]=$ANIUP_USERNAME" |\
+  jq -r '.data[0].id')"
 
 # Fetch entries
-base="https://hummingbird.me/api/v1"
-chk_url="$base/users/$ANIUP_USERNAME/library?status=currently-watching"
-entries="$(curl -sf "$chk_url" | jq -r "$jqscript")"
+echo "Getting library entries..."
+entries=$(wget -qO- \
+  "$api/library-entries\
+?page[limit]=500\
+&include=anime\
+&fields[libraryEntries]=progress,anime\
+&fields[anime]=canonicalTitle,episodeCount\
+&filter[status]=current\
+&filter[userId]=$uid" |\
+  jq -r '(
+    .included |
+    map({key: .id,
+         value: {title: .attributes.canonicalTitle,
+                 eps: .attributes.episodeCount}}) |
+    from_entries) as $index |
+    .data[] |
+    $index[.relationships.anime.data.id] as $entry |
+    "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')
+
 if [ -z "$entries" ]; then
   echo "No entries found for $ANIUP_USERNAME."
   exit 0
@@ -42,12 +61,23 @@ fi
 selection="$(fzf --with-nth 2.. <<< "$entries")"
 [ -z "$selection" ] && exit 0
 id="$(cut -f1 <<< "$selection")"
+ep_stats="$(cut -f2 <<< "$selection")"
 anime="$(cut -f3- <<< "$selection")"
+next_ep="$((${ep_stats%%/*} + 1))"
 
+echo
+echo "ID: $id"
+echo "Name: $anime"
+echo "Stats: $ep_stats"
+echo "Next: $next_ep"
+
+exit 5
+
+# TODO: update below
 # Update the entry
-update_url="$base/libraries/$id"
+update_url="$api/libraries/$id"
 update_data="auth_token=$ANIUP_TOKEN&id=$id&increment_episodes=true"
-ep="$(curl -sf "$update_url" -X POST -d "$update_data" |
+ep="$(wget -qO- "$update_url" -X POST -d "$update_data" |
       jq -r '.episodes_watched')"
 if [ -z "$ep" ]; then
   echo "Unable to update watched count for \"$anime\"."
