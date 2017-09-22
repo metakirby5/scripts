@@ -2,14 +2,14 @@
 # PYTHON_ARGCOMPLETE_OK
 
 """
-Uses the (unstable) kitsu.io API and anilist.co API to tell
-you what episodes you need to catch up on. You can specify the username either
-via argument or the KITSU_USERNAME environment variable.
+Uses the  kitsu.io API and anilist.co API to tell you what episodes you need to
+catch up on. Series limit is 500.
 
-Series limit is 500.
-
-Requires environment variables $OAUTH2_ANILIST_ID and $OAUTH2_ANILIST_SECRET,
-from anilist.co api.
+Required environment variables:
+    $OAUTH2_ANILIST_ID, $OAUTH2_ANILIST_SECRET: anilist.co Oauth2 credentials.
+Optional environment variables:
+    $KITSU_USERNAME: The default username to check. Can be overridden with the
+        `username` arg.
 """
 
 import os
