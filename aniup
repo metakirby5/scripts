@@ -57,12 +57,12 @@ if [ -f "$token_file" ]; then
     token_json="$(< "$token_file")"
   # Otherwise, grab a new one
   else
-    refresh_token="$(jq '.refresh_token // ""' "$token_file")"
+    refresh_token="$(jq -r '.refresh_token // ""' "$token_file")"
     if [ "$refresh_token" ]; then
       token_json="$(curl -sfgX POST \
         -d "grant_type=refresh_token&refresh_token=$refresh_token" \
         "$oauth/token")"
-      [ "$token_json" ] && \
+      [ "$token_json" ] &&
         jq ".refresh_token = $refresh_token" \
         <<< "$token_json" > "$token_file"
     fi
@@ -124,24 +124,21 @@ ep_stats="$(cut -f2 <<< "$selection")"
 anime="$(cut -f3- <<< "$selection")"
 next_ep="$((${ep_stats%%/*} + 1))"
 
-echo
-echo "ID: $id"
-echo "Name: $anime"
-echo "Stats: $ep_stats"
-echo "Next: $next_ep"
-echo "Token: $token"
+json_patch="$(jq -r \
+  '. = {
+    access_token: "'"$token"'",
+    data: {
+      type: "library-entries",
+      id: '"$id"',
+      attributes: {
+        progress: '"$next_ep"'
+      }
+    }
+  }' <<< '{}')"
 
-exit 5
-
-# TODO: update below
-# Update the entry
-update_url="$api/libraries/$id"
-update_data="auth_token=$ANIUP_TOKEN&id=$id&increment_episodes=true"
-ep="$(curl -sfg "$update_url" -X POST -d "$update_data" |
-      jq -r '.episodes_watched')"
-if [ -z "$ep" ]; then
-  echo "Unable to update watched count for \"$anime\"."
-  exit 1
-fi
-
-echo "Updated \"$anime\" to episode $ep."
+curl -sfgX PATCH \
+  -d "$json_patch" \
+  -H 'Content-Type: application/vnd.api+json' \
+  "$api/library-entries/$id" &>/dev/null &&
+    echo "Updated $anime to episode $next_ep." ||
+    echo "Failed to update $anime to episode $next_ep."
