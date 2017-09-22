@@ -144,10 +144,19 @@ anime_by_id = {
 
 # Get anilist.co credentials if needed
 human('Authenticating with anilist.co...')
+os.makedirs(os.path.dirname(AL_TOKEN), exist_ok=True)
+def check_token(token):
+    if 'error' in token:
+        try:
+            os.remove(AL_TOKEN)
+        except OSError:
+            pass
+        exit_with('Error. {error}: {error_description}'.format(**token))
 try:
     now_utc = datetime.now(tzlocal.get_localzone()).astimezone(pytz.utc)
     with open(AL_TOKEN, 'r') as f:
         token = json.load(f)
+        check_token(token)
         expiry = datetime.fromtimestamp(
             token['expires'] - 60, pytz.utc)
         if expiry < now_utc:
@@ -160,9 +169,10 @@ except IOError:
             'client_id': AL_ID,
             'client_secret': AL_SECRET,
         }).content
+    token = json.loads(content.decode('utf8'))
+    check_token(token)
     with open(AL_TOKEN, 'wb') as f:
         f.write(content)
-    token = json.loads(content.decode('utf8'))
 
 # Get currently airing anime
 human('Fetching currently airing series from anilist.co...')
