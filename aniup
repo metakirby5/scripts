@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Quick and dirty script to increment the watched count for an episode.
-# $ANIUP_USERNAME should be your kitsu.io username.
+# $KITSU_USERNAME should be your kitsu.io username.
 # Dependencies: wget, jq, fzf
 
 checkdep() {
@@ -14,19 +14,19 @@ if [ "$missing" ]; then
 fi
 
 # Check for required variables
-if [ -z "$ANIUP_USERNAME" ]; then
-  echo 'Required: $ANIUP_USERNAME'
+if [ -z "$KITSU_USERNAME" ]; then
+  echo 'Required: $KITSU_USERNAME'
   exit 1
 fi
 
 api="https://kitsu.io/api/edge"
 
 # Get user ID
-echo "Fetching kitsu.io profile for $ANIUP_USERNAME..."
+echo "Fetching kitsu.io profile for $KITSU_USERNAME..."
 uid="$(wget -qO- \
   "$api/users\
 ?fields[users]=id\
-&filter[name]=$ANIUP_USERNAME" |\
+&filter[name]=$KITSU_USERNAME" |\
   jq -r '.data[0].id')"
 
 # Fetch entries
@@ -48,7 +48,7 @@ entries=$(wget -qO- \
   "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')
 
 if [ -z "$entries" ]; then
-  echo "No entries found for $ANIUP_USERNAME."
+  echo "No entries found for $KITSU_USERNAME."
   exit 0
 fi
 

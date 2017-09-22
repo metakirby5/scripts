@@ -4,7 +4,7 @@
 """
 Uses the (unstable) kitsu.io API and anilist.co API to tell
 you what episodes you need to catch up on. You can specify the username either
-via argument or the ANICHK_USERNAME environment variable.
+via argument or the KITSU_USERNAME environment variable.
 
 Series limit is 500.
 
@@ -86,7 +86,7 @@ parser.add_argument('username',
                     help="kitsu.io username",
                     nargs='?',
                     type=str,
-                    default=environ.get('ANICHK_USERNAME'))
+                    default=environ.get('KITSU_USERNAME'))
 autocomplete(parser)
 args = parser.parse_args()
 porcelain = args.porcelain
