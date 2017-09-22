@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 # Quick and dirty script to increment the watched count for an episode.
-# $KITSU_USERNAME should be your kitsu.io username.
+#
 # Dependencies: wget, jq, fzf
+#
+# Optional environment variables:
+#   $KITSU_USERNAME: The default username to check. Can be overriden with $1.
+#     Overriding this unsets $KITSU_PASSWORD.
+#   $KITSU_PASSWORD: The password corresponding to $KITSU_USERNAME. If unset,
+#     `read -s` is used to get the password.
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
@@ -12,6 +18,18 @@ if [ "$missing" ]; then
   echo "The following dependencies are missing:$missing"
   exit 1
 fi
+
+usage() {
+  echo "Usage: $(basename "$0") [kitsu.io username]"
+  exit 1
+}
+
+# Complain if too many args
+[ "$#" -gt 1 ] && usage
+[[ "$1" == -* ]] && usage
+
+# If arg provided, use it
+[ "$1" ] && KITSU_USERNAME="$1" && KITSU_PASSWORD=''
 
 # Check for required variables
 if [ -z "$KITSU_USERNAME" ]; then
@@ -60,11 +78,16 @@ ep_stats="$(cut -f2 <<< "$selection")"
 anime="$(cut -f3- <<< "$selection")"
 next_ep="$((${ep_stats%%/*} + 1))"
 
+[ -z "$KITSU_PASSWORD" ] && read -sp \
+  "Enter the password for $KITSU_USERNAME: " KITSU_PASSWORD
+echo
+
 echo
 echo "ID: $id"
 echo "Name: $anime"
 echo "Stats: $ep_stats"
 echo "Next: $next_ep"
+echo "Password: $KITSU_PASSWORD"
 
 exit 5
 
