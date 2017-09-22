@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Quick and dirty script to increment the watched count for an episode.
 #
-# Dependencies: wget, jq, fzf
+# Dependencies: curl, jq, fzf
 #
 # Optional environment variables:
 #   $KITSU_USERNAME: The default username to check. Can be overriden with $1.
@@ -13,7 +13,7 @@ checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
 
-missing="$(checkdep wget)$(checkdep jq)$(checkdep fzf)"
+missing="$(checkdep curl)$(checkdep jq)$(checkdep fzf)"
 if [ "$missing" ]; then
   echo "The following dependencies are missing:$missing"
   exit 1
@@ -37,11 +37,13 @@ if [ -z "$KITSU_USERNAME" ]; then
   exit 1
 fi
 
-api="https://kitsu.io/api/edge"
+base="https://kitsu.io/api"
+api="$base/edge"
+oauth="$base/oauth"
 
 # Get user ID
 echo "Fetching kitsu.io profile for $KITSU_USERNAME..."
-uid="$(wget -qO- \
+uid="$(curl -sfg \
   "$api/users\
 ?fields[users]=id\
 &filter[name]=$KITSU_USERNAME" |\
@@ -49,7 +51,7 @@ uid="$(wget -qO- \
 
 # Fetch entries
 echo "Fetching library entries for user ID $uid..."
-entries=$(wget -qO- \
+entries="$(curl -sfg \
   "$api/library-entries\
 ?page[limit]=500\
 &include=anime\
@@ -63,7 +65,7 @@ entries=$(wget -qO- \
          value: {title: .attributes.canonicalTitle,
                  eps: .attributes.episodeCount}}) | from_entries
   ) as $index | .data[] | $index[.relationships.anime.data.id] as $entry |
-  "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')
+  "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')"
 
 if [ -z "$entries" ]; then
   echo "No entries found for $KITSU_USERNAME."
@@ -91,11 +93,17 @@ echo "Password: $KITSU_PASSWORD"
 
 exit 5
 
+token=$(curl -sfgX POST \
+  "$oauth/token" |\
+  jq -r '.')
+
+curl -X POST 'https://kitsu.io/api/oauth/token' -d 'grant_type=password&username=___&password=___'
+
 # TODO: update below
 # Update the entry
 update_url="$api/libraries/$id"
 update_data="auth_token=$ANIUP_TOKEN&id=$id&increment_episodes=true"
-ep="$(wget -qO- "$update_url" -X POST -d "$update_data" |
+ep="$(curl -sfg "$update_url" -X POST -d "$update_data" |
       jq -r '.episodes_watched')"
 if [ -z "$ep" ]; then
   echo "Unable to update watched count for \"$anime\"."
