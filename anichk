@@ -29,7 +29,7 @@ from argcomplete import autocomplete
 # Constants and helpers
 KT_API = 'https://kitsu.io/api/edge/'
 AL_API = 'https://anilist.co/api/'
-AL_TOKEN = os.path.expanduser('~/.local/tokens/anilist')
+AL_TOKEN = os.path.expanduser('~/.local/tokens/anilist/client')
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
 SEASONS = (
