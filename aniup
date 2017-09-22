@@ -5,9 +5,6 @@
 #
 # Optional environment variables:
 #   $KITSU_USERNAME: The default username to check. Can be overriden with $1.
-#     Overriding this unsets $KITSU_PASSWORD.
-#   $KITSU_PASSWORD: The password corresponding to $KITSU_USERNAME. If unset,
-#     `read -s` is used to get the password.
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
@@ -29,7 +26,7 @@ usage() {
 [[ "$1" == -* ]] && usage
 
 # If arg provided, use it
-[ "$1" ] && KITSU_USERNAME="$1" && KITSU_PASSWORD=''
+[ "$1" ] && KITSU_USERNAME="$1"
 
 # Check for required variables
 if [ -z "$KITSU_USERNAME" ]; then
@@ -37,9 +34,59 @@ if [ -z "$KITSU_USERNAME" ]; then
   exit 1
 fi
 
+maybe_exit() {
+  if [ -z "$1" ]; then
+    echo "$2"
+    exit "${3:-1}"
+  fi
+}
+
 base="https://kitsu.io/api"
 api="$base/edge"
 oauth="$base/oauth"
+
+token_dir=~/.local/tokens/kitsu/password
+mkdir -p "$token_dir"
+
+# Try to get existing token
+token_file="$token_dir/$KITSU_USERNAME"
+if [ -f "$token_file" ]; then
+  # If not expired, simply use it
+  expiry="$(jq -r '.created_at + .expires_in // ""' "$token_file")"
+  if [ "${expiry:-0}" -gt "$(date +%s)" ]; then
+    token_json="$(< "$token_file")"
+  # Otherwise, grab a new one
+  else
+    refresh_token="$(jq '.refresh_token // ""' "$token_file")"
+    if [ "$refresh_token" ]; then
+      token_json="$(curl -sfgX POST \
+        -d "grant_type=refresh_token&refresh_token=$refresh_token" \
+        "$oauth/token")"
+      [ "$token_json" ] && \
+        jq ".refresh_token = $refresh_token" \
+        <<< "$token_json" > "$token_file"
+    fi
+  fi
+fi
+
+# If we failed to get it, prompt to authorize
+if [ -z "$token_json" ]; then
+  [ -z "$KITSU_PASSWORD" ] && read -sp \
+    "Enter the password for $KITSU_USERNAME: " KITSU_PASSWORD
+  echo
+
+  token_json="$(curl -sfgX POST \
+    -d \
+  "grant_type=password\
+&username=$KITSU_USERNAME\
+&password=$KITSU_PASSWORD" \
+    "$oauth/token")"
+  maybe_exit "$token_json" 'Failed to authenticate.'
+
+  echo "$token_json" > "$token_file"
+fi
+
+token="$(jq -r '.access_token' <<< "$token_json")"
 
 # Get user ID
 echo "Fetching kitsu.io profile for $KITSU_USERNAME..."
@@ -48,6 +95,7 @@ uid="$(curl -sfg \
 ?fields[users]=id\
 &filter[name]=$KITSU_USERNAME" |\
   jq -r '.data[0].id')"
+maybe_exit "$uid" 'Failed to get user ID.'
 
 # Fetch entries
 echo "Fetching library entries for user ID $uid..."
@@ -66,11 +114,7 @@ entries="$(curl -sfg \
                  eps: .attributes.episodeCount}}) | from_entries
   ) as $index | .data[] | $index[.relationships.anime.data.id] as $entry |
   "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')"
-
-if [ -z "$entries" ]; then
-  echo "No entries found for $KITSU_USERNAME."
-  exit 0
-fi
+maybe_exit "$entries" "No entries found for $KITSU_USERNAME." 0
 
 # Get user selection
 selection="$(fzf --with-nth 2.. <<< "$entries")"
@@ -80,24 +124,14 @@ ep_stats="$(cut -f2 <<< "$selection")"
 anime="$(cut -f3- <<< "$selection")"
 next_ep="$((${ep_stats%%/*} + 1))"
 
-[ -z "$KITSU_PASSWORD" ] && read -sp \
-  "Enter the password for $KITSU_USERNAME: " KITSU_PASSWORD
-echo
-
 echo
 echo "ID: $id"
 echo "Name: $anime"
 echo "Stats: $ep_stats"
 echo "Next: $next_ep"
-echo "Password: $KITSU_PASSWORD"
+echo "Token: $token"
 
 exit 5
-
-token=$(curl -sfgX POST \
-  "$oauth/token" |\
-  jq -r '.')
-
-curl -X POST 'https://kitsu.io/api/oauth/token' -d 'grant_type=password&username=___&password=___'
 
 # TODO: update below
 # Update the entry
