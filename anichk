@@ -29,6 +29,7 @@ from argcomplete import autocomplete
 # Constants and helpers
 KT_API = 'https://kitsu.io/api/edge/'
 AL_API = 'https://anilist.co/api/'
+KT_CACHE = os.path.expanduser('~/.cache/kitsu/usernames')
 AL_TOKEN = os.path.expanduser('~/.local/tokens/anilist/client')
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
@@ -112,19 +113,29 @@ def get_json(url, params={}):
 
 
 # Get user ID
-human('Fetching kitsu.io profile for {}...'.format(username))
+os.makedirs(KT_CACHE, exist_ok=True)
+KT_CACHED_UID = os.path.join(KT_CACHE, username)
 try:
-    uid = get_json(KT_API + 'users', params={
-        'fields[users]': 'id',
-        'filter[name]': username,
-    })['data'][0]['id']
-except OSError:
-    exit_with("Could not reach kitsu.io.")
-except ValueError:
-    exit_with("{} isn't on kitsu.io.".format(username))
+    with open(KT_CACHED_UID, 'r') as f:
+        uid = int(f.read())
+    human('User ID for {} cached.'.format(username))
+except FileNotFoundError:
+    human('Fetching user ID for {}...'.format(username))
+    try:
+        uid = get_json(KT_API + 'users', params={
+            'fields[users]': 'id',
+            'filter[name]': username,
+        })['data'][0]['id']
+    except OSError:
+        exit_with("Could not reach kitsu.io.")
+    except ValueError:
+        exit_with("{} isn't on kitsu.io.".format(username))
+    with open(KT_CACHED_UID, 'w') as f:
+        f.write(uid)
+
 
 # Get your currently watching anime
-human('Fetching library entries for user ID {}...'.format(uid))
+human('Fetching library entries...'.format(uid))
 kt = get_json(KT_API + 'library-entries', params={
     'page[limit]': 500,
     'include': 'anime',
@@ -143,10 +154,7 @@ anime_by_id = {
 }
 
 # Get anilist.co credentials if needed
-human('Authenticating with anilist.co...')
 os.makedirs(os.path.dirname(AL_TOKEN), exist_ok=True)
-
-# Try to load existing token
 try:
     now_utc = datetime.now(tzlocal.get_localzone()).astimezone(pytz.utc)
     with open(AL_TOKEN, 'r') as f:
@@ -155,7 +163,10 @@ try:
             token['expires'] - 60, pytz.utc)
         if expiry < now_utc:
             raise IOError
+    human('Existing anilist.co token valid.')
 except:
+    human('Authenticating with anilist.co...')
+
     # Delete existing token
     try:
         os.remove(AL_TOKEN)
