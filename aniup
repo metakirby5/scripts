@@ -91,9 +91,7 @@ token="$(jq -r '.access_token' <<< "$token_json")"
 
 # Get user ID
 uid="$(< "$uid_cache")"
-if [ "$uid" ]; then
-  echo "User ID for $KITSU_USERNAME cached."
-else
+if [ -z "$uid" ]; then
   echo "Fetching user ID for $KITSU_USERNAME..."
   uid="$(curl -sfg \
     "$api/users\

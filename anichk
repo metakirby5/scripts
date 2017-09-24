@@ -118,7 +118,6 @@ KT_CACHED_UID = os.path.join(KT_CACHE, username)
 try:
     with open(KT_CACHED_UID, 'r') as f:
         uid = int(f.read())
-    human('User ID for {} cached.'.format(username))
 except FileNotFoundError:
     human('Fetching user ID for {}...'.format(username))
     try:
@@ -163,7 +162,6 @@ try:
             token['expires'] - 60, pytz.utc)
         if expiry < now_utc:
             raise IOError
-    human('Existing anilist.co token valid.')
 except:
     human('Authenticating with anilist.co...')
 
