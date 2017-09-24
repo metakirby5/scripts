@@ -45,6 +45,7 @@ base="https://kitsu.io/api"
 api="$base/edge"
 oauth="$base/oauth"
 
+uid_cache=~/.cache/kitsu/usernames/"$KITSU_USERNAME"
 token_dir=~/.local/tokens/kitsu/password
 mkdir -p "$token_dir"
 
@@ -89,16 +90,21 @@ fi
 token="$(jq -r '.access_token' <<< "$token_json")"
 
 # Get user ID
-echo "Fetching kitsu.io profile for $KITSU_USERNAME..."
-uid="$(curl -sfg \
-  "$api/users\
-?fields[users]=id\
-&filter[name]=$KITSU_USERNAME" |\
-  jq -r '.data[0].id')"
-maybe_exit "$uid" 'Failed to get user ID.'
+uid="$(< "$uid_cache")"
+if [ "$uid" ]; then
+  echo "User ID for $KITSU_USERNAME cached."
+else
+  echo "Fetching user ID for $KITSU_USERNAME..."
+  uid="$(curl -sfg \
+    "$api/users\
+  ?fields[users]=id\
+  &filter[name]=$KITSU_USERNAME" |\
+    jq -r '.data[0].id')"
+  maybe_exit "$uid" 'Failed to get user ID.'
+fi
 
 # Fetch entries
-echo "Fetching library entries for user ID $uid..."
+echo "Fetching library entries..."
 entries="$(curl -sfg \
   "$api/library-entries\
 ?page[limit]=500\
