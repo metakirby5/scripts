@@ -239,8 +239,8 @@ anime.sort(key=lambda i: i['canonicalTitle'])
 human()
 for a in anime:
     title = a['canonicalTitle']
-    cur = a['progress'] or 0
-    total = a['episodeCount'] or 0
+    cur = a['progress']
+    total = a['episodeCount']
 
     try:
         available = a['next_episode'] - 1
@@ -270,12 +270,9 @@ for a in anime:
             status = green(time)
         # If we're behind
         elif cur < available:
-            printer = green if available != total else yellow
+            printer = yellow if available == total else green
             status = printer('{}/{}'.format(cur, available))
             machine(u'{} {}'.format(title, cur + 1))
-        # If no information available
-        elif not available:
-            status = yellow('NO INFO')
         # Invalid state
         else:
             status = red('INVALID')
