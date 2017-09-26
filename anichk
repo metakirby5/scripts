@@ -33,11 +33,7 @@ KT_CACHE = os.path.expanduser('~/.cache/kitsu/usernames')
 AL_TOKEN = os.path.expanduser('~/.local/tokens/anilist/client')
 END = '\033[0m'
 LONG_VOWELS = re.compile(r'([aeiou])\1+')
-SEASONS = (
-    [('fall', 'winter')] * 3 +
-    [('winter', 'spring')] * 3 +
-    [('spring', 'summer')] * 3 +
-    [('summer', 'fall')] * 3)
+SEASONS = ('winter', 'spring', 'summer', 'fall')
 OVERRIDES = {
     'Youjo Senki: Saga of Tanya the Evil': 'Youjo Senki',
     'Kobayashi-san Chi no Maid Dragon': 'Kobayashi-san Chi no Maidragon',
@@ -83,6 +79,9 @@ parser = ArgumentParser(description=__doc__,
 parser.add_argument('--porcelain',
                     help="only output unwatched as [series] [episode #]",
                     action='store_true')
+parser.add_argument('-v',
+                    help="verbose",
+                    action='store_true')
 parser.add_argument('username',
                     help="kitsu.io username",
                     nargs='?',
@@ -91,6 +90,7 @@ parser.add_argument('username',
 autocomplete(parser)
 args = parser.parse_args()
 porcelain = args.porcelain
+verbose = args.v
 username = args.username
 
 if not username:
@@ -106,6 +106,10 @@ def human(s=''):
 def machine(s=''):
     if porcelain:
         print(s)
+
+
+def json_pp(d):
+    return json.dumps(d, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def get_json(url, params={}):
@@ -186,15 +190,17 @@ except:
 
 # Get currently airing anime
 human('Fetching currently airing series from anilist.co...')
+ac = []
 now = datetime.now()
+season_num = (now.month - 1) // 3
+seasons = [SEASONS[season_num - 1], SEASONS[season_num]]
 try:
-    ac = []
-    for season in SEASONS[now.month - 1]:
+    for season in seasons:
+        human('Getting season {} {}...'.format(season, now.year))
         ac += get_json(
             AL_API + 'browse/anime',
             params={
                 'access_token': token['access_token'],
-                'status': 'currently airing',
                 'year': now.year,
                 'season': season,
                 'full_page': True,
@@ -206,19 +212,27 @@ except ValueError:
     exit_with("Malformed anichart.net JSON.")
 
 airing = {}
+if verbose:
+    human('=== AIRING ===')
 for a in ac:
     airing[normalize(a['title_romaji'])] = a['airing']
     # Sometimes kitsu.io will put english for romaji...
     airing[normalize(a['title_english'])] = a['airing']
+    if verbose:
+        human('\n{}:\n{}'.format(a['title_romaji'], json_pp(a)))
 
 # Create list of series
 anime = []
+if verbose:
+    human('=== KITSU ===')
 for info in kt['data']:
     attrs = info['attributes']
     attrs.update(anime_by_id[info['relationships']['anime']['data']['id']])
     # For currently airing shows, pull in next episode attrs
     attrs.update(airing.get(normalize(attrs['titles']['en_jp'])) or {})
     anime.append(attrs)
+    if verbose:
+        human('\n{}:\n{}'.format(attrs['canonicalTitle'], json_pp(attrs)))
 anime.sort(key=lambda i: i['canonicalTitle'])
 
 # Print info
@@ -256,7 +270,8 @@ for a in anime:
             status = green(time)
         # If we're behind
         elif cur < available:
-            status = yellow('{}/{}'.format(cur, available))
+            printer = green if available != total else yellow
+            status = printer('{}/{}'.format(cur, available))
             machine(u'{} {}'.format(title, cur + 1))
         # If no information available
         elif not available:
