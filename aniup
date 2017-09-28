@@ -95,8 +95,8 @@ if [ -z "$uid" ]; then
   echo "Fetching user ID for $KITSU_USERNAME..."
   uid="$(curl -sfg \
     "$api/users\
-  ?fields[users]=id\
-  &filter[name]=$KITSU_USERNAME" |\
+?fields[users]=id\
+&filter[name]=$KITSU_USERNAME" |\
     jq -r '.data[0].id')"
   maybe_exit "$uid" 'Failed to get user ID.'
 fi
