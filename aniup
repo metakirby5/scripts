@@ -121,12 +121,28 @@ entries="$(curl -sfg \
 maybe_exit "$entries" "No entries found for $KITSU_USERNAME." 0
 
 # Get user selection
-selection="$(fzf --with-nth 2.. <<< "$entries")"
-[ -z "$selection" ] && exit 0
+selection="$(fzf --prompt "Series to increment: " \
+  --with-nth 2.. <<< "$entries")"
+maybe_exit "$selection" "Cancelling." 0
 id="$(cut -f1 <<< "$selection")"
 ep_stats="$(cut -f2 <<< "$selection")"
 anime="$(cut -f3- <<< "$selection")"
 next_ep="$((${ep_stats%%/*} + 1))"
+final_ep="$((${ep_stats##*/}))"
+
+# Request rating if final episode
+rating_twenty=
+rating_info=
+if [ "$next_ep" -eq "$final_ep" ]; then
+  echo "Final episode, requesting rating."
+  rating="$(seq 1 20 |\
+    awk '{print $1 "\t" $1 / 2}' |\
+    fzf --prompt "Rating: " \
+    --with-nth 2..)"
+  maybe_exit "$rating" "No rating provided."
+  rating_twenty="ratingTwenty: $(cut -f1 <<< "$rating"),"
+  rating_info=", rated $(cut -f2 <<< "$rating")"
+fi
 
 json_patch="$(jq -r \
   '. = {
@@ -135,6 +151,7 @@ json_patch="$(jq -r \
       type: "library-entries",
       id: '"$id"',
       attributes: {
+        '"$rating_twenty"'
         progress: '"$next_ep"'
       }
     }
@@ -144,5 +161,5 @@ curl -sfgX PATCH \
   -d "$json_patch" \
   -H 'Content-Type: application/vnd.api+json' \
   "$api/library-entries/$id" &>/dev/null &&
-    echo "Updated $anime to episode $next_ep." ||
+    echo "Updated $anime to episode ${next_ep}${rating_info}." ||
     echo "Failed to update $anime to episode $next_ep."
