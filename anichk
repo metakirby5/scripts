@@ -203,8 +203,8 @@ try:
                 'access_token': token['access_token'],
                 'year': now.year,
                 'season': season,
-                'full_page': True,
-                'airing_data': True,
+                'full_page': 'true',
+                'airing_data': 'true',
             })
 except OSError:
     exit_with("Could not reach anilist.co.")
