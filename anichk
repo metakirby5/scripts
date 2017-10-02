@@ -250,7 +250,7 @@ for a in anime:
     # Only bother if we haven't finished the series
     if not total or cur < total:
         # If we're waiting for next episode
-        if cur == available:
+        if not available or cur == available:
             # Create human-readable countdown
             try:
                 time = naturaltime(
