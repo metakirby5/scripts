@@ -117,7 +117,7 @@ entries="$(curl -sfg \
          value: {title: .attributes.canonicalTitle,
                  eps: .attributes.episodeCount}}) | from_entries
   ) as $index | .data[] | $index[.relationships.anime.data.id] as $entry |
-  "\(.id)\t\(.attributes.progress)/\($entry.eps)\t\($entry.title)"')"
+  "\(.id)\t\(.attributes.progress)/\($entry.eps // "?")\t\($entry.title)"')"
 maybe_exit "$entries" "No entries found for $KITSU_USERNAME." 0
 
 # Get user selection
