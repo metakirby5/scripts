@@ -64,7 +64,7 @@ if [ -f "$token_file" ]; then
         -d "grant_type=refresh_token&refresh_token=$refresh_token" \
         "$oauth/token")"
       [ "$token_json" ] &&
-        jq ".refresh_token = $refresh_token" \
+        jq '.refresh_token = "'$refresh_token'"' \
         <<< "$token_json" > "$token_file"
     fi
   fi
