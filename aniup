@@ -133,7 +133,7 @@ final_ep="${ep_stats##*/}"
 # Request rating if final episode
 rating_twenty=
 rating_info=
-if [ "$next_ep" -eq "$final_ep" ]; then
+if [ "$next_ep" == "$final_ep" ]; then
   echo "Final episode, requesting rating."
   rating="$(seq 1 20 |\
     awk '{print $1 "\t" $1 / 2}' |\
