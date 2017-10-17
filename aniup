@@ -128,7 +128,7 @@ id="$(cut -f1 <<< "$selection")"
 ep_stats="$(cut -f2 <<< "$selection")"
 anime="$(cut -f3- <<< "$selection")"
 next_ep="$((${ep_stats%%/*} + 1))"
-final_ep="$((${ep_stats##*/}))"
+final_ep="${ep_stats##*/}"
 
 # Request rating if final episode
 rating_twenty=
