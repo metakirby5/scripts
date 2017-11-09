@@ -38,6 +38,7 @@ print(driver.title)
 e.click()
 
 while True:
+    # Change this ID to the Waitlist button ID.
     e = driver.find_element_by_id('grid-edit-plan-id-wait-6')
     if not e.get_attribute('disabled'):
         print('ENROLL, NOW!!!')
