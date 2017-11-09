@@ -32,13 +32,15 @@ AL_API = 'https://anilist.co/api/'
 KT_CACHE = os.path.expanduser('~/.cache/kitsu/usernames')
 AL_TOKEN = os.path.expanduser('~/.local/tokens/anilist/client')
 END = '\033[0m'
-LONG_VOWELS = re.compile(r'([aeiou])\1+')
 SEASONS = ('winter', 'spring', 'summer', 'fall')
+RE_LONG_VOWELS = re.compile(r'([aeiou])\1+')
+RE_REPLACES = [(re.compile(pat), replacewith) for pat, replacewith in [
+    (r' \([^)]*\)', r''),                 # (TV), (Web), etc
+    (r'(\d)(st|nd|rd|th) Season', r'\1')  # nth Season
+]]
 OVERRIDES = {
     'Youjo Senki: Saga of Tanya the Evil': 'Youjo Senki',
     'Kobayashi-san Chi no Maid Dragon': 'Kobayashi-san Chi no Maidragon',
-    'Boku no Hero Academia 2nd Season': 'Boku no Hero Academia 2',
-    'Black Clover (TV)': 'Black Clover',
     'Yuuki Yuuna wa Yuusha de Aru: Yuusha no Shou':
     'Yuuki Yuuna wa Yuusha de Aru: Washio Sumi no Shou / Yuusha no Shou',
 }
@@ -46,8 +48,11 @@ OVERRIDES = {
 
 def normalize(s):
     s = OVERRIDES.get(s, s)
-    alnum = ''.join(c.lower() for c in unidecode(s) if c.isalnum())
-    return LONG_VOWELS.sub(r'\1', alnum)
+    for regex, replacewith in RE_REPLACES:
+        s = regex.sub(replacewith, s)
+    s = RE_LONG_VOWELS.sub(r'\1', s)
+    s = ''.join(c.lower() for c in unidecode(s) if c.isalnum())
+    return s
 
 
 def red(s):
