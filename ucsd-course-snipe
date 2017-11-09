@@ -6,6 +6,7 @@ from datetime import datetime
 from getpass import getpass
 from pushbullet import Pushbullet
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 
 def print_noendl(text):
@@ -13,8 +14,15 @@ def print_noendl(text):
     stdout.flush()
 
 
+button_id = input('Waitlist button ID: ')
 pb_key = input('PB API Key: ')
 pb = Pushbullet(pb_key)
+
+
+def print_and_push(text):
+    print(text)
+    pb.push_note('course_snipe.py', text)
+
 
 print('- UCSD Credentials -')
 username = input('Username: ')
@@ -39,11 +47,16 @@ e.click()
 
 while True:
     # Change this ID to the Waitlist button ID.
-    e = driver.find_element_by_id('grid-edit-plan-id-wait-6')
-    if not e.get_attribute('disabled'):
-        print('ENROLL, NOW!!!')
-        pb.push_note('course_snipe.py', 'ENROLL, NOW!!!')
+    try:
+        e = driver.find_element_by_id(button_id)
+    except NoSuchElementException:
+        print_and_push('COULD NOT FIND %s, ERROR!!!' % button_id)
         break
+
+    if not e.get_attribute('disabled'):
+        print_and_push('ENROLL, NOW!!!')
+        break
+
     print_noendl('(%s) Refreshing' % datetime.now())
     for _ in range(5):
         print_noendl('.')
