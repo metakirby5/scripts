@@ -20,7 +20,9 @@ print('- UCSD Credentials -')
 username = input('Username: ')
 password = getpass()
 
-driver = webdriver.Chrome()
+options = webdriver.ChromeOptions()
+options.add_argument('headless')
+driver = webdriver.Chrome(chrome_options=options)
 driver.get('https://act.ucsd.edu/webreg2/start')
 
 e = driver.find_element_by_id('ssousername')
