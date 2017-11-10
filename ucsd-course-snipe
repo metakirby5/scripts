@@ -47,6 +47,7 @@ e.click()
 while True:
     # Change this ID to the Waitlist button ID.
     try:
+        driver.refresh()
         e = driver.find_element_by_id(button_id)
     except Exception as e:
         print_and_push('EXCEPTION: %s' % e)
@@ -61,4 +62,3 @@ while True:
         print_noendl('.')
         time.sleep(1)
     print()
-    driver.refresh()
