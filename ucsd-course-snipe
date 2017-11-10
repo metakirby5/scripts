@@ -6,7 +6,6 @@ from datetime import datetime
 from getpass import getpass
 from pushbullet import Pushbullet
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 
 
 def print_noendl(text):
@@ -49,8 +48,8 @@ while True:
     # Change this ID to the Waitlist button ID.
     try:
         e = driver.find_element_by_id(button_id)
-    except NoSuchElementException:
-        print_and_push('COULD NOT FIND %s, ERROR!!!' % button_id)
+    except Exception as e:
+        print_and_push('EXCEPTION: %s' % e)
         break
 
     if not e.get_attribute('disabled'):
