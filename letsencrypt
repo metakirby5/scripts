@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Updates nginx letsencrypt domains.
-
-domains="$(grep -r '^\s*server_name\s\+[a-zA-Z0-9.-]\+;$' /etc/nginx/ |
-           cut -d' ' -f2 | cut -d';' -f1 | sed 's/^/-d /')"
+# Updates nginx letsencrypt domains by server_name.
 
 /opt/letsencrypt/letsencrypt-auto \
-           certonly -a webroot --webroot-path=/var/www/ssl $domains
+  certonly -a webroot --webroot-path=/var/www/ssl \
+  $(grep -hro '^\s*server_name\s\+[a-zA-Z0-9.-]\+' /etc/nginx/ |
+    awk '{print "-d", $2}')
