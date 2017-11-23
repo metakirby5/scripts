@@ -4,4 +4,4 @@
 /opt/letsencrypt/letsencrypt-auto \
   certonly -a webroot --webroot-path=/var/www/ssl \
   $(grep -hro '^\s*server_name\s\+[a-zA-Z0-9.-]\+' /etc/nginx/ |
-    awk '{print "-d", $2}')
+    sort | uniq | awk '{print "-d", $2}')
