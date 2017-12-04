@@ -3,10 +3,11 @@
 
 LE_BIN='/opt/letsencrypt/letsencrypt-auto'
 domains=$(grep -hro '^\s*server_name\(\s\+[a-zA-Z0-9.-]\+\)\+' /etc/nginx/ |
-  awk '{ $1 = ""; print " " $0 }' | sort | uniq)
+  awk '{ $1 = ""; print $0 }' | tr ' ' '\n' | sort | uniq)
 
 echo "Running $LE_BIN for:"
 echo "$domains"
+echo
 
 $LE_BIN certonly -a webroot --webroot-path=/var/www/ssl \
   $(xargs printf ' -d %s' <<< "$domains")
