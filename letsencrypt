@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 # Updates nginx letsencrypt domains by server_name.
 
-/opt/letsencrypt/letsencrypt-auto \
-  certonly -a webroot --webroot-path=/var/www/ssl \
-  $(grep -hro '^\s*server_name\s\+[a-zA-Z0-9.-]\+' /etc/nginx/ |
-    awk '{ $1 = ""; print $0 }' | sort | uniq | xargs printf ' -d %s')
+LE_BIN='/opt/letsencrypt/letsencrypt-auto'
+domains=$(grep -hro '^\s*server_name\(\s\+[a-zA-Z0-9.-]\+\)\+' /etc/nginx/ |
+  awk '{ $1 = ""; print " " $0 }' | sort | uniq)
+
+echo "Running $LE_BIN for:"
+echo "$domains"
+
+$LE_BIN certonly -a webroot --webroot-path=/var/www/ssl \
+  $(xargs printf ' -d %s' <<< "$domains")
