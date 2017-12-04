@@ -3,7 +3,7 @@
 
 LE_BIN='/opt/letsencrypt/letsencrypt-auto'
 domains=$(grep -hro '^\s*server_name\(\s\+[a-zA-Z0-9.-]\+\)\+' /etc/nginx/ |
-  awk '{ $1 = ""; print $0 }' | tr ' ' '\n' | sort | uniq)
+  awk '{ $1 = ""; print $0 }' | tr '[:space:]' '\n' | sort | uniq)
 
 echo "Running $LE_BIN for:"
 echo "$domains"
