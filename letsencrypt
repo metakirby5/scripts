@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Updates nginx letsencrypt domains by server_name.
+# Updates letsencrypt domains by nginx vhost server_name.
 
 LE_BIN='/opt/letsencrypt/letsencrypt-auto'
-domains=$(grep -hro '^\s*server_name\(\s\+[a-zA-Z0-9.-]\+\)\+' /etc/nginx/ |
+NGINX_ROOT='/etc/nginx/'
+domains=$(grep -hro '^\s*server_name\(\s\+[a-zA-Z0-9.-]\+\)\+' "$NGINX_ROOT" |
   awk '{ $1 = ""; print $0 }' | tr '[:space:]' '\n' |
   awk '{ print length($0), $0 }' | sort -n |
   uniq | cut -d ' ' -f 2-)
 
-echo "Running $LE_BIN for:"
+echo "Running \"$LE_BIN\" for vhosts found in \"$NGINX_ROOT\":"
 echo "$domains"
 echo
 
-$LE_BIN certonly -a webroot --webroot-path=/var/www/ssl \
+"$LE_BIN" certonly -a webroot --webroot-path=/var/www/ssl \
   $(xargs printf ' -d %s' <<< "$domains")
