@@ -70,11 +70,11 @@ while not link.endswith(ext):
     if not links:
         exit_with("Leaf link \"{}\" is not a video.".format(link))
 
-    _, _, next = process.extractOne(
+    _, _, path = process.extractOne(
         search_terms, {l.get('href'): normalize(l.string) for l in links},
         scorer=fuzz.token_set_ratio)
 
-    link = urljoin(base, next)
+    link = urljoin(base, path)
     print('-> {}'.format(unquote_plus(link)))
 program.append(link)
 call(program)
