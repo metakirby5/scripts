@@ -121,7 +121,7 @@ def json_pp(d):
 
 
 def get_json(url, params={}):
-    return json.loads(requests.get(url, params=params).content.decode('utf8'))
+    return json.loads(requests.get(url, params=params).text)
 
 
 # Get user ID
@@ -189,11 +189,11 @@ except:
             'grant_type': 'client_credentials',
             'client_id': AL_ID,
             'client_secret': AL_SECRET,
-        }).content
-    token = json.loads(content.decode('utf8'))
+        }).text
+    token = json.loads(content)
     if 'error' in token:
         exit_with('Error. {error}: {error_description}'.format(**token))
-    with open(AL_TOKEN, 'wb') as f:
+    with open(AL_TOKEN, 'w') as f:
         f.write(content)
 
 # Get currently airing anime
