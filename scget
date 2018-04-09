@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Automatically apply these id3 tags to a Soundcloud track:
+# Downloads a SoundCloud track, then applies these id3 tags:
 #   Title
 #   Artist
 #   Art
 #
 # Dependencies: curl, grep, jq
+#
+# Required environment variables:
+#   $SC_CLIENT: SoundCloud API client ID.
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
@@ -17,12 +20,12 @@ if [ "$missing" ]; then
 fi
 
 usage() {
-  echo "Usage: $(basename "$0") [soundcloud url] [file to tag]"
+  echo "Usage: $(basename "$0") [SoundCloud url]"
   exit 1
 }
 
 # Complain if incorrect args.
-[ "$#" -ne 2 ] && usage
+[ "$#" -ne 1 ] && usage
 
 maybe_exit() {
   if [ -z "$1" ]; then
@@ -37,15 +40,28 @@ data="$(curl -sfg "$1" |
   jq -r '.[4].data[0]')"
 maybe_exit "$data" 'Failed to pull data from url.'
 
-echo 'Fetching image...'
-img="$(<<<"$data" jq -r '.artwork_url' | sed 's/-large/-t500x500/')"
-dest="$(mktemp).${img##*.}"
-curl -sfg -o "$dest" "$img"
+echo 'Fetching song...'
 
-eyeD3 "$2" \
+# Fetch the mp3 url
+mp3_data="$(curl -sfg \
+  "https://api.soundcloud.com/i1/tracks/$( \
+  <<<"$data" jq -r '.id')/streams?client_id=$SC_CLIENT")"
+maybe_exit "$mp3_data" 'Failed to get mp3 url from SoundCloud.'
+
+# Then fetch the mp3
+mp3_file="$(<<<"$data" jq -r '"\(.user.username) - \(.title)"').mp3"
+curl -g -o "$mp3_file" "$(<<<"$mp3_data" jq -r '.http_mp3_128_url')"
+
+echo 'Fetching image...'
+img_url="$(<<<"$data" jq -r '.artwork_url' | sed 's/-large/-t500x500/')"
+img_file="$(mktemp).${img_url##*.}"
+curl -g -o "$img_file" "$img_url"
+
+echo 'Writing tags...'
+eyeD3 "$mp3_file" \
   -t "$(<<<"$data" jq -r '.title')" \
   -a "$(<<<"$data" jq -r '.user.username')" \
-  --add-image "$dest:FRONT_COVER"
+  --add-image "$img_file:FRONT_COVER"
 
 # Clean up.
-rm "$dest"
+rm "$img_file"
