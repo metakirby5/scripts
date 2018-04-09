@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Automatically apply these id3 tags to a Soundcloud track:
+#   Title
+#   Artist
+#   Art
+#
+# Dependencies: curl, grep, jq
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep curl)$(checkdep grep)$(checkdep jq)"
+if [ "$missing" ]; then
+  echo "The following dependencies are missing:$missing"
+  exit 1
+fi
+
+usage() {
+  echo "Usage: $(basename "$0") [soundcloud url] [file to tag]"
+  exit 1
+}
+
+# Complain if incorrect args.
+[ "$#" -ne 2 ] && usage
+
+maybe_exit() {
+  if [ -z "$1" ]; then
+    echo "$2"
+    exit "${3:-1}"
+  fi
+}
+
+echo 'Fetching song data...'
+data="$(curl -sfg "$1" |
+  grep -o 'c=\[.*\],' | grep -o '\[.*\]' |
+  jq -r '.[4].data[0]')"
+maybe_exit "$data" 'Failed to pull data from url.'
+
+echo 'Fetching image...'
+img="$(<<<"$data" jq -r '.artwork_url' | sed 's/-large/-t500x500/')"
+dest="$(mktemp).${img##*.}"
+curl -sfg -o "$dest" "$img"
+
+eyeD3 "$2" \
+  -t "$(<<<"$data" jq -r '.title')" \
+  -a "$(<<<"$data" jq -r '.user.username')" \
+  --add-image "$dest:FRONT_COVER"
+
+# Clean up.
+rm "$dest"
