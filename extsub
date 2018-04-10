@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Runs a command with two arguments:
+# $1, and $1 with the extension substituted for $2.
+
+src="$1"
+dest="${src%.*}.$2"
+shift; shift
+"$@" "$src" "$dest"
