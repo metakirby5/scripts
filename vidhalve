@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Halves video dimensions for uploading to GitLab.
+#
+# Dependencies: ffmpeg
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep ffmpeg)"
+if [ "$missing" ]; then
+  echo "The following dependencies are missing:$missing"
+  exit 1
+fi
+
+usage() {
+  echo "Usage: $(basename "$0") [filename]"
+  exit 1
+}
+
+[ "$#" -ne 1 ] && usage
+
+out="$(mktemp).${1##*.}"
+ffmpeg -i "$1" -vf 'scale=iw/2:-1' "$out"
+mv "$out" "$1"

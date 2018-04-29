@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Gets artifacts from a GitLab job.
+#
+# Dependencies: apk-reinstall, urlencode
+# Environment variables: $GITLAB_TOKEN
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep apk-reinstall)$(checkdep urlencode)"
+if [ "$missing" ]; then
+  echo "The following dependencies are missing:$missing"
+  exit 1
+fi
+
+usage() {
+  echo "Usage: $(basename "$0") [job URL] [output filename]"
+  exit 1
+}
+
+[ "$#" -ne 2 ] && usage
+
+# https://gitlab.domain.com/user/project/-/jobs/12345
+protocol="${1%%://*}"
+strip_protocol="${1##*://}"
+base="$protocol://${strip_protocol%%/*}"
+strip_base="${strip_protocol#*/}"
+project="${strip_base%%/-*}"
+job="${strip_base##*/}"
+
+curl \
+  -o "$2" \
+  --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+  "$base/api/v4/projects/$(urlencode "$project")/jobs/$job/artifacts"
