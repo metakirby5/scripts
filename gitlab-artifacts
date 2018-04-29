@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Gets artifacts from a GitLab job.
+# Gets artifacts from a GitLab job, e.g.
+# https://gitlab.domain.com/user/project/-/jobs/12345
 #
 # Dependencies: apk-reinstall, urlencode
 # Environment variables: $GITLAB_TOKEN
@@ -21,7 +22,6 @@ usage() {
 
 [ "$#" -ne 2 ] && usage
 
-# https://gitlab.domain.com/user/project/-/jobs/12345
 protocol="${1%%://*}"
 strip_protocol="${1##*://}"
 base="$protocol://${strip_protocol%%/*}"
