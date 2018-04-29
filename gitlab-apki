@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Installs an apk found in GitLab job artifacts, e.g.
+# https://gitlab.domain.com/user/project/-/jobs/12345
+#
+# Dependencies: unzip, apk-reinstall, gitlab-artifacts
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep unzip)$(checkdep apk-reinstall)$(checkdep gitlab-artifacts)"
+if [ "$missing" ]; then
+  echo "The following dependencies are missing:$missing"
+  exit 1
+fi
+
+usage() {
+  echo "Usage: $(basename "$0") [job URL]"
+  exit 1
+}
+
+[ "$#" -ne 1 ] && usage
+
+artifacts="$(mktemp).zip"
+artifacts_dir="$(mktemp)_extracted"
+function finish {
+  rm -rf "$artifacts" "$artifacts_dir"
+}
+trap finish EXIT
+
+gitlab-artifacts "$1" "$artifacts" || exit 1
+unzip "$artifacts" -d "$artifacts_dir"
+find "$artifacts_dir" -name '*.apk' | xargs apk-reinstall || exit 1
