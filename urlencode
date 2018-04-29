@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# https://gist.github.com/cdown/1163649
+
+old_lc_collate=$LC_COLLATE
+LC_COLLATE=C
+
+arg="$*"
+length="${#arg}"
+for (( i = 0; i < length; i++ )); do
+  c="${arg:i:1}"
+  case $c in
+    [a-zA-Z0-9.~_-]) printf "$c" ;;
+    *) printf '%%%02X' "'$c" ;;
+  esac
+done
+
+LC_COLLATE=$old_lc_collate
+
