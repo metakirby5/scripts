@@ -29,7 +29,7 @@ strip_base="${strip_protocol#*/}"
 project="${strip_base%%/-*}"
 job="${strip_base##*/}"
 
-curl \
-  -o "$2" \
-  --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-  "$base/api/v4/projects/$(urlencode "$project")/jobs/$job/artifacts"
+endpoint="$base/api/v4/projects/$(urlencode "$project")/jobs/$job/artifacts"
+echo "Retrieving: $endpoint"
+
+curl -o "$2" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$endpoint"
