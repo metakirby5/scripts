@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 # Do an adb operation with a file, pull it, and remove it.
+#
+# Dependencies: adb
 
-if [ "$#" -lt  2 ]; then
-  echo 'Usage: adbf [filename] [commands...]'
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep adb)"
+if [ "$missing" ]; then
+  echo "The following dependencies are missing:$missing"
   exit 1
 fi
+
+usage() {
+  echo "Usage: $(basename "$0") [filename] [commands...]"
+  exit 1
+}
+
+[ "$#" -lt 2 ] && usage
 
 filename="/sdcard/$1"
 shift
