@@ -2,14 +2,14 @@
 # Gets artifacts from a GitLab job, e.g.
 # https://gitlab.domain.com/user/project/-/jobs/12345
 #
-# Dependencies: apk-reinstall, urlencode
+# Dependencies: urlencode, curl
 # Environment variables: $GITLAB_TOKEN
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
 
-missing="$(checkdep apk-reinstall)$(checkdep urlencode)"
+missing="$(checkdep urlencode)$(checkdep curl)"
 if [ "$missing" ]; then
   echo "The following dependencies are missing:$missing"
   exit 1
