@@ -34,7 +34,7 @@ maybe_exit() {
 echo 'Fetching song data...'
 data="$(curl -sfg "$1" |
   grep -o 'c=\[.*\],' | grep -o '\[.*\]' |
-  jq -r '.[4].data[0]')"
+  jq -r '.[].data[0] | select(.title)')"
 maybe_exit "$data" 'Failed to pull data from url.'
 
 echo 'Fetching image...'
