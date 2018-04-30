@@ -42,7 +42,7 @@ img="$(<<<"$data" jq -r '.artwork_url' | sed 's/-large/-t500x500/')"
 dest="$(mktemp).${img##*.}"
 curl -sfg -o "$dest" "$img"
 
-eyeD3 "$2" \
+eyeD3 --encoding utf8 "$2" \
   -t "$(<<<"$data" jq -r '.title')" \
   -a "$(<<<"$data" jq -r '.user.username')" \
   --add-image "$dest:FRONT_COVER"
