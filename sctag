@@ -38,7 +38,8 @@ data="$(curl -sfg "$1" |
 maybe_exit "$data" 'Failed to pull data from url.'
 
 echo 'Fetching image...'
-img="$(<<<"$data" jq -r '.artwork_url' | sed 's/-large/-t500x500/')"
+img="$(<<<"$data" jq -r '.artwork_url // .user.avatar_url' |
+  sed 's/-large/-t500x500/')"
 dest="$(mktemp).${img##*.}"
 curl -sfg -o "$dest" "$img"
 
