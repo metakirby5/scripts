@@ -16,6 +16,7 @@ fi
 
 usage() {
   echo "Usage: $(basename "$0") [job URL] (name pattern) (installer...)"
+  echo "  For iOS: $(basename "$0") [job URL] '*.ipa' ideviceinstaller -i"
   exit 1
 }
 
