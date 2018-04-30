@@ -42,6 +42,7 @@ img="$(<<<"$data" jq -r '.artwork_url' | sed 's/-large/-t500x500/')"
 dest="$(mktemp).${img##*.}"
 curl -sfg -o "$dest" "$img"
 
+eyeD3 --remove-all "$2" &>/dev/null
 eyeD3 --encoding utf8 "$2" \
   -t "$(<<<"$data" jq -r '.title')" \
   -a "$(<<<"$data" jq -r '.user.username')" \
