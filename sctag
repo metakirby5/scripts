@@ -43,11 +43,15 @@ img="$(<<<"$data" jq -r '.artwork_url // .user.avatar_url' |
 dest="$(mktemp).${img##*.}"
 curl -sfg -o "$dest" "$img"
 
-eyeD3 --remove-all "$2" &>/dev/null
-eyeD3 --encoding utf8 "$2" \
-  -t "$(<<<"$data" jq -r '.title')" \
-  -a "$(<<<"$data" jq -r '.user.username')" \
-  --add-image "$dest:FRONT_COVER"
+if [ "$ART_ONLY" ]; then
+  eyeD3 "$2" --add-image "$dest:FRONT_COVER"
+else
+  eyeD3 --remove-all "$2" &>/dev/null
+  eyeD3 --encoding utf8 "$2" \
+    -t "$(<<<"$data" jq -r '.title')" \
+    -a "$(<<<"$data" jq -r '.user.username')" \
+    --add-image "$dest:FRONT_COVER"
+fi
 
 # Clean up.
 rm "$dest"
