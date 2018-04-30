@@ -28,7 +28,7 @@ shift
 
 artifacts="$(mktemp).zip"
 artifacts_dir="$(mktemp)_extracted"
-function finish {
+finish() {
   rm -rf "$artifacts" "$artifacts_dir"
 }
 trap finish EXIT
