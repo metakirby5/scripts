@@ -15,11 +15,15 @@ if [ "$missing" ]; then
 fi
 
 usage() {
-  echo "Usage: $(basename "$0") [job URL]"
+  echo "Usage: $(basename "$0") [job URL] (name pattern) (installer...)"
   exit 1
 }
 
-[ "$#" -ne 1 ] && usage
+[ "$#" -lt 1 ] && usage
+job="$1"
+shift
+name_pat="$1"
+shift
 
 artifacts="$(mktemp).zip"
 artifacts_dir="$(mktemp)_extracted"
@@ -28,6 +32,6 @@ function finish {
 }
 trap finish EXIT
 
-gitlab-artifacts "$1" "$artifacts" || exit 1
+gitlab-artifacts "$job" "$artifacts" || exit 1
 unzip "$artifacts" -d "$artifacts_dir"
-find "$artifacts_dir" -name '*.apk' | xargs apk-reinstall || exit 1
+find "$artifacts_dir" -name "${name_pat:-*.apk}" | xargs "${@:-apk-reinstall}" || exit 1
