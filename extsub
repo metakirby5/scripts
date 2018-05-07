@@ -2,6 +2,13 @@
 # Runs a command with two arguments:
 # $1, and $1 with the extension substituted for $2.
 
+usage() {
+  echo "Usage: $(basename "$0") [source file] [extension] [command...]"
+  exit 1
+}
+
+[ "$#" -lt 2 ] && usage
+
 src="$1"
 dest="${src%.*}.$2"
 shift; shift
