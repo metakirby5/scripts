@@ -2,13 +2,13 @@
 # Installs an apk found in GitLab job artifacts, e.g.
 # https://gitlab.domain.com/user/project/-/jobs/12345
 #
-# Dependencies: mktemp, unzip, apk-reinstall, gitlab-artifacts
+# Dependencies: mktemp, unzip, adb, gitlab-artifacts
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
 
-missing="$(checkdep mktemp)$(checkdep unzip)$(checkdep apk-reinstall)$(checkdep gitlab-artifacts)"
+missing="$(checkdep mktemp)$(checkdep unzip)$(checkdep adb)$(checkdep gitlab-artifacts)"
 if [ "$missing" ]; then
   echo "The following dependencies are missing:$missing"
   exit 1
@@ -35,4 +35,5 @@ trap finish EXIT
 
 gitlab-artifacts "$job" "$artifacts" || exit 1
 unzip "$artifacts" -d "$artifacts_dir"
-find "$artifacts_dir" -name "${name_pat:-*.apk}" | xargs "${@:-apk-reinstall}" || exit 1
+default_cmd=( "adb" "install" "-r" "-d" )
+find "$artifacts_dir" -name "${name_pat:-*.apk}" | xargs "${@:-"${default_cmd[@]}"}" || exit 1
