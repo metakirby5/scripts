@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# This is used to crop the excess background of a gif out.
+
+[ $# -ne 1 ] && exit 1
+
+file="$1"
+bgcolor="$(convert "$file[0]" -format "%[pixel:u.p{0,0}]" info:)"
+convert "$file" -trim -layers TrimBounds out-%03d.miff
+mogrify -background "$bgcolor" -layers flatten out-*.miff
+convert -dispose previous -delay 10 out-*.miff -loop 0 "out-$file"
+rm out-*.miff
