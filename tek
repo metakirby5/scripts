@@ -3,7 +3,7 @@
 # Requires jq.
 
 usage() {
-  echo "USAGE: up2teknik [file]"
+  echo "USAGE: $(basename "$0") [file]"
   exit 1
 }
 

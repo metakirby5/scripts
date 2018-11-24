@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Uploads stdin to ix.io.
+
+curl -sfF 'f:1=<-' ix.io
