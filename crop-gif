@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # This is used to crop the excess background of a gif out.
+#
+# Author: metakirby5
 
 [ $# -ne 1 ] && exit 1
 

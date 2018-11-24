@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Uses settings from "screencast"
+#
+# Author: metakirby5
 
 usage() {
-	echo "USAGE: resize-video [src] [dest] (height) (qmax)"
+  echo "USAGE: $(basename "$0") [src] [dest] (height) (qmax)"
   exit 1
 }
 
@@ -12,5 +14,5 @@ usage() {
 NUM_CORES=$(nproc || gnproc)
 
 ffmpeg -i "$1" -vf scale=-1:${3:-900} -c:v libvpx -qmin 1 -qmax ${4:-10} \
-	-an -threads $NUM_CORES -slices 8 -auto-alt-ref 1 -lag-in-frames 16 \
-	-f webm "$2"
+  -an -threads $NUM_CORES -slices 8 -auto-alt-ref 1 -lag-in-frames 16 \
+  -f webm "$2"

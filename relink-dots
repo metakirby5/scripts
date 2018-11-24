@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 # Relinks configs from source folders to a destination folder.
+#
+# DEPRECATED! I use GNU Stow now.
+#
+# Author: metakirby5
 
 ### CONFIG
 

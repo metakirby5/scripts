@@ -23,7 +23,7 @@ if [[ ! -f $historyfile ]]; then
 fi
 
 todolen=$(wc -l $todofile | cut -d" " -f1)
-str_usage="Usage: todo [e|w|p|p#|pq|px|up|u|u#|q|l|la|h|ha|x|hx] (task(s) | #)"
+str_usage="Usage: $(basename "$0") [e|w|p|p#|pq|px|up|u|u#|q|l|la|h|ha|x|hx] (task(s) | #)"
 
 # Pops from $1 onto $popped ("return value")
 pop() {

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Creates a gif using ffmpeg
+#
+# Author: metakirby5
 
 usage() {
-  echo "USAGE: mkgif [src] [dest] (width)"
+  echo "USAGE: $(basename "$0") [src] [dest] (width)"
   exit 1
 }
 

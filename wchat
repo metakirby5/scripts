@@ -7,7 +7,7 @@
 # A script to emulate a multi-person chatroom using write.
 
 usage() {
-	echo "Usage: wchat [your name] [user1 (pts/XXX)] (user2 (pts/XXX)) (...)"
+	echo "Usage: $(basename "$0") [your name] [user1 (pts/XXX)] (user2 (pts/XXX)) (...)"
 	echo
 }
 

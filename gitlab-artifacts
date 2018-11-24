@@ -4,6 +4,8 @@
 #
 # Dependencies: urlencode, curl
 # Environment variables: $GITLAB_TOKEN
+#
+# Author: metakirby5
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"

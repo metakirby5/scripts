@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Sends a notification once per 30 seconds if the battery is at or below 15%
 # and is not charging.
+#
+# Author: metakirby5
 
 DUNSTIFY_ID="/tmp/bat-notify_dunstify_id"
 

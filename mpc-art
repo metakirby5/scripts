@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Display album art in term, auto-change on song change
-# Note that this will make your cursor invisible. Restore with `tput cnorm`
-# metakirby5
+# Display album art in term, auto-change on song change.
+# Note that this will make your cursor invisible. Restore with `tput cnorm`.
+#
+# Author: metakirby5
 
 CHARHEIGHT=31
 CHARWIDTH=15

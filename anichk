@@ -10,6 +10,8 @@ Required environment variables:
 Optional environment variables:
     $KITSU_USERNAME: The default username to check. Can be overridden with the
         `username` arg.
+
+Author: metakirby5
 """
 
 import os

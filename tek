@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Uploads a file to teknik.io.
 # Requires jq.
+#
+# Author: metakirby5
 
 usage() {
   echo "USAGE: $(basename "$0") [file]"

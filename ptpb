@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# ptpb client.
+#
+# Author: metakirby5
 
 usage() {
   echo "Usage:"

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# anime quotes
+# Notify with anime quotes.
+#
+# Author: metakirby5
 
 usage() {
-  echo "USAGE: aquote [hummingbird.me anime id]"
+  echo "USAGE: $(basename "$0") [hummingbird.me anime id]"
   exit 1
 }
 

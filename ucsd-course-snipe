@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Checks if a course is available for waitlist in UCSD.
+# The webpage has probably changed by now, so this probably won't work.
+#
+# Author: metakirby5
 
 import time
 from sys import stdout

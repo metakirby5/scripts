@@ -5,6 +5,8 @@
 #
 # Optional environment variables:
 #   $KITSU_USERNAME: The default username to check. Can be overriden with $1.
+#
+# Author: metakirby5
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"

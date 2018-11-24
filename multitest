@@ -27,7 +27,7 @@ done
 if [[ $# -lt 3 ]]; then
 	echo
 	echo "tester's all test cases found in provided files, with provided inputs."
-	echo "Usage: multitest (-o | -e) (input sets) [local prog] [solution prog] [arg sets]"
+	echo "Usage: $(basename "$0") (-o | -e) (input sets) [local prog] [solution prog] [arg sets]"
 	echo "    -o -- only test stdout"
 	echo "    -e -- only test stderr"
 	echo

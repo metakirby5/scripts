@@ -48,7 +48,7 @@ fi
 if [[ $# -lt 2 ]]; then
 	echo
 	echo "Diffs program outputs if differences exist."
-	echo "Usage: tester (-v) (-o | -e) (input set) [local prog] [solution prog] (args)"
+	echo "Usage: $(basename "$0") (-v) (-o | -e) (input set) [local prog] [solution prog] (args)"
 	echo "    -v -- vimdiff instead of diff"
 	echo "    -o -- only test stdout"
 	echo "    -e -- only test stderr"

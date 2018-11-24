@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Updates letsencrypt domains by nginx vhost server_name.
+#
+# Author: metakirby5
 
 LE_BIN='/opt/letsencrypt/letsencrypt-auto'
 NGINX_ROOT='/etc/nginx/'

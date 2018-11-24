@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Shows a dancing sudowoodo.
+#
+# Author: metakirby5
 
 frameHeight=15
 ((botline = $(tput lines) - 1))

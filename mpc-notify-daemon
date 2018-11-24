@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Daemon for mpc-notify.
+#
+# Author: metakirby5
 
 # Connect to socket
 exec 3<> /dev/tcp/localhost/6600

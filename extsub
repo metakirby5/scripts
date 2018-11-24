@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Runs a command with two arguments:
 # $1, and $1 with the extension substituted for $2.
+#
+# Author: metakirby5
 
 usage() {
   echo "Usage: $(basename "$0") [source file] [extension] [command...]"

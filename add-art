@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Add album art to music using ffmpeg
+# Add album art to music using ffmpeg.
+#
 # http://stackoverflow.com/questions/18710992/how-to-add-album-art-with-ffmpeg
+# Author: metakirby5
 
 usage() {
-  echo "USAGE: add-art -i [image file / url] [music file(s)]"
+  echo "USAGE: $(basename "$0") -i [image file / url] [music file(s)]"
   exit 1
 }
 

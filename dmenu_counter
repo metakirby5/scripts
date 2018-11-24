@@ -4,6 +4,8 @@ description = """
 Counts how many times a dmenu entry has been run and
 reorders accordingly. Executes dmenu as provided by
 the remaining arguments.
+
+Author: metakirby5
 """
 
 import os

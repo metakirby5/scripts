@@ -11,6 +11,8 @@ Required environment variables:
 Optional environment variables:
     `ANISTRM_PROGRAM`: The program to use to play anime. Defaults to 'mpv',
     and can be overridden with the `--program` flag.
+
+Author: metakirby5
 """
 
 import re

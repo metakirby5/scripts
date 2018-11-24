@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Chains together anichk with anistrm to play a random show.
+#
+# Author: metakirby5
 
 echo "Querying your list..."
 show="$(anichk --porcelain | shuf | head -n1)"

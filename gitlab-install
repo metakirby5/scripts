@@ -3,6 +3,8 @@
 # https://gitlab.domain.com/user/project/-/jobs/12345
 #
 # Dependencies: mktemp, unzip, adb, gitlab-artifacts
+#
+# Author: metakirby5
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"

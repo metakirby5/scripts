@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Assumes you have chrome open and a reasonably fast computer...
-# This script is disgusting
+# This script is disgusting.
+#
+# Author: metakirby5
 
 google-chrome &>/dev/null
 

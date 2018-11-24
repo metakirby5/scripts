@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Runs colorz on an image file to get 6 colors, then stuffs those colors
 # through zenbu.
+#
+# Author: metakirby5
 
 usage() {
-  echo "USAGE: autozb [image file / URL] (primary color) (secondary color)"
+  echo "USAGE: $(basename "$0") [image file / URL] (primary color) (secondary color)"
   echo "Resources will be saved at ~/.local/zenbu/auto/"
   echo "Available colors: red,  green,   yellow,"
   echo "                  blue, magenta, cyan"

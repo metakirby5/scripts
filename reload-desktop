@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Reload the desktop
+# Reload the desktop.
+#
+# Author: metakirby5
 
 killall compton dunst
 

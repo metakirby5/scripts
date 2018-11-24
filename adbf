@@ -2,6 +2,7 @@
 # Do an adb operation with a file, pull it, and remove it.
 #
 # Dependencies: adb
+# Author: metakirby5
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"

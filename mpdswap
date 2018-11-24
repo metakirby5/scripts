@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Swaps between mpd and mopidy.
+#
+# Author: metakirby5
 
 if pgrep -x mpd &>/dev/null; then
   echo "Starting mopidy..."

@@ -2,6 +2,8 @@
 # Halves video dimensions for uploading to GitLab.
 #
 # Dependencies: ffmpeg
+#
+# Author: metakirby5
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"

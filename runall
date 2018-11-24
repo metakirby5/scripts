@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# I think this is a poor man's xargs, I don't really remember.
+#
+# Author: metakirby5
 
 if [[ "$#" -lt 3 || "$#" -gt 4 ]]; then
-	echo "Usage: runall [program] [base dir] [inputs] (done extension)"
+	echo "Usage: $(basename "$0") [program] [base dir] [inputs] (done extension)"
 	exit 0
 fi
 

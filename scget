@@ -8,6 +8,8 @@
 #
 # Required environment variables:
 #   $SC_CLIENT: SoundCloud API client ID.
+#
+# Author: metakirby5
 
 checkdep() {
   which "$1" &>/dev/null || echo " $1"

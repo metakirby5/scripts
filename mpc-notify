@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Sends a dunstify notification with information from mpc -f.
 # Adapted from https://bbs.archlinux.org/viewtopic.php?pid=684807#p684807
+#
+# Author: metakirby5
 
 DUNSTIFY_ID="/tmp/mpc-notify_dunstify_id"
 ALBUM_ART="$(mktemp).png"

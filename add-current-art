@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Add album art to currently playing in mpd
+# Add album art to currently playing in mpd.
+#
+# Author: metakirby5
 
 usage() {
-  echo "USAGE: add-current-art [image file]"
+  echo "USAGE: $(basename "$0") [image file]"
   exit 1
 }
 
