@@ -4,7 +4,7 @@
 # Dependencies: git, urlencode, curl
 # Environment variables: $GITLAB_TOKEN
 #
-# Usage: gitlab-api [endpoint]
+# Usage: gitlab-api (endpoint) (curl args)
 #
 # Author: metakirby5
 
@@ -27,4 +27,4 @@ project_git="${no_user##*:}"
 project="$(urlencode "${project_git%%.*}")"
 base="$host/api/v4/projects/$project"
 
-curl -L --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$base/$1"
+curl -L --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$base/$1" "${@:2}"
