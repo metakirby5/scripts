@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Runs a task for a gitlab job.
+# API calls inferred from repo information.
+#
+# Dependencies: gitlab-api, git, urlencode, curl, jq
+# Environment variables: $GITLAB_TOKEN
+#
+# Usage: gitlab-job [action] [job id]
+#
+# Author: metakirby5
+
+log() {
+  echo "$@" >/dev/stderr
+}
+
+fail() {
+  log "$@"
+  exit 1
+}
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="\
+$(checkdep gitlab-api)\
+$(checkdep git)\
+$(checkdep urlencode)\
+$(checkdep curl)\
+$(checkdep jq)\
+"
+[ "$missing" ] && "The following dependencies are missing:$missing"
+
+usage() {
+  echo "Usage: ${0##*/} [action] [job id]"
+  echo "Actions: artifacts, logs, cancel, retry, play"
+  echo
+  exit 1
+}
+
+[ "$#" -ne 2 ] && usage
+
+call() {
+  gitlab-api "$@" 2>/dev/null
+}
+
+post() {
+  call "$@" --request POST
+}
+
+parse() {
+  jq -r '"\(.status): \(.web_url)"' 2>/dev/null
+}
+
+base="jobs/$2"
+case "$1" in
+  artifacts)
+    call "$base/artifacts" -o artifacts.zip
+    ;;
+  logs)
+    call "$base/trace" | less -r
+    ;;
+  cancel)
+    post "$base/cancel" | parse
+    ;;
+  retry)
+    post "$base/retry" | parse
+    ;;
+  play)
+    post "$base/play" | parse
+    ;;
+  *)
+    usage
+    ;;
+esac
