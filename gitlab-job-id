@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Prints a gitlab job ID.
+# API calls inferred from repo information.
+#
+# Dependencies: gitlab-api, git, urlencode, curl, jq, fzf
+# Environment variables: $GITLAB_TOKEN
+#
+# Usage: gitlab-job-id
+#
+# Author: metakirby5
+
+log() {
+  echo "$@" >/dev/stderr
+}
+
+fail() {
+  log "$@"
+  exit 1
+}
+
+checkdep() {
+  which "$1" &>/dev/null || log " $1"
+}
+
+missing="\
+$(checkdep gitlab-api)\
+$(checkdep git)\
+$(checkdep urlencode)\
+$(checkdep curl)\
+$(checkdep jq)\
+$(checkdep fzf)\
+"
+[ "$missing" ] && "The following dependencies are missing:$missing"
+
+maybe_fail() {
+  [ "$?" -ne 0 ] && fail "$@"
+}
+
+maybe_exit() {
+  [ -z "$1" ] && fail "$2"
+}
+
+call() {
+  gitlab-api "$@" 2>/dev/null
+}
+
+parse() {
+  jq -r "$1 // \"\"" 2>/dev/null
+}
+
+commit="$(git rev-parse --short=8 HEAD)"
+commit_info="$(call "repository/commits/$commit")"
+
+pipeline="$(call "repository/commits/$commit" | parse '.last_pipeline.id')"
+maybe_fail "Pipeline API failed."
+maybe_exit "$pipeline" "No pipeline ID for $commit."
+log "Pipeline: $pipeline"
+
+jobz="$(call "pipelines/$pipeline/jobs" | parse '.[] | "\(.id)\t\(.status)\t\(.name)"')"
+maybe_fail "Jobs API failed."
+maybe_exit "$jobz" "No jobs for $pipeline at $commit."
+
+job="$(<<<"$jobz" fzf --prompt 'Job: ' --with-nth 2..)"
+maybe_exit "$job" "No job selected."
+
+<<<"$job" cut -f 1
