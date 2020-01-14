@@ -17,5 +17,5 @@ missing="$(checkdep gsutil)$(checkdep fzf)"
 
 gsutil ls "$@" | fzf \
   --header 'Tab / Shift-Tab to navigate' \
-  --bind 'tab:reload(gsutil ls {})' \
-  --bind 'btab:reload(bash -c "gsutil ls $(dirname $(dirname {}))")'
+  --bind 'tab:clear-query+reload(gsutil ls {})' \
+  --bind 'btab:clear-query+reload(bash -c "gsutil ls $(dirname $(dirname {}))")'
