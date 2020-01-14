@@ -8,8 +8,12 @@
 #
 # Author: metakirby5
 
+log() {
+  echo "$@" >/dev/stderr
+}
+
 fail() {
-  echo "$@"
+  log "$@"
   exit 1
 }
 
