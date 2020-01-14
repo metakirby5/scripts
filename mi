@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Install a build on a mobile device.
+# Automatically detects whether it's iOS or Android.
+#
+# Author: metakirby5
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep adb)$(checkdep ideviceinstaller)"
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
+
+usage() {
+  echo "USAGE: ${0##*/} [file]"
+  echo
+  echo "  Install a build on a mobile device."
+  echo "  Automatically detects whether it's iOS or Android."
+  echo
+  exit 1
+}
+
+[ "$#" -ne 1 ] && usage
+
+ext="${1##*.}"
+case "$ext" in
+  apk)
+    adb install -rd "$1"
+    ;;
+  ipa)
+    ideviceinstaller -i "$1"
+    ;;
+  *)
+    echo "Unable to handle extension $ext."
+    ;;
+esac
