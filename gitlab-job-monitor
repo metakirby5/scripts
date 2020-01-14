@@ -59,6 +59,7 @@ spin() {
 while :; do
   case "$(call "jobs/$1" | parse)" in
     failed|success|canceled)
+      echo
       exit 0
       ;;
   esac
