@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# gsutil file picker.
+#
+# Author: metakirby5
+
+fail() {
+  echo "$@"
+  exit 1
+}
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep gsutil)$(checkdep fzf)"
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
+
+gsutil ls "$@" | fzf \
+  --header 'Tab / Shift-Tab to navigate' \
+  --bind 'tab:reload(gsutil ls {})' \
+  --bind 'btab:reload(bash -c "gsutil ls $(dirname $(dirname {}))")' \
+
