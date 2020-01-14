@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Calls a gitlab endpoint based on the repo information.
+#
+# Dependencies: git, urlencode, curl
+# Environment variables: $GITLAB_TOKEN
+#
+# Usage: gitlab-api [endpoint]
+#
+# Author: metakirby5
+
+fail() {
+  echo "$@"
+  exit 1
+}
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="$(checkdep git)$(checkdep urlencode)$(checkdep curl)"
+[ "$missing" ] && "The following dependencies are missing:$missing"
+
+remote="$(git config --get remote.origin.url)"
+no_user="${remote##*@}"
+host="${no_user%%:*}"
+project_git="${no_user##*:}"
+project="$(urlencode "${project_git%%.*}")"
+base="$host/api/v4/projects/$project"
+
+curl -L --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$base/$1"
