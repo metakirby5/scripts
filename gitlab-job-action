@@ -62,7 +62,7 @@ case "$1" in
     call "$base" | parse '.name'
     ;;
   artifacts)
-    call "$base/artifacts" -o artifacts.zip
+    gitlab-api "$base/artifacts" -o artifacts.zip
     ;;
   logs)
     call "$base/trace" | less -r
