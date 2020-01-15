@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Interactive interface for gitlab jobs.
+# API calls inferred from repo information.
+#
+# Dependencies: gitlab-job-id, gitlab-job-action, gitlab-job-monitor,
+#               gitlab-api, git, urlencode, curl, jq, fzf, pb
+# Environment variables: $GITLAB_TOKEN
+#
+# Usage: gitlab-job-interactive
+#
+# Author: metakirby5
+
+set -e
+
+log() {
+  echo "$@" >/dev/stderr
+}
+
+fail() {
+  log "$@"
+  exit 1
+}
+
+maybe_fail() {
+  [ "$?" -ne 0 ] && fail "$@"
+}
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="\
+$(checkdep gitlab-job-id)\
+$(checkdep gitlab-job-action)\
+$(checkdep gitlab-job-monitor)\
+$(checkdep gitlab-api)\
+$(checkdep git)\
+$(checkdep urlencode)\
+$(checkdep curl)\
+$(checkdep jq)\
+$(checkdep fzf)\
+$(checkdep pb)\
+"
+[ "$missing" ] && "The following dependencies are missing:$missing"
+
+job="$(gitlab-job-id)"
+name="$(gitlab-job-action name "$job")"
+desc="$name ($job)"
+log "Job: $desc"
+
+monitor-and-notify() {
+  gitlab-job-monitor "$job"
+  pb push -d 0 "$desc done!"
+}
+
+action="$(fzf --prompt 'Action: ' <<EOF
+artifacts
+logs
+cancel
+retry
+retry + monitor
+play
+play + monitor
+monitor
+EOF
+)"
+
+case "$action" in
+  artifacts|logs|cancel|retry|play)
+    gitlab-job-action "$action" "$job"
+    ;;
+  *\ +\ monitor)
+    base_action="${action%% *}"
+    gitlab-job-action "$base_action" "$job"
+    monitor-and-notify
+    ;;
+  monitor)
+    monitor-and-notify
+    ;;
+  *)
+    fail "Invalid action $action."
+    ;;
+esac
