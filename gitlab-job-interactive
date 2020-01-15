@@ -48,7 +48,7 @@ monitor-and-notify() {
   pb push -d 0 "$name done!"
 }
 
-action="$(fzf --prompt 'Action: ' <<EOF
+action="$(fzf --prompt "$name: " <<EOF
 artifacts
 logs
 cancel
