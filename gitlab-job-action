@@ -53,7 +53,7 @@ parse() {
 }
 
 parse-status() {
-  parse '"\(.status): \(.web_url)"'
+  parse '"\(.id)\t\(.status)\t\(.web_url)"'
 }
 
 base="jobs/$2"

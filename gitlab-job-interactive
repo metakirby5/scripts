@@ -21,10 +21,6 @@ fail() {
   exit 1
 }
 
-maybe_fail() {
-  [ "$?" -ne 0 ] && fail "$@"
-}
-
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
@@ -45,12 +41,11 @@ $(checkdep pb)\
 
 job="$(gitlab-job-id)"
 name="$(gitlab-job-action name "$job")"
-desc="$name ($job)"
-log "Job: $desc"
+log "Job: $name ($job)"
 
 monitor-and-notify() {
-  gitlab-job-monitor "$job"
-  pb push -d 0 "$desc done!"
+  gitlab-job-monitor "$1"
+  pb push -d 0 "$name done!"
 }
 
 action="$(fzf --prompt 'Action: ' <<EOF
@@ -71,11 +66,14 @@ case "$action" in
     ;;
   *\ +\ monitor)
     base_action="${action%% *}"
-    gitlab-job-action "$base_action" "$job"
-    monitor-and-notify
+    result="$(gitlab-job-action "$base_action" "$job")"
+    log "$result"
+
+    new_job="$(<<<"$result" cut -f 1)"
+    monitor-and-notify "$new_job"
     ;;
   monitor)
-    monitor-and-notify
+    monitor-and-notify "$job"
     ;;
   *)
     fail "Invalid action $action."

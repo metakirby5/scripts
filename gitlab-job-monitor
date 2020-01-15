@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Monitors a gitlab job for completion: failed, success, or canceled.
-# Checks every minute.
+# Checks every 10 seconds.
 # API calls inferred from repo information.
 #
 # Dependencies: gitlab-api, git, urlencode, curl, jq
@@ -17,6 +17,10 @@ log() {
 fail() {
   log "$@"
   exit 1
+}
+
+maybe_fail() {
+  [ "$?" -ne 0 ] && fail "$@"
 }
 
 checkdep() {
@@ -57,14 +61,17 @@ spin() {
 }
 
 while :; do
-  case "$(call "jobs/$1" | parse)" in
+  job_status="$(call "jobs/$1" | parse)"
+  maybe_fail 'Jobs API failed.'
+
+  case "$job_status" in
     failed|success|canceled)
       echo
       exit 0
       ;;
   esac
 
-  for i in {1..600}; do
+  for i in {1..100}; do
     spin
     sleep 0.1
   done

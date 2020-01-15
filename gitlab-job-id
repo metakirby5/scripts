@@ -60,7 +60,7 @@ jobz="$(call "pipelines/$pipeline/jobs" | parse '.[] | "\(.id)\t\(.status)\t\(.n
 maybe_fail "Jobs API failed."
 maybe_exit "$jobz" "No jobs for $pipeline at $commit."
 
-job="$(<<<"$jobz" fzf --prompt 'Job: ' --with-nth 2..)"
+job="$(<<<"$jobz" fzf --prompt 'Job: ')"
 maybe_exit "$job" "No job selected."
 
 <<<"$job" cut -f 1
