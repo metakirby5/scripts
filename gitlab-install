@@ -37,5 +37,5 @@ trap finish EXIT
 
 gitlab-artifacts "$job" "$artifacts" || exit 1
 unzip "$artifacts" -d "$artifacts_dir"
-default_cmd=( "adb" "install" "-rd" )
+default_cmd=( "adb" "install" "-r" "-d" )
 find "$artifacts_dir" -name "${name_pat:-*.apk}" | xargs "${@:-"${default_cmd[@]}"}" || exit 1

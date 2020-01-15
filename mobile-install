@@ -25,7 +25,7 @@ usage() {
 ext="${1##*.}"
 case "$ext" in
   apk)
-    adb install -rd "$1"
+    adb install -r -d "$1"
     ;;
   ipa)
     ideviceinstaller -i "$1"
