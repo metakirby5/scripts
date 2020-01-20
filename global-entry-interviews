@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Simple script to check global entry interview times.
+#
+# Dependencies: curl, jq
+#
+# Usage: global-entry-interviews [location ID] [date description...]
+#
+# Author: metakirby5
+
+set -e
+
+log() {
+  echo "$@" >/dev/stderr
+}
+
+fail() {
+  log "$@"
+  exit 1
+}
+
+checkdep() {
+  which "$1" &>/dev/null || echo " $1"
+}
+
+missing="\
+$(checkdep curl)\
+$(checkdep jq)\
+"
+[ "$missing" ] && "The following dependencies are missing:$missing"
+
+usage() {
+  echo "Usage: ${0##*/} [location ID] [date description...]"
+  echo "Date description: e.g. '7 days'"
+  echo
+  exit 1
+}
+
+[ "$#" -lt 2 ] && usage
+
+location_id="$1"
+shift
+
+date="$(date -d "$*" '+%Y-%m-%d')"
+url="https://ttp.cbp.dhs.gov/schedulerapi/slots?\
+orderBy=soonest&\
+locationId=$location_id&\
+filterTimestampBy=before&\
+timestamp=$date"
+
+curl "$url" 2>/dev/null |
+  jq -r '.[] | "\(.startTimestamp):00Z" | fromdate | strftime("%c")'
