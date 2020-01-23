@@ -27,7 +27,12 @@ apps=(
   com.eg.android.AlipayGphone
 )
 
+pm() {
+  adb -s "127.0.0.1:4444" shell pm "$@"
+}
+
 for app in ${apps[@]}; do
   echo "$app"
-  adb -s 127.0.0.1:4444 shell pm uninstall -k --user 0 "$app"
+  pm uninstall --user 0 "$app"
+  pm disable-user --user 0 "$app"
 done
