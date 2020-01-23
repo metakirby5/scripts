@@ -30,7 +30,8 @@ $(checkdep curl)\
 $(checkdep jq)\
 $(checkdep fzf)\
 "
-[ "$missing" ] && "The following dependencies are missing:$missing"
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
+[ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 maybe_fail() {
   [ "$?" -ne 0 ] && fail "$@"

@@ -7,15 +7,22 @@
 #
 # Author: metakirby5
 
+log() {
+  echo "$@" >/dev/stderr
+}
+
+fail() {
+  log "$@"
+  exit 1
+}
+
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
 
 missing="$(checkdep urlencode)$(checkdep curl)"
-if [ "$missing" ]; then
-  echo "The following dependencies are missing:$missing"
-  exit 1
-fi
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
+[ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 usage() {
   echo "Usage: $(basename "$0") [job URL] [output filename]"

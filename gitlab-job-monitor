@@ -19,10 +19,6 @@ fail() {
   exit 1
 }
 
-maybe_fail() {
-  [ "$?" -ne 0 ] && fail "$@"
-}
-
 checkdep() {
   which "$1" &>/dev/null || echo " $1"
 }
@@ -34,7 +30,8 @@ $(checkdep urlencode)\
 $(checkdep curl)\
 $(checkdep jq)\
 "
-[ "$missing" ] && "The following dependencies are missing:$missing"
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
+[ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 usage() {
   echo "Usage: ${0##*/} [job id]"
@@ -61,8 +58,7 @@ spin() {
 }
 
 while :; do
-  job_status="$(call "jobs/$1" | parse)"
-  maybe_fail 'Jobs API failed.'
+  job_status="$(call "jobs/$1" | parse)" || fail 'Jobs API failed.'
 
   case "$job_status" in
     failed|success|canceled)

@@ -22,7 +22,8 @@ checkdep() {
 }
 
 missing="$(checkdep git)$(checkdep urlencode)$(checkdep curl)"
-[ "$missing" ] && "The following dependencies are missing:$missing"
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
+[ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 remote="$(git config --get remote.origin.url)"
 no_user="${remote##*@}"
