@@ -26,7 +26,7 @@ missing="\
 $(checkdep curl)\
 $(checkdep jq)\
 "
-[ "$missing" ] && "The following dependencies are missing:$missing"
+[ "$missing" ] && fail "The following dependencies are missing:$missing"
 
 usage() {
   echo "Usage: ${0##*/} [location ID] [date description...]"
