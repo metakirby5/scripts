@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Unintalls bloatware from the Fossil Sport smartwatch.
+
+set -e
+
+apps=(
+  com.dianping.v1
+  com.sogou.map.android.maps
+  com.sdu.didi.psnger
+  com.mobvoi.wear.fitness.aw
+  com.mobvoi.ticwear.sidewearvoicesearch
+  com.mobvoi.wear.social.aw
+  com.mobvoi.wear.account.aw
+  com.fossil.wearables.ds
+  com.fossil.wearables.ks
+  com.fossil.wearables.mk
+  com.fossil.wearables.ms
+  com.fossil.wearables.pu
+  com.mobvoi.wear.appsservice
+  com.mobvoi.wear.health.aw
+  com.mobvoi.wear.neteasemusic.aw
+  com.google.android.inputmethod.pinyin
+  com.mobvoi.ticwear.aw.appstore
+  ctrip.android.view
+  com.gotokeep.androidwear
+  com.amberweather.watch
+  com.eg.android.AlipayGphone
+)
+
+for app in ${apps[@]}; do
+  echo "$app"
+  adb -s 127.0.0.1:4444 shell pm uninstall -k --user 0 "$app"
+done
