@@ -6,7 +6,7 @@
 #               gitlab-api, git, urlencode, curl, jq, fzf, pb
 # Environment variables: $GITLAB_TOKEN
 #
-# Usage: gitlab-job-interactive
+# Usage: gitlab-job-interactive (git ref)
 #
 # Author: metakirby5
 
@@ -40,7 +40,7 @@ $(checkdep pb)\
 [ "$missing" ] && fail "The following dependencies are missing:$missing"
 [ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
-job="$(gitlab-job-id)"
+job="$(gitlab-job-id "$@")"
 name="$(gitlab-job-action name "$job")"
 log "Job: $name ($job)"
 
