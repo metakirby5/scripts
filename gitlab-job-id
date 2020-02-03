@@ -49,10 +49,17 @@ parse() {
   jq -r "$1 // \"\"" 2>/dev/null
 }
 
-commit="$(git rev-parse --short=8 "${1:-HEAD}")"
-commit_info="$(call "repository/commits/$commit")"
+cache=/tmp/gitlab-job-id
+mkdir -p "$cache"
 
-pipeline="$(call "repository/commits/$commit" | parse '.last_pipeline.id')"
+commit="$(git rev-parse --short=8 "${1:-HEAD}")"
+
+# Use cached pipeline info if we can, and cache it if we look it up.
+cached="$cache/$commit"
+pipeline="$(cat "$cached" 2>/dev/null)" ||
+  pipeline="$(call "repository/commits/$commit" | parse '.last_pipeline.id')" &&
+  <<<"$pipeline" cat > "$cached"
+
 maybe_fail "Pipeline API failed."
 maybe_exit "$pipeline" "No pipeline ID for $commit."
 log "Pipeline: $pipeline"
