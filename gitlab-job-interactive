@@ -50,6 +50,7 @@ monitor-and-notify() {
 }
 
 action="$(fzf --prompt "$name: " <<EOF
+info
 artifacts
 logs
 cancel
@@ -62,7 +63,7 @@ EOF
 )"
 
 case "$action" in
-  artifacts|logs|cancel|retry|play)
+  info|artifacts|logs|cancel|retry|play)
     gitlab-job-action "$action" "$job"
     ;;
   *\ +\ monitor)

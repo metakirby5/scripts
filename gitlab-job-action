@@ -34,7 +34,7 @@ $(checkdep jq)\
 
 usage() {
   echo "Usage: ${0##*/} [action] [job id]"
-  echo "Actions: name, artifacts, logs, cancel, retry, play"
+  echo "Actions: name, info, artifacts, logs, cancel, retry, play"
   echo
   exit 1
 }
@@ -61,6 +61,20 @@ base="jobs/$2"
 case "$1" in
   name)
     call "$base" | parse '.name'
+    ;;
+  info)
+    call "$base" | jq -r '
+def date: if . then sub("\\.[^Z]*"; "") | fromdate | strftime("%c") else "-" end;
+"
+  \(.name) (\(.id)): \(.status)
+  \(.pipeline.ref) (\(.pipeline.sha))
+  \(.web_url)
+    Runner:\t\(.runner.description // "-")
+    Created:\t\(.created_at | date)
+    Started:\t\(.started_at | date)
+    Finished:\t\(.finished_at | date)
+"
+    '
     ;;
   artifacts)
     gitlab-api "$base/artifacts" -o artifacts.zip
