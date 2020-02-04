@@ -3,7 +3,7 @@
 # API calls inferred from repo information.
 #
 # Dependencies: gitlab-api, git, urlencode, curl, jq, fzf
-# Environment variables: $GITLAB_TOKEN
+# Environment variables: $GITLAB_TOKEN, $NO_CACHE
 #
 # Usage: gitlab-job-id (git ref)
 #
@@ -56,7 +56,7 @@ commit="$(git rev-parse --short=8 "${1:-HEAD}")"
 
 # Use cached pipeline info if we can, and cache it if we look it up.
 cached="$cache/$commit"
-pipeline="$(cat "$cached" 2>/dev/null)" ||
+[ -z "$NO_CACHE" ] && pipeline="$(cat "$cached" 2>/dev/null)" ||
   pipeline="$(call "repository/commits/$commit" | parse '.last_pipeline.id')" &&
   <<<"$pipeline" cat > "$cached"
 
