@@ -15,9 +15,9 @@ anime="$(echo "$1" |\
 len=50
 
 notify() {
-  if which notify-send &>/dev/null; then
+  if type notify-send &>/dev/null; then
     notify-send -a 'aquote' "$1" "$2"
-  elif which osascript &>/dev/null; then
+  elif type osascript &>/dev/null; then
     osascript -e "display notification \"$(tr -d \" <<< "$2")\" \
 with title \"$(tr -d \" <<< "$1")\""
   else

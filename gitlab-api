@@ -18,7 +18,7 @@ fail() {
 }
 
 checkdep() {
-  which "$1" &>/dev/null || echo " $1"
+  type "$1" &>/dev/null || echo " $1"
 }
 
 missing="$(checkdep git)$(checkdep urlencode)$(checkdep curl)"

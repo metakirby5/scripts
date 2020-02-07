@@ -12,7 +12,7 @@
 # Author: metakirby5
 
 checkdep() {
-  which "$1" &>/dev/null || echo " $1"
+  type "$1" &>/dev/null || echo " $1"
 }
 
 missing="$(checkdep curl)$(checkdep grep)$(checkdep jq)"
