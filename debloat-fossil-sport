@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # Unintalls bloatware from the Fossil Sport smartwatch.
 
-set -e
-
 apps=(
   com.amberweather.watch
   com.dianping.v1
   com.eg.android.AlipayGphone
+  com.fossil.charge.darter
   com.fossil.wearables.ds
   com.fossil.wearables.ks
   com.fossil.wearables.mk
@@ -22,8 +21,11 @@ apps=(
   com.mobvoi.wear.health.aw
   com.mobvoi.wear.neteasemusic.aw
   com.mobvoi.wear.social.aw
+  com.nike.plusgps
+  com.safetrekapp.safetrek
   com.sdu.didi.psnger
   com.sogou.map.android.maps
+  com.spotify.music
   ctrip.android.view
 )
 
@@ -32,7 +34,7 @@ pm() {
 }
 
 for app in ${apps[@]}; do
-  echo "$app"
-  pm uninstall --user 0 "$app"
-  pm disable-user --user 0 "$app"
+  echo "=== $app"
+  echo "Uninstall: $(pm uninstall --user 0 "$app")"
+  echo "Disable: $(pm disable-user --user 0 "$app" 2>/dev/null || echo "Skipped")"
 done
