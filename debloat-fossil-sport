@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Unintalls bloatware from the Fossil Sport smartwatch.
-# Usage: debloat-fossil-sport [device id]
 
 set -e
 
@@ -28,11 +27,8 @@ apps=(
   ctrip.android.view
 )
 
-[ "$#" -ne 1 ] && echo 'Missing device id!'
-id="$1"; shift
-
 pm() {
-  adb -s "$id" shell pm "$@"
+  adb shell pm "$@"
 }
 
 for app in ${apps[@]}; do
