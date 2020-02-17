@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Unintalls bloatware from the Fossil Sport smartwatch.
+# Usage: debloat-fossil-sport [adb args]
 
 set -e
 
@@ -27,8 +28,10 @@ apps=(
   com.eg.android.AlipayGphone
 )
 
+args="$@"
+
 pm() {
-  adb -s "127.0.0.1:4444" shell pm "$@"
+  adb "$args" shell pm "$@"
 }
 
 for app in ${apps[@]}; do
