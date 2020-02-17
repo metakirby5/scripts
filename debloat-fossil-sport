@@ -5,27 +5,27 @@
 set -e
 
 apps=(
+  com.amberweather.watch
   com.dianping.v1
-  com.sogou.map.android.maps
-  com.sdu.didi.psnger
-  com.mobvoi.wear.fitness.aw
-  com.mobvoi.ticwear.sidewearvoicesearch
-  com.mobvoi.wear.social.aw
-  com.mobvoi.wear.account.aw
+  com.eg.android.AlipayGphone
   com.fossil.wearables.ds
   com.fossil.wearables.ks
   com.fossil.wearables.mk
   com.fossil.wearables.ms
   com.fossil.wearables.pu
+  com.google.android.inputmethod.pinyin
+  com.gotokeep.androidwear
+  com.mobvoi.ticwear.aw.appstore
+  com.mobvoi.ticwear.sidewearvoicesearch
+  com.mobvoi.wear.account.aw
   com.mobvoi.wear.appsservice
+  com.mobvoi.wear.fitness.aw
   com.mobvoi.wear.health.aw
   com.mobvoi.wear.neteasemusic.aw
-  com.google.android.inputmethod.pinyin
-  com.mobvoi.ticwear.aw.appstore
+  com.mobvoi.wear.social.aw
+  com.sdu.didi.psnger
+  com.sogou.map.android.maps
   ctrip.android.view
-  com.gotokeep.androidwear
-  com.amberweather.watch
-  com.eg.android.AlipayGphone
 )
 
 [ "$#" -ne 1 ] && echo 'Missing device id!'
