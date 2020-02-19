@@ -46,7 +46,7 @@ log "Job: $name ($job)"
 
 monitor-and-notify() {
   gitlab-job-monitor "$1"
-  pb push -d 0 "$name done!"
+  ntfy send "$name done!"
 }
 
 action="$(fzf --prompt "$name: " <<EOF
