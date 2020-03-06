@@ -16,13 +16,14 @@ if [ "$missing" ]; then
 fi
 
 usage() {
-  echo "Usage: $(basename "$0") [filename]"
+  echo "Usage: $(basename "$0") [filename] (new height)"
   exit 1
 }
 
-[ "$#" -ne 1 ] && usage
+[ "$#" -lt 1 ] && usage
 
 out="$(mktemp).${1##*.}"
-ffmpeg -i "$1" -vf 'scale=-2:ih/2' "$out" &&
+ffmpeg -i "$1" -max_muxing_queue_size 4000 \
+  -vf "scale=trunc(oh*a/2)*2:${2:-ih/2}" "$out" &&
   mv "$out" "$1" ||
   rm "$out"
