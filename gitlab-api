@@ -25,7 +25,7 @@ missing="$(checkdep git)$(checkdep urlencode)$(checkdep curl)"
 [ "$missing" ] && fail "The following dependencies are missing:$missing"
 [ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
-remote="$(git config --get remote.origin.url)"
+remote="$(git remote get-url --push origin)"
 no_user="${remote##*@}"
 host="${no_user%%:*}"
 project_git="${no_user##*:}"
