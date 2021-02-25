@@ -24,6 +24,6 @@ usage() {
 
 out="$(mktemp).${1##*.}"
 ffmpeg -i "$1" -max_muxing_queue_size 4000 \
-  -vf "scale=trunc(oh*a/2)*2:${2:-ih/2}" "$out" &&
+  -vf "scale=trunc(oh*a/2)*2:trunc(${2:-ih/2}/2)*2" "$out" &&
   mv "$out" "$1" ||
   rm "$out"
