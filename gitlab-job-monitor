@@ -58,7 +58,7 @@ spin() {
 }
 
 while :; do
-  job_status="$(call "jobs/$1" | parse)" || fail 'Jobs API failed.'
+  job_status="$(call "jobs/${1##*/}" | parse)" || fail 'Jobs API failed.'
 
   case "$job_status" in
     failed|success|canceled)
