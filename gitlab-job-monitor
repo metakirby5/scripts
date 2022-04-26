@@ -6,7 +6,7 @@
 # Dependencies: gitlab-api, git, urlencode, curl, jq
 # Environment variables: $GITLAB_TOKEN
 #
-# Usage: gitlab-job-monitor [job id]
+# Usage: gitlab-job-monitor [job ids...]
 #
 # Author: metakirby5
 
@@ -34,12 +34,12 @@ $(checkdep jq)\
 [ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 usage() {
-  echo "Usage: ${0##*/} [job id]"
+  echo "Usage: ${0##*/} [job ids...]"
   echo
   exit 1
 }
 
-[ "$#" -ne 1 ] && usage
+[ "$#" -lt 1 ] && usage
 
 call() {
   gitlab-api "$@" 2>/dev/null
@@ -52,23 +52,35 @@ parse() {
 # Loading spinner: https://unix.stackexchange.com/a/225183
 i=1
 sp="/-\|"
-echo -n 'Monitoring...  '
 spin() {
   printf "\b${sp:i++%${#sp}:1}"
 }
 
-while :; do
-  job_status="$(call "jobs/${1##*/}" | parse)" || fail 'Jobs API failed.'
+while [ "$#" -gt 0 ]; do
+  while :; do
+    job=${1##*/}
+    echo -n "Monitoring job ID $job...  "
 
-  case "$job_status" in
-    failed|success|canceled)
-      echo
-      exit 0
-      ;;
-  esac
+    job_info="$(call "jobs/$job")" || fail 'Jobs API failed.'
+    job_status="$(parse <<<"$job_info")" || fail 'Jobs status parse failed.'
 
-  for i in {1..100}; do
-    spin
-    sleep 0.1
+    case "$job_status" in
+      failed|success|canceled)
+        echo
+        break
+        ;;
+      null)
+        echo
+        echo 'No job status.'
+        echo "$job_info"
+        break
+        ;;
+    esac
+
+    for i in {1..100}; do
+      spin
+      sleep 0.1
+    done
   done
+  shift
 done
