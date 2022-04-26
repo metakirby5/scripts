@@ -55,23 +55,25 @@ sp="/-\|"
 spin() {
   printf "\b${sp:i++%${#sp}:1}"
 }
+end_spin() {
+  printf "\b$*\n"
+}
 
 while [ "$#" -gt 0 ]; do
-  while :; do
-    job=${1##*/}
-    echo -n "Monitoring job ID $job...  "
+  job=${1##*/}
+  echo -n "Monitoring job ID $job...  "
 
+  while :; do
     job_info="$(call "jobs/$job")" || fail 'Jobs API failed.'
     job_status="$(parse <<<"$job_info")" || fail 'Jobs status parse failed.'
 
     case "$job_status" in
       failed|success|canceled)
-        echo
+        end_spin "$job_status"
         break
         ;;
       null)
-        echo
-        echo 'No job status.'
+        end_spin 'Response: No job status.'
         echo "$job_info"
         break
         ;;
@@ -82,5 +84,7 @@ while [ "$#" -gt 0 ]; do
       sleep 0.1
     done
   done
+
+  echo
   shift
 done
