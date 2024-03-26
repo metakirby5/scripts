@@ -7,8 +7,11 @@ sp="/-\|"
 
 # https://stackoverflow.com/a/42284788
 while IFS= read -r line; do
+  cols="$(tput cols)"
+  trimmed="${line:0:$(( cols - 2 ))}"
+
   # LF, whitespace, LF, content
-  printf '\r%s\r%s%s' "  ${prev//?/ }" "${sp:i++%${#sp}:1} " "$line"
-  prev="$line"
+  printf '\r%s\r%s%s' "  ${prev//?/ }" "${sp:i++%${#sp}:1} " "$trimmed"
+  prev="$trimmed"
 done
 echo
