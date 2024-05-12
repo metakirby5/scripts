@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# List bitwarden passwords in sorted order.
+
+bw sync
+bw list items |
+  jq -r '
+    sort_by(.login.password) |
+    .[] | [.name, .login.password // "-", .revisionDate] | @tsv
+  ' |
+  column -ts $'\t' | less
