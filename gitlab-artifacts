@@ -25,11 +25,11 @@ missing="$(checkdep urlencode)$(checkdep curl)"
 [ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 usage() {
-  echo "Usage: $(basename "$0") [job URL] [output filename]"
+  echo "Usage: $(basename "$0") [job URL] [output filename] [artifact path]"
   exit 1
 }
 
-[ "$#" -ne 2 ] && usage
+[ "$#" -lt 2 ] && usage
 
 protocol="${1%%://*}"
 strip_protocol="${1##*://}"
@@ -38,7 +38,7 @@ strip_base="${strip_protocol#*/}"
 project="${strip_base%%/-*}"
 job="${strip_base##*/}"
 
-endpoint="$base/api/v4/projects/$(urlencode "$project")/jobs/$job/artifacts"
+endpoint="$base/api/v4/projects/$(urlencode "$project")/jobs/$job/artifacts/$3"
 echo "Retrieving: $endpoint"
 
 curl -o "$2" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$endpoint"
