@@ -25,7 +25,7 @@ missing="$(checkdep urlencode)$(checkdep curl)"
 [ -z "$GITLAB_TOKEN" ] && fail 'Missing $GITLAB_TOKEN!'
 
 usage() {
-  echo "Usage: $(basename "$0") [job URL] [output filename] [artifact path]"
+  echo "Usage: $(basename "$0") [job URL] [output filename] (artifact path)"
   exit 1
 }
 
